@@ -16,7 +16,7 @@
           <Button text icon="pi pi-minus" label="Collapse All" @click="collapseAll" />
         </div></div>
       </template>
-      <Column expander style="width: 5rem" />
+      <Column expander style="width: 5rem " />
       <Column field="title" header="List elements" :headerStyle="{ height: '4.5rem' }">
         <template #body="{ data, field }">
           <div class="flex items-center space-x-4">
@@ -68,13 +68,16 @@
 <script setup>
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 const props = defineProps({
   tableData: Object,
   filters: Object,
 });
 
-console.log("tableData",props.tableData);
+console.log("tableData sublist data",props.tableData?.sublists);
+console.log("tableData sublist length",props.tableData?.sublists?.length);
 const emit = defineEmits();
 const filters = ref(props.filters);
 const expandedRows = ref({});

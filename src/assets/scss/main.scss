@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+  // font-family: "Inter var", sans-serif;
+  font-family: "Poppins", sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-variation-settings: normal;
+  --font-family: "Poppins", sans-serif;
+  --font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  --primary-50: 224 246 255;
+  --primary-100: 178 227 247;
+  --primary-200: 186 230 253;
+  --primary-300: 125 211 252;
+  --primary-400: 56 189 248;
+  --primary-500: 17 155 214;
+  --primary-600: 0 158 226;
+  --primary-700: 3 94 133;
+  --primary-800: 6 95 70;
+  --primary-900: 4 78 56;
+  --primary-950: 2 44 34;
+
+  --surface-0: 255 255 255;
+  --surface-50: 249 250 251;
+  --surface-100: 243 244 246;
+  --surface-200: 229 231 235;
+  --surface-300: 209 213 219;
+  --surface-400: 156 163 175;
+  --surface-500: 107 114 128;
+  --surface-600: 75 85 99;
+  --surface-700: 55 65 81;
+  --surface-800: 31 41 55;
+  --surface-900: 17 24 39;
+  --surface-950: 8 8 8;
+  --white: 255 255 255;
+}
+
+:root {
+  --body-bg: rgb(var(--white));
+  --body-text-color: rgb(var(--surface-900));
+  --card-border: 1px solid var(--border-color);
+  --card-bg: rgb(var(--surface-0));
+  --border-color: rgb(var(--surface-200));
+}
+
+:root[class="dark"] {
+  --body-bg: rgb(var(--surface-900));
+  --body-text-color: rgb(var(--surface-50));
+  --card-border: 1px solid transparent;
+  --card-bg: rgb(var(--surface-800));
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  margin: 0px;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: var(--body-bg);
+  font-weight: normal;
+  color: var(--body-text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scalein {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.8);
+    transition:
+      transform 0.12s cubic-bezier(0, 0, 0.2, 1),
+      opacity 0.12s cubic-bezier(0, 0, 0.2, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes slidedown {
+  0% {
+    max-height: 0;
+  }
+  100% {
+    max-height: auto;
+  }
+}
+@keyframes slideup {
+  0% {
+    max-height: 1000px;
+  }
+  100% {
+    max-height: 0;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+      display: none;
+  }
+ /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+}
+}
+
+.scalein {
+  animation: scalein 150ms linear;
+}
+
+.fadein {
+  animation: fadein 150ms linear;
+}
+
+.fadeout {
+  animation: fadeout 150ms linear;
+}
+
+.slidedown {
+  animation: slidedown 0.45s ease-in-out;
+}
+
+.slideup {
+  animation: slideup 0.45s cubic-bezier(0, 1, 0, 1);
+}
+
+.layout-ripple-disabled [data-pc-name="ripple"] {
+  display: none !important;
+}
+.p-menubar-root-list {
+  box-shadow: none !important;
+}
+
+
+/* assets/global.scss */
+
+// *::-webkit-scrollbar {
+//   width: 10px;
+//   height: 10px;
+// }
+
+// *::-webkit-scrollbar-track {
+//   background: #f1f1f1;
+// }
+
+// *::-webkit-scrollbar-thumb {
+//   background: #009ee233;
+//   border-radius: 8px;
+// }
+
+// *::-webkit-scrollbar-thumb:hover {
+//   background: #009ee288;
+// }
+/* assets/global.scss */
+
+* {
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #009ee233;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #009ee288;
+  }
+
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #009ee233 #f1f1f1;
+}
+
+/* Hide scrollbar for Internet Explorer and Edge */
+* {
+  -ms-overflow-style: none;
+}
+// *::-webkit-scrollbar {
+//   width: 0; /* Remove scrollbar space */
+//   height: 0; /* Remove scrollbar space */
+// }
+
+// * {
+//   scrollbar-width: none; /* Hide scrollbar for Firefox */
+//   -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+// }

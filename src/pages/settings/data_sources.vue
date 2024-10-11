@@ -175,7 +175,6 @@ function handleUpdateDataSource(data) {
 }
 watch(allDataSources, (newVal) => {
   tableData.value = newVal;
-  console.log(" data source val", tableData.value);
   
 });
 function handleCreateList(data) {

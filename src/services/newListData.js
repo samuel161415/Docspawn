@@ -44,7 +44,15 @@ export const addNewListItem = ref([
                                 title: 'Data',
                                 isHovered: false,
                                 level: 3,
-                                sublists:[]
+                                sublists:[
+                                    {
+                                        id: 1,
+                                        title: 'Inside data',
+                                        isHovered: false,
+                                        level: 4,
+                                        sublists:[]
+                                    }
+                                ]
                             }
                         ]  
                     },

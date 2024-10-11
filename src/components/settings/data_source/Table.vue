@@ -124,7 +124,14 @@
 
       <template #expansion="{ data }">
         <div class="p-4 max-w-[90vw]">
-          <h5>Data for {{ data.name }}</h5>
+          <h5 class=" font-semibold">
+            Data for {{ data.name.replace(/\.[^/.]+$/, "") }}
+            <span v-if="data.subtitles?.length" class="text-sm font-normal">
+              ({{ data.subtitles.length }} subtitle{{
+                data.subtitles.length > 1 ? "s" : ""
+              }})
+            </span>
+          </h5>
           <div class="expanded-table-container">
             <div v-if="loadingRows[data.index]" class="loading-indicator">
               Loading...

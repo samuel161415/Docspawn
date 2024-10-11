@@ -313,7 +313,6 @@ const handleopensubmenu = (clickedItem) => {
 
 onMounted(() => {
   tableData.value = addNewListItem.value[0];
-  console.log('table data from list',tableData.value);
   
 });
 

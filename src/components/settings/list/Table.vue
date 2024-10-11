@@ -2,7 +2,7 @@
   <div class="card">
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="tableData.sublists"
+      :value="tableData.isDataSource ? tableData.data : tableData.sublists"
       dataKey="id"
       @rowExpand="onRowExpand"
       @rowCollapse="onRowCollapse"
@@ -12,29 +12,41 @@
         <div class="flex flex-wrap justify-between">
           <p class="font-poppins">{{ tableData.title }}</p>
           <div class="flex flex-wrap justify-end gap-2">
-          <Button text icon="pi pi-plus" label="Expand All" @click="expandAll" />
-          <Button text icon="pi pi-minus" label="Collapse All" @click="collapseAll" />
-        </div></div>
-      </template>
-      <Column expander style="width: 5rem " />
-      <Column field="title" header="List elements" :headerStyle="{ height: '4.5rem' }">
-        <template #body="{ data, field }">
-          <div class="flex items-center space-x-4">
-            <font-awesome-icon
-              v-if="data?.sublists?.length > 0"
-              :icon="['fat', 'list-tree']"
-              style="color: #3d3d3d"
+            <Button
+              text
+              icon="pi pi-plus"
+              label="Expand All"
+              @click="expandAll"
             />
-            <font-awesome-icon
-              v-else
-              :icon="['fat', 'list-tree']"
-              style="color: #00000000"
+            <Button
+              text
+              icon="pi pi-minus"
+              label="Collapse All"
+              @click="collapseAll"
             />
-            <p class="font-poppins">{{ data[field] }}</p>
           </div>
+        </div>
+      </template>
+      
+      <Column v-if="hasSublists(tableData)" expander style="width: 5rem" />
+      <!-- <Column v-if="hasSublists(rowData)" expander style="width: 5rem" /> -->
+      <Column
+        v-for="(column, index) in columns"
+        :key="index"
+        :field="column"
+        :header="column"
+        :headerStyle="{ height: '4.5rem' }"
+      >
+        <template #body="{ data, field }">
+          <p class="font-poppins">{{ data[field] }}</p>
         </template>
       </Column>
-      <Column header="Actions" icon="pi pi-trash" header-style="text-center" style="width: 5%">
+      <Column
+        header="Actions"
+        icon="pi pi-trash"
+        header-style="text-center"
+        style="width: 5%"
+      >
         <template #body="{ data }">
           <div class="flex space-x-8">
             <font-awesome-icon
@@ -50,14 +62,12 @@
           </div>
         </template>
       </Column>
+      <!-- <template #expansion="{ data }">
+        <SublistComponent :data="data" />
+      </template> -->
       <template #expansion="{ data }">
-        <div class="p-4">
-          <h5>Sublists for {{ data.title }}</h5>
-          <DataTable :value="data.sublists">
-            <Column field="id" header="Id" sortable></Column>
-            <Column field="title" header="Title" sortable></Column>
-            <Column field="level" header="Level" sortable></Column>
-          </DataTable>
+        <div v-if="hasSublists(data)">
+          <SublistComponent :data="data" />
         </div>
       </template>
     </DataTable>
@@ -66,33 +76,46 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import ProgressSpinner from 'primevue/progressspinner';
-
+import { ref, computed } from "vue";
+import { useToast } from "primevue/usetoast";
+import SublistComponent from "./SublistComponent.vue";
 
 const props = defineProps({
   tableData: Object,
   filters: Object,
 });
 
-console.log("tableData sublist data",props.tableData?.sublists);
-console.log("tableData sublist length",props.tableData?.sublists?.length);
+
 const emit = defineEmits();
 const filters = ref(props.filters);
 const expandedRows = ref({});
 const toast = useToast();
 
 const onRowExpand = (event) => {
-  toast.add({ severity: 'info', summary: 'Row Expanded', detail: event.data.title, life: 3000 });
+  toast.add({
+    severity: "info",
+    summary: "Row Expanded",
+    detail: event.data.title,
+    life: 3000,
+  });
 };
 
 const onRowCollapse = (event) => {
-  toast.add({ severity: 'success', summary: 'Row Collapsed', detail: event.data.title, life: 3000 });
+  toast.add({
+    severity: "success",
+    summary: "Row Collapsed",
+    detail: event.data.title,
+    life: 3000,
+  });
 };
 
 const expandAll = () => {
-  expandedRows.value = props.tableData.sublists.reduce((acc, item) => (acc[item.id] = true) && acc, {});
+  if (props.tableData.sublists) {
+    expandedRows.value = props.tableData.sublists.reduce(
+      (acc, item) => (acc[item.id] = true) && acc,
+      {}
+    );
+  }
 };
 
 const collapseAll = () => {
@@ -100,12 +123,30 @@ const collapseAll = () => {
 };
 
 const handleEditItem = (data) => {
-  emit('edit-item', data);
+  emit("edit-item", data);
 };
 
 const handleOpenDelete = (data) => {
-  emit('open-delete', data);
+  emit("open-delete", data);
 };
+
+const hasSublists = (data) => {
+  return data?.sublists?.length > 0;
+};
+
+// Compute the columns for both simple list and data source
+const columns = computed(() => {
+  if (props.tableData.isDataSource && props.tableData.data?.length > 0) {
+    return Object.keys(props.tableData.data[0]).filter(
+      (key) => key !== "sublists"
+    );
+  } else if (props.tableData.sublists?.length > 0) {
+    return Object.keys(props.tableData.sublists[0]).filter(
+      (key) => key !== "sublists"
+    );
+  }
+  return [];
+});
 </script>
 
 <style scoped>

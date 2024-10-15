@@ -1,45 +1,55 @@
 <template>
-  <div class="card">
+  <div class="">
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
       dataKey="id"
-      @rowExpand="onRowExpand"
-      @rowCollapse="onRowCollapse"
       tableStyle="min-width: 60rem"
       :paginator="showPaginator"
       :rows="5"
+      class="border border-white"
     >
       <template #header>
         <div class="flex flex-wrap justify-between items-center">
-          <p
-            :class="calledFrom === 'root' ? 'text-primaryBlue' : ''"
+        <!-- :class="calledFrom === 'root' ? 'text-primaryBlue' : ''" -->
+          <p  
             class="font-poppins font-normal text-lg"
           >
           <!-- comingFrom -->
             {{ tableData.title }}
           </p>
           <div class="flex flex-col md:flex-row justify-end gap-2">
+
+            <Button
+              :icon="isAllExpanded ? 'pi pi-minus  ' : 'pi pi-plus'"
+              :label="isAllExpanded ? 'Collapse' : 'Expand'"
+              class="p-button-success w-36"
+              outlined
+              @click="toggleExpandCollapse"
+            />
             <Button
               icon="pi pi-plus"
               label="Add item(s)"
               outlined
               @click="$emit('open-add-items', tableData.title)"
-              class="text-success border-success hover:bg-green-50"
+              class="text-success border-success hover:bg-green-50 w-40"
             />
             <Button
               icon="pi pi-cog"
               label="List options"
-              class="p-button-success"
+              class="p-button-success w-40 flex justify-start"
               outlined
               @click="$emit('open-list-options')"
             />
-            <Button
-              :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
+           
+            <!-- <Button
+              :icon="isAllExpanded ? 'pi pi-minus  ' : 'pi pi-plus'"
               :label="isAllExpanded ? 'Collapse All' : 'Expand All'"
+              class="p-button-success border border-red-500"
+              outlined
               text
               @click="toggleExpandCollapse"
-            />
+            /> -->
           </div>
         </div>
 
@@ -106,7 +116,7 @@
         </div>
       </template>
     </DataTable>
-    <Toast />
+    <!-- <Toast /> -->
   </div>
 </template>
 
@@ -208,7 +218,15 @@ const columns = computed(() => {
 </script>
 
 <style scoped>
-::v-deep .p-datatable-header {
+::v-deep .p-datatable {
+  border: none !important;
+}
+
+::v-deep .p-datatable-tbody > tr > td {
+  border: none !important;
+}
+
+/* ::v-deep .p-datatable-header {
   border-radius: 0.4rem 0.4rem 0 0 !important;
 }
 
@@ -218,5 +236,5 @@ const columns = computed(() => {
 
 ::v-deep .p-datatable-table > tbody > tr:last-of-type > td:last-of-type {
   border-radius: 0 0 0.5rem 0 !important;
-}
+} */
 </style>

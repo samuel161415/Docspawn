@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-full ml-4 bg-white overflow-scroll no-scrollbar">
-    <div class="px-8 py-8 rounded-lg">
+    <div class="md:px-8 md:py-8 rounded-lg">
       <div id="lists">
         <List />
       </div>

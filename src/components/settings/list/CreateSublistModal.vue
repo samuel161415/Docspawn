@@ -126,6 +126,7 @@ const dataSourceSelectedColumns = ref([]);
 const dataSourceSelectedRows = ref([]);
 const fileName = ref();
 const fileupload = ref(null); // Define the fileupload reference
+const isSublistSimple = ref(true);
 
 const handleAdd = () => {
   const items = sublistItem.value
@@ -341,34 +342,23 @@ watch(dataSourceFileCompleteJSON, () => {
 const handleCreateList = () => {
   addClicked.value = true;
   if (listType.value === "simple" && sublistItems.value.length > 0) {
+    isSublistSimple.value = true;
     sublistItems.value = sublistItems.value.map((item, index) => {
       return {
         id: index,
         title: item.name,
         isHovered: false,
         level: props.level + 1,
+        isSublistSimple : false,
+        sublists: [],
       };
     });
-    emit("createSubSubList", { sublistItems: sublistItems.value });
-  } else if (
-    listType.value === "dataSource" &&
-    selectedFiles.value.length > 0
-  ) {
+    emit("createSubSubList", { sublistItems: sublistItems.value, isSublistSimple: isSublistSimple.value });
+  } else if (listType.value === "dataSource" && selectedFiles.value.length > 0) {
+    isSublistSimple.value = false;
     // Handle data source creation
-    emit("createSubSubList", {
-      sublistItems: dataSourceFileCompleteJSON.value,
-    });
+    emit("createSubSubList", { sublistItems: dataSourceFileCompleteJSON.value, isSublistSimple: isSublistSimple.value });
   }
-
-  sublistItem.value = "";
-  sublistItems.value = [];
-  selectedFiles.value = [];
-  dataSourceFileCompleteJSON.value = [];
-  dataSourceColumnNames.value = [];
-  dataSourceSelectedColumns.value = [];
-
-  emit("success");
-  emit("cancel");
 };
 
 const deleteItem = (data) => {

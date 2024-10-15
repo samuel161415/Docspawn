@@ -24,6 +24,7 @@ export const addNewListItem = ref([
         isHovered: false,
         opensubmenu: true,
         level: 0,
+        isSublistSimple : true,
         sublists: [
             {
                 id: 1,
@@ -31,6 +32,7 @@ export const addNewListItem = ref([
                 isHovered: false,
                 opensubmenu: false,
                 level: 1,
+                isSublistSimple : true,
                 sublists:[
                     {
                         id: 1,
@@ -38,18 +40,22 @@ export const addNewListItem = ref([
                         isHovered: false,
                         opensubmenu: true,
                         level: 2,
+                        isSublistSimple : true,
                         sublists:[
                             {
                                 id: 1,
                                 title: 'Data',
                                 isHovered: false,
+                                opensubmenu: true,
                                 level: 3,
+                                isSublistSimple : true,
                                 sublists:[
                                     {
                                         id: 1,
                                         title: 'Inside data',
                                         isHovered: false,
                                         level: 4,
+                                        isSublistSimple : true,
                                         sublists:[]
                                     }
                                 ]
@@ -62,12 +68,14 @@ export const addNewListItem = ref([
                         isHovered: false,
                         level: 2,
                         opensubmenu: false,
+                        isSublistSimple : true,
                         sublists:[
                             {
                                 id: 1,
                                 title: 'Task Data',
                                 isHovered: false,
                                 level: 3,
+                                isSublistSimple : true,
                                 sublists:[]
                             }
                         ]
@@ -81,6 +89,7 @@ export const addNewListItem = ref([
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
+                isSublistSimple : true,
                 sublists:[
                     {
                         id: 2,
@@ -88,12 +97,14 @@ export const addNewListItem = ref([
                         isHovered: false,
                         level: 2,
                         opensubmenu: false,
+                        isSublistSimple : true,
                         sublists:[
                             {
                                 id: 1,
                                 title: 'Task data',
                                 isHovered: false,
                                 level: 3,
+                                isSublistSimple : true,
                                 sublists:[]
                             }
                         ]
@@ -107,6 +118,7 @@ export const addNewListItem = ref([
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
+                isSublistSimple : true,
                 sublists:[]
             }
         ]
@@ -117,6 +129,7 @@ export const addNewListItem = ref([
         isHovered: false,
         opensubmenu: true,
         level: 0,
+        isSublistSimple : true,
         sublists: [
             {
                 id: 1,
@@ -125,6 +138,7 @@ export const addNewListItem = ref([
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
+                isSublistSimple : true,
                 sublists:[
                     {
                         id: 1,
@@ -132,6 +146,7 @@ export const addNewListItem = ref([
                         isHovered: false,
                         opensubmenu: false,
                         level: 2,
+                        isSublistSimple : true,
                         sublists:[]
                     }
                 ]
@@ -143,6 +158,7 @@ export const addNewListItem = ref([
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
+                isSublistSimple : true,
                 sublists:[]
             }
         ]

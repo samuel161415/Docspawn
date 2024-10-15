@@ -1,24 +1,24 @@
 <template>
   <div class="w-full flex bg-white overflow-scroll no-scrollbar">
-    <div class="px-4 py-2 rounded-md bg-white w-full">
+    <div class="px-4 py-2 rounded-md bg-white w-full ">
       <p class="font-semibold text-surface-700 text-xl my-5 ml-1">List</p>
-      <div class="flex w-full">
+      <div class="flex flex-col md:flex-row  w-full">
         <!-- left side menu -->
         <div
-          class="flex flex-col justify-between h-full overflow-y-scroll w-64 pt-5 no-scrollbar"
+          class="flex md:max-w-[30vw] flex-col  justify-between h-full overflow-y-scroll  pt-5 no-scrollbar "
         >
-          <div class="flex ml-1">
+          <div class="flex max-md:justify-center  ml-1 ">
             <Button
               icon="pi pi-plus"
               label="Create new list"
               outlined
-              class="text-success border-success hover:bg-green-50 hover:border-success w-48"
+              class="text-success border-success hover:bg-green-50 hover:border-success max-md:w-3/4 w-48"
               @click="visible = true"
             />
           </div>
 
-          <div class="mt-4">
-            <span class="relative flex h-10 ml-1">
+          <div class="mt-4 flex max-md:justify-center ">
+            <span class="relative flex h-10 ml-1  max-md:w-3/4 ">
               <i
                 class="pi pi-search absolute top-2/4 -mt-2 left-2 text-surface-400 dark:text-surface-600 text-sm"
                 style="color: rgb(117, 119, 120)"
@@ -26,20 +26,20 @@
               <InputText
                 v-model="searchQuery"
                 placeholder="Search"
-                class="pl-7 font-normal rounded-md border-gray-300 font-poppins w-48"
+                class="pl-7 font-normal rounded-md border-gray-300 font-poppins max-md:w-full w-48"
               />
             </span>
           </div>
 
-          <ul>
+          <ul class="">
             <li
               v-for="items in filteredLists"
               :key="items.title"
-              class="cursor-pointer flex flex-col mt-4 w-full mr-4"
+              class=" cursor-pointer flex flex-col mt-4 w-full mr-4"
             >
               <div
                 :key="items.title"
-                class="flex px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
+                class=" flex max-md:justify-center px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
                 @click="handleopensubmenu(items)"
               >
                 <i
@@ -62,12 +62,12 @@
                 />
               </div>
 
-              <ul v-if="items.opensubmenu" class="ml-3">
+              <ul v-if="items.opensubmenu" class="ml-3  flex flex-col max-md:items-center">
                 <li v-for="subItem in items.sublists" :key="subItem.id">
                   <div
                     v-if="subItem?.sublists && subItem.sublists.length > 0"
                     :key="subItem.id"
-                    class="flex py-2 pl-1 hover:bg-surface-100 items-center ml-4 font-poppins"
+                    class="flex py-2 pl-1 hover:bg-surface-100 max-md:items-center ml-4 font-poppins"
                     @click="handleopensubmenu(subItem)"
                   >
                     <i
@@ -134,8 +134,8 @@
         </div>
 
         <!-- right section -->
-        <div class="w-full py-5 ml-2">
-          <div class="flex flex-col md:flex-row justify-end gap-2">
+        <div class="w-full md:max-w-[70vw] py-5 ml-2">
+          <!-- <div class="flex flex-col md:flex-row justify-end gap-2 border-t border-l border-r  bg-surface-50">
             <Button
               icon="pi pi-plus"
               label="Add item(s)"
@@ -150,16 +150,18 @@
               outlined
               @click="openListOptions = true"
             />
-          </div>
+          </div> -->
 
           <!-- table -->
-          <div class="mt-4 mb-12 ml-2">
+          <div class=" mb-12 ml-2">
             <DataTableComponent
               :tableData="tableData"
               :filters="filters"
               @row-reorder="onRowReorder"
               @edit-item="handleEditItem"
               @open-delete="handleOpenDelete"
+              @open-add-items="handleOpenAddItems"
+              @open-list-options="openListOptions = true"
             />
             <Toast />
           </div>
@@ -188,6 +190,7 @@
 
     <AddItemsModal
       v-model:visible="openAddItems"
+      :listTitle="addItemsTitle"
       @addItems="handleAddItems"
       @cancel="openAddItems = false"
     />
@@ -251,12 +254,12 @@ import ListOptionModal from "~/components/settings/list/ListOptionModal.vue";
 import CreateSublistModal from "~/components/settings/list/CreateSublistModal.vue";
 import { addNewListItem } from "~/services/newListData.js";
 
-
 const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
 
 const toast = useToast();
 const visible = ref(false);
 const openAddItems = ref(false);
+const addItemsTitle = ref('');
 const openListOptions = ref(false);
 const openItemOptions = ref(false);
 const openDeleteModal = ref(false);
@@ -265,12 +268,11 @@ const tableData = ref({});
 const deleteItem = ref();
 const openCreateSubList = ref(false);
 const currentListLevel = ref();
+const isSublistSimple = ref(true);
 // sublist id
 const sublistId = ref();
 const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
-
-
 
 const filteredList = computed(() => {
   const filterItems = (items, fn) => {
@@ -313,7 +315,6 @@ const handleopensubmenu = (clickedItem) => {
 
 onMounted(() => {
   tableData.value = addNewListItem.value[0];
-  
 });
 
 const filters = ref({
@@ -323,7 +324,6 @@ const filters = ref({
     constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
   },
 });
-
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
@@ -335,11 +335,20 @@ const createSubList = (data) => {
 
 // this is emitted from createSublistModal
 const handleCreateSubSublist = (data) => {
+  console.log("data to be created", data);
+  isSublistSimple.value = data.isSublistSimple;
   tableData.value.sublists.map((list) => {
     if (list.id === sublistId.value) {
       list.sublists = data.sublistItems;
+      list.isSublistSimple = data.isSublistSimple; // Set isSublistSimple property
     }
   });
+};
+
+// 
+const handleOpenAddItems = (title) => {
+  addItemsTitle.value = title;
+  openAddItems.value = true;
 };
 
 const handleCreateList = (data) => {

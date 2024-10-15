@@ -8,7 +8,7 @@
     <template #header>
       <div class="flex justify-center items-center ml-5">
         <p class="font-semibold text-xl flex justify-center text-center">
-          Add items
+          Add Item(s) to <span class="text-primaryBlue px-2">{{ listTitle }}</span> list
         </p>
       </div>
     </template>
@@ -43,10 +43,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, defineProps } from "vue";
 import { useToast } from "primevue/usetoast";
-const toast = useToast();
 
+const props = defineProps({
+  listTitle: String,
+});
+
+const toast = useToast();
 const visible = ref(false);
 const listItem = ref("");
 const listItems = ref([]);

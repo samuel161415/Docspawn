@@ -27,9 +27,9 @@
         />
       </div>
     </div>
-
+<!--  v-if="props.editableItem?.level != 3" -->
     <div
-      v-if="props.editableItem?.level != 3"
+     
       class="flex align-items-center px-5 mt-5"
     >
       <Checkbox

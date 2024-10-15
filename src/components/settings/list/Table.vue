@@ -11,41 +11,38 @@
       :rows="5"
     >
       <template #header>
-        <div class="flex flex-col md:flex-row justify-end gap-2 w-full">
-          <Button
-            icon="pi pi-plus"
-            label="Add item(s)"
-            outlined
-            @click="$emit('open-add-items', tableData.title)"
-            class="text-success border-success hover:bg-green-50"
-          />
-          <Button
-            icon="pi pi-cog"
-            label="List options"
-            class="p-button-success"
-            outlined
-            @click="$emit('open-list-options')"
-          />
-        </div>
         <div class="flex flex-wrap justify-between items-center">
-          <p class="font-poppins font-normal text-primaryBlue text-lg">
+          <p
+            :class="calledFrom === 'root' ? 'text-primaryBlue' : ''"
+            class="font-poppins font-normal text-lg"
+          >
+          <!-- comingFrom -->
             {{ tableData.title }}
           </p>
-          <div class="flex flex-wrap justify-end gap-2">
+          <div class="flex flex-col md:flex-row justify-end gap-2">
             <Button
-              text
               icon="pi pi-plus"
-              label="Expand All"
-              @click="expandAll"
+              label="Add item(s)"
+              outlined
+              @click="$emit('open-add-items', tableData.title)"
+              class="text-success border-success hover:bg-green-50"
             />
             <Button
+              icon="pi pi-cog"
+              label="List options"
+              class="p-button-success"
+              outlined
+              @click="$emit('open-list-options')"
+            />
+            <Button
+              :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
+              :label="isAllExpanded ? 'Collapse All' : 'Expand All'"
               text
-              icon="pi pi-minus"
-              label="Collapse All"
-              @click="collapseAll"
+              @click="toggleExpandCollapse"
             />
           </div>
         </div>
+
       </template>
 
       <Column
@@ -93,7 +90,7 @@
           </div>
         </template>
       </Column>
-      <template v-if="tableData?.sublists?.length" #expansion="{ data }" >
+      <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
           :class="isSublistData ? 'max-w-[60vw] border border-red-500' : ''"
@@ -104,6 +101,7 @@
             @open-list-options="$emit('open-list-options')"
             @edit-item="$emit('edit-item', $event)"
             @open-delete="$emit('open-delete', $event)"
+            calledFrom="nested"
           />
         </div>
       </template>
@@ -120,12 +118,16 @@ import Table from "~/components/settings/list/Table.vue";
 const props = defineProps({
   tableData: Object,
   filters: Object,
+  calledFrom: String,
 });
+
+console.log("props comingFrom ", props?.calledFrom);
 
 const emit = defineEmits();
 const filters = ref(props.filters);
 const expandedRows = ref({});
 const toast = useToast();
+const isAllExpanded = ref(false);
 
 const showPaginator = computed(() => {
   return props.tableData.sublists?.length > 5;
@@ -158,6 +160,15 @@ const expandAll = () => {
   }
 };
 
+const toggleExpandCollapse = () => {
+  if (isAllExpanded.value) {
+    collapseAll();
+  } else {
+    expandAll();
+  }
+  isAllExpanded.value = !isAllExpanded.value;
+};
+
 const collapseAll = () => {
   expandedRows.value = null;
 };
@@ -188,18 +199,11 @@ const columns = computed(() => {
       (key) => key !== "sublists"
     );
   } else if (props.tableData.sublists?.length > 0) {
-    return ["id", "title"];
+    return [ "title"];
   }
   return [];
 
-  // if (!props.subData.isSublistSimple && props.subData.sublists?.length > 0) {
-  //   return Object.keys(props.subData.sublists[0]).filter(
-  //     (key) => key !== "sublists"
-  //   );
-  // } else if (props.subData.sublists?.length > 0) {
-  //   return ["id", "title"];
-  // }
-  // return [];
+
 });
 </script>
 

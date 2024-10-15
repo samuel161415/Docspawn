@@ -133,8 +133,8 @@
             </span>
           </h5>
           <div class="expanded-table-container">
-            <div v-if="loadingRows[data.index]" class="loading-indicator">
-              Loading...
+            <div v-if="loadingRows[data.index]" class="p-2 w-full flex justify-center ">
+              <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
             </div>
             <div v-else>
               <DataTable
@@ -236,7 +236,7 @@ const collapseAll = () => {
   max-height: 500px; /* Adjust the height as needed */
   max-width: 100%; /* Adjust the width as needed */
   overflow: auto;
-  border: 1px solid #ddd; /* Optional: Add a border for better visibility */
+  /* border: 1px solid #ddd; Optional: Add a border for better visibility */
 }
 
 .loading-indicator {

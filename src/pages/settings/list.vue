@@ -1,13 +1,13 @@
 <template>
   <div class="w-full flex bg-white overflow-scroll no-scrollbar">
-    <div class="px-4 py-2 rounded-md bg-white w-full ">
+    <div class="px-4 py-2 rounded-md bg-white w-full">
       <p class="font-semibold text-surface-700 text-xl my-5 ml-1">List</p>
       <div class="flex flex-col md:flex-row md:justify-between w-full">
         <!-- left side menu -->
         <div
-          class="flex md:max-w-[30vw] flex-col  justify-between h-full overflow-y-scroll  pt-5 no-scrollbar "
+          class="flex md:max-w-[30vw] flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
         >
-          <div class="flex max-md:justify-center  ml-1 ">
+          <div class="flex max-md:justify-center ml-1">
             <Button
               icon="pi pi-plus"
               label="Create new list"
@@ -17,8 +17,8 @@
             />
           </div>
 
-          <div class="mt-4 flex max-md:justify-center ">
-            <span class="relative flex h-10 ml-1  max-md:w-3/4 ">
+          <div class="mt-4 flex max-md:justify-center">
+            <span class="relative flex h-10 ml-1 max-md:w-3/4">
               <i
                 class="pi pi-search absolute top-2/4 -mt-2 left-2 text-surface-400 dark:text-surface-600 text-sm"
                 style="color: rgb(117, 119, 120)"
@@ -35,11 +35,11 @@
             <li
               v-for="items in filteredLists"
               :key="items.title"
-              class=" cursor-pointer flex flex-col max-md:items-center mt-4 w-full mr-4"
+              class="cursor-pointer flex flex-col max-md:items-center mt-4 w-full mr-4"
             >
               <div
                 :key="items.title"
-                class=" flex max-md:justify-start max-md:w-3/4 px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
+                class="flex max-md:justify-start max-md:w-3/4 px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
                 @click="handleopensubmenu(items)"
               >
                 <i
@@ -62,12 +62,15 @@
                 />
               </div>
 
-              <ul v-if="items.opensubmenu" class="ml-3  flex flex-col max-md:w-3/4">
+              <ul
+                v-if="items.opensubmenu"
+                class="ml-3 flex flex-col max-md:w-3/4"
+              >
                 <li v-for="subItem in items.sublists" :key="subItem.id">
                   <div
                     v-if="subItem?.sublists && subItem.sublists.length > 0"
                     :key="subItem.id"
-                    class="flex py-2 pl-1 hover:bg-surface-100  ml-4 font-poppins"
+                    class="flex py-2 pl-1 hover:bg-surface-100 ml-4 font-poppins"
                     @click="handleopensubmenu(subItem)"
                   >
                     <i
@@ -153,7 +156,7 @@
           </div> -->
 
           <!-- table -->
-          <div class=" mb-12 ml-2">
+          <div class="mb-12 ml-2">
             <DataTableComponent
               :tableData="tableData"
               :filters="filters"
@@ -162,6 +165,7 @@
               @open-delete="handleOpenDelete"
               @open-add-items="handleOpenAddItems"
               @open-list-options="openListOptions = true"
+              calledFrom="root"
             />
             <Toast />
           </div>
@@ -259,7 +263,7 @@ const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
 const toast = useToast();
 const visible = ref(false);
 const openAddItems = ref(false);
-const addItemsTitle = ref('');
+const addItemsTitle = ref("");
 const openListOptions = ref(false);
 const openItemOptions = ref(false);
 const openDeleteModal = ref(false);
@@ -345,7 +349,7 @@ const handleCreateSubSublist = (data) => {
   });
 };
 
-// 
+//
 const handleOpenAddItems = (title) => {
   addItemsTitle.value = title;
   openAddItems.value = true;

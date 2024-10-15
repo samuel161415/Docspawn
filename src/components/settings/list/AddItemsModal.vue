@@ -8,7 +8,7 @@
     <template #header>
       <div class="flex justify-center items-center ml-5">
         <p class="font-semibold text-xl flex justify-center text-center">
-          Add Item(s) to <span class="text-primaryBlue px-2">{{ listTitle }}</span> list
+          Add Item(s) to <span class="text-primaryBlue px-2">{{ listTitle }}</span> 
         </p>
       </div>
     </template>

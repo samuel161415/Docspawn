@@ -2,7 +2,7 @@
   <div class="w-full flex bg-white overflow-scroll no-scrollbar">
     <div class="px-4 py-2 rounded-md bg-white w-full ">
       <p class="font-semibold text-surface-700 text-xl my-5 ml-1">List</p>
-      <div class="flex flex-col md:flex-row  w-full">
+      <div class="flex flex-col md:flex-row md:justify-between w-full">
         <!-- left side menu -->
         <div
           class="flex md:max-w-[30vw] flex-col  justify-between h-full overflow-y-scroll  pt-5 no-scrollbar "
@@ -35,11 +35,11 @@
             <li
               v-for="items in filteredLists"
               :key="items.title"
-              class=" cursor-pointer flex flex-col mt-4 w-full mr-4"
+              class=" cursor-pointer flex flex-col max-md:items-center mt-4 w-full mr-4"
             >
               <div
                 :key="items.title"
-                class=" flex max-md:justify-center px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
+                class=" flex max-md:justify-start max-md:w-3/4 px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
                 @click="handleopensubmenu(items)"
               >
                 <i
@@ -62,12 +62,12 @@
                 />
               </div>
 
-              <ul v-if="items.opensubmenu" class="ml-3  flex flex-col max-md:items-center">
+              <ul v-if="items.opensubmenu" class="ml-3  flex flex-col max-md:w-3/4">
                 <li v-for="subItem in items.sublists" :key="subItem.id">
                   <div
                     v-if="subItem?.sublists && subItem.sublists.length > 0"
                     :key="subItem.id"
-                    class="flex py-2 pl-1 hover:bg-surface-100 max-md:items-center ml-4 font-poppins"
+                    class="flex py-2 pl-1 hover:bg-surface-100  ml-4 font-poppins"
                     @click="handleopensubmenu(subItem)"
                   >
                     <i

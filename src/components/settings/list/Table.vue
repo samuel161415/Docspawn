@@ -65,6 +65,7 @@
         :key="index"
         :field="column"
         :header="column"
+        sortable
         :headerStyle="{ height: '4.5rem' }"
       >
         <template #body="{ data, field }">

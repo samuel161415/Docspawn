@@ -167,6 +167,16 @@
               @open-list-options="openListOptions = true"
               calledFrom="root"
             />
+            <!-- <TempTable
+              :tableData="tableData"
+              :filters="filters"
+              @row-reorder="onRowReorder"
+              @edit-item="handleEditItem"
+              @open-delete="handleOpenDelete"
+              @open-add-items="handleOpenAddItems"
+              @open-list-options="openListOptions = true"
+              calledFrom="root"
+            /> -->
             <Toast />
           </div>
         </div>
@@ -251,6 +261,7 @@ import { ref, watch } from "vue";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import DataTableComponent from "~/components/settings/list/Table.vue";
+import TempTable from'~/components/settings/list/TempTable.vue'
 import CreateListModal from "~/components/settings/list/CreateListModal.vue";
 import AddItemsModal from "~/components/settings/list/AddItemsModal.vue";
 import EditItemOptionModal from "~/components/settings/list/EditItemOptionModal.vue";
@@ -340,10 +351,22 @@ const createSubList = (data) => {
 // this is emitted from createSublistModal
 const handleCreateSubSublist = (data) => {
   console.log("data to be created", data);
+  
   isSublistSimple.value = data.isSublistSimple;
   tableData.value.sublists.map((list) => {
     if (list.id === sublistId.value) {
-      list.sublists = list.sublists.concat(data.sublistItems); // Concatenate new items with existing sublist
+      console.log("existing sublistis is sublist", list.isSublistSimple);
+      if(!isSublistSimple.value){
+        list.sublists = data.sublistItems
+      }
+      else{
+        if(list.isSublistSimple)
+        list.sublists = list.sublists.concat(data.sublistItems); 
+       else{
+        list.sublists = data.sublistItems
+       }
+      }
+      // Concatenate new items with existing sublist
       list.isSublistSimple = data.isSublistSimple; // Set isSublistSimple property
     }
   });
@@ -399,6 +422,7 @@ const handleAddItems = (data) => {
 };
 
 const handleEditItem = (data) => {
+  console.log('the data to be added to the existing list',data)
   editableItem.value = data;
   openItemOptions.value = true;
 

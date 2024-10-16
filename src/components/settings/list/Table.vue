@@ -52,17 +52,12 @@
       </template>
 
       <Column
-        v-if="hasSublists(tableData, 'main')"
+        v-if="!isSublistData"
         expander
         style="width: 5rem"
-        :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
         class="bg-white"
       >
-        <!-- <template #body="{ data }">
-          <span v-if="hasSublists(data, 'branch')" class="p-column-title">
-            <i class="pi pi-chevron-right"></i>
-          </span>
-        </template> -->
+      
       </Column>
       <!--  :header="column" -->
       <Column
@@ -143,7 +138,6 @@ const props = defineProps({
   calledFrom: String,
 });
 
-console.log("props comingFrom ", props?.calledFrom);
 
 const emit = defineEmits();
 const filters = ref(props.filters);
@@ -183,6 +177,7 @@ const expandAll = () => {
 };
 
 const toggleExpandCollapse = () => {
+  console.log("data table",props?.tableData)
   if (isAllExpanded.value) {
     collapseAll();
   } else {
@@ -207,12 +202,12 @@ const hasSublists = (data, from) => {
   return data?.sublists?.length > 0;
 };
 const isSublistData = computed(() => {
-  console.log("sublist value", props.tableData?.isSublistSimple);
+  console.log('is this simple list',props.tableData?.isSublistSimple)
   return !props.tableData?.isSublistSimple;
 });
 
 const columns = computed(() => {
-  console.log("is the sublist sublist?", props.tableData.isSublistSimple);
+ 
   if (
     !props.tableData.isSublistSimple &&
     props.tableData.sublists?.length > 0

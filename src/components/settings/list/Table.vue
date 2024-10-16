@@ -7,7 +7,7 @@
       tableStyle="min-width: 60rem"
       :paginator="showPaginator"
       :rows="5"
-      class="border border-white"
+      class=""
     >
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
@@ -219,7 +219,7 @@ const toggleExpandCollapse = () => {
 };
 
 const collapseAll = () => {
-  expandedRows.value = null;
+  expandedRows.value = {};
 };
 
 const handleEditItem = (data) => {
@@ -263,17 +263,23 @@ const toggleRow = (data) => {
 </script>
 
 <style scoped>
+::v-deep .p-datatable-row-expansion {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 ::v-deep .p-datatable {
   border: none !important;
 }
 
 ::v-deep .p-datatable-tbody > tr > td {
   border: none !important;
-  padding: 8px 8px !important;
+  padding: 8px 0px !important;
 }
+
 ::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
   margin: 0 !important; /* Remove margin for expanded content */
-  padding: 4px 8px !important; /* Adjust padding for expanded content */
+  padding: 0 !important; /* Adjust padding for expanded content */
 }
 
 ::v-deep .p-datatable-thead > tr > th {

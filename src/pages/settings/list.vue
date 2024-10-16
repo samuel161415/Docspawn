@@ -343,7 +343,7 @@ const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
   tableData.value.sublists.map((list) => {
     if (list.id === sublistId.value) {
-      list.sublists = data.sublistItems;
+      list.sublists = list.sublists.concat(data.sublistItems); // Concatenate new items with existing sublist
       list.isSublistSimple = data.isSublistSimple; // Set isSublistSimple property
     }
   });

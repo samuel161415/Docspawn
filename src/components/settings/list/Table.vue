@@ -9,17 +9,14 @@
       :rows="5"
       class="border border-white"
     >
-      <template #header>
+      <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
-        <!-- :class="calledFrom === 'root' ? 'text-primaryBlue' : ''" -->
-          <p  
-            class="font-poppins font-normal text-lg"
-          >
-          <!-- comingFrom -->
+          <!-- :class="calledFrom === 'root' ? 'text-primaryBlue' : ''" -->
+          <p class="font-poppins font-normal text-lg">
+            <!-- comingFrom -->
             {{ tableData.title }}
           </p>
           <div class="flex flex-col md:flex-row justify-end gap-2">
-
             <Button
               :icon="isAllExpanded ? 'pi pi-minus  ' : 'pi pi-plus'"
               :label="isAllExpanded ? 'Collapse' : 'Expand'"
@@ -41,7 +38,7 @@
               outlined
               @click="$emit('open-list-options')"
             />
-           
+
             <!-- <Button
               :icon="isAllExpanded ? 'pi pi-minus  ' : 'pi pi-plus'"
               :label="isAllExpanded ? 'Collapse All' : 'Expand All'"
@@ -52,14 +49,14 @@
             /> -->
           </div>
         </div>
-
       </template>
 
       <Column
         v-if="hasSublists(tableData, 'main')"
         expander
         style="width: 5rem"
-        class=""
+        :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
+        class="bg-white"
       >
         <!-- <template #body="{ data }">
           <span v-if="hasSublists(data, 'branch')" class="p-column-title">
@@ -67,26 +64,34 @@
           </span>
         </template> -->
       </Column>
+      <!--  :header="column" -->
       <Column
         v-for="(column, index) in columns"
         :key="index"
         :field="column"
-        :header="column"
-        sortable
-        :headerStyle="{ height: '4.5rem' }"
+        :header="isSublistData ? column : null"
+        :sortable="isSublistData ? true : false"
+        :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
       >
         <template #body="{ data, field }">
           <p class="font-poppins font-normal">{{ data[field] }}</p>
         </template>
       </Column>
+      <!--       header="Actions" -->
       <Column
-        header="Actions"
+        :header="isSublistData ? 'Actions' : null"
         icon="pi pi-trash"
-        header-style="text-center"
         style="width: 5%"
+        class="bg-white text-center"
+        :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
       >
         <template #body="{ data }">
           <div class="flex space-x-8">
+            <font-awesome-icon
+              :icon="['fas', 'plus']"
+              class="text-primaryBlue cursor-pointer"
+              @click="$emit('open-add-items', tableData.title)"
+            />
             <font-awesome-icon
               :icon="['fas', 'pencil-alt']"
               class="text-success text-lg cursor-pointer"
@@ -97,13 +102,20 @@
               class="text-error text-lg cursor-pointer"
               @click="$emit('open-delete', data)"
             />
+
+            <!-- <font-awesome-icon
+              :icon="['fas', 'trash-alt']"
+              class="text-error text-lg cursor-pointer"
+              @click="$emit('open-delete', data)"
+            /> -->
           </div>
         </template>
       </Column>
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          :class="isSublistData ? 'max-w-[60vw] border border-red-500' : ''"
+          class="pl-5 "
+          :class="isSublistData ? 'max-w-[60vw] ' : ''"
         >
           <Table
             :tableData="data"
@@ -209,11 +221,9 @@ const columns = computed(() => {
       (key) => key !== "sublists"
     );
   } else if (props.tableData.sublists?.length > 0) {
-    return [ "title"];
+    return ["title"];
   }
   return [];
-
-
 });
 </script>
 
@@ -224,17 +234,20 @@ const columns = computed(() => {
 
 ::v-deep .p-datatable-tbody > tr > td {
   border: none !important;
+  padding: 8px 8px !important;
+}
+::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
+  margin: 0 !important; /* Remove margin for expanded content */
+  padding: 4px 8px !important; /* Adjust padding for expanded content */
 }
 
-/* ::v-deep .p-datatable-header {
-  border-radius: 0.4rem 0.4rem 0 0 !important;
+::v-deep .p-datatable-thead > tr > th {
+  border: none !important;
+  padding: 0 !important;
 }
 
-::v-deep .p-datatable-table > tbody > tr:last-of-type > td:first-of-type {
-  border-radius: 0 0 0 0.5rem !important;
-}
-
-::v-deep .p-datatable-table > tbody > tr:last-of-type > td:last-of-type {
-  border-radius: 0 0 0.5rem 0 !important;
+/* ::v-deep .p-datatable-tfoot > tr > td {
+  border: none !important;
+  padding: 0 !important;
 } */
 </style>

@@ -60,7 +60,13 @@
           :headerStyle="{ height: '0px', backgroundColor: 'blue', border: '0 white' }"
         >
           <template #body="{ data, field }">
-            <p class="font-poppins font-normal">{{ data[field] }}</p>
+            <p class="font-poppins font-normal ">
+              <font-awesome-icon
+                v-if="!hasSublists(data)"
+                :icon="['fas', 'minus']"
+                class="text-error mr-1"
+              />
+            {{ data[field] }}</p>
           </template>
         </Column>
         <Column
@@ -108,7 +114,7 @@
           :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
         >
           <template #body="{ data, field }">
-            <p class="font-poppins font-normal">{{ data[field] }}</p>
+            <p class="font-poppins font-normal mr-14 ">{{ data[field] }}</p>
           </template>
         </Column>
         <Column
@@ -143,7 +149,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-5"
+          class="pl-5 "
           :class="isSublistData ? 'max-w-[60vw]' : ''"
         >
           <Table

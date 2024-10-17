@@ -1,5 +1,7 @@
 <template>
-  <div class="">
+  <div 
+ 
+  class="">
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
@@ -7,7 +9,7 @@
       tableStyle="min-width: 60rem"
       :paginator="showPaginator"
       :rows="5"
-      class=""
+      :class="calledFrom && 'pr-3'"
     >
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
@@ -68,46 +70,54 @@
         >
           <template #body="{ data, field }">
             <p class="font-poppins font-normal">
-              <span v-if="!hasSublists(data)" class="mr-1">-</span>
+              <span v-if="!hasSublists(data)" class="mr-5">-</span>
               {{ data[field] }}
             </p>
           </template>
         </Column>
 
         <Column
-          :header="null"
-          style="width: 5%"
-          class="bg-white text-center"
-          :headerStyle="{
-            height: '0px',
-            backgroundColor: 'blue',
-            border: '0 white',
-          }"
-        >
-          <template #body="{ data }">
-            <div class="flex space-x-8">
-              <SplitButton label="" icon="pi pi-cog"  @click="save" outlined severity="info" class="pl-5"
-                :model="[
-                  {
-                    label: 'Add Item',
-                    icon: 'pi pi-plus',
-                    command: () => $emit('open-add-items', tableData.title),
-                  },
-                  {
-                    label: 'Edit',
-                    icon: 'pi pi-pencil',
-                    command: () => $emit('edit-item', data),
-                  },
-                  {
-                    label: 'Delete',
-                    icon: 'pi pi-trash',
-                    command: () => $emit('open-delete', data),
-                  },
-                ]"
-              />
-            </div>
-          </template>
-        </Column>
+  :header="null"
+  style="width: 5%"
+  class="bg-white text-center"
+  :headerStyle="{
+    height: '0px',
+    backgroundColor: 'blue',
+    border: '0 white',
+  }"
+>
+  <template #body="{ data }">
+    <div class="flex space-x-8 pr-5">
+      <Button
+        icon="pi pi-chevron-down"
+        outlined severity="info"
+        class="p-button-rounded p-button-info mr-5 flex justify-center items-center"
+        @click="$refs.menu.toggle($event)"
+      />
+      <Menu
+        ref="menu"
+        :model="[
+          {
+            label: 'Add Item',
+            icon: 'pi pi-plus',
+            command: () => $emit('open-add-items', tableData.title),
+          },
+          {
+            label: 'Edit',
+            icon: 'pi pi-pencil',
+            command: () => $emit('edit-item', data),
+          },
+          {
+            label: 'Delete',
+            icon: 'pi pi-trash',
+            command: () => $emit('open-delete', data),
+          },
+        ]"
+        popup
+      />
+    </div>
+  </template>
+</Column>
       </template>
 
       <template v-else>
@@ -131,7 +141,7 @@
         >
           <template #body="{ data, field }">
             <p
-              class="font-poppins font-normal mr-14 mt-3 whitespace-nowrap py-2"
+              class="font-poppins font-normal  flex justify-center mt-3 whitespace-nowrap py-2"
             >
               {{ data[field] }}
             </p>
@@ -142,8 +152,8 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-5"
-          :class="isSublistData ? 'max-w-[60vw]' : ''"
+          class="pl-8 margin-end  w-full max-w-[68vw] overflow-hidden "
+          :class="isSublistData ? '' : ''"
         >
           <Table
             :tableData="data"
@@ -167,7 +177,7 @@ import Table from "~/components/settings/list/Table.vue";
 const props = defineProps({
   tableData: Object,
   filters: Object,
-  calledFrom: String,
+  calledFrom: String
 });
 
 const emit = defineEmits();
@@ -277,7 +287,7 @@ const toggleRow = (data) => {
 
 ::v-deep .p-datatable-tbody > tr > td {
   border: none !important;
-  padding: 8px 8px !important;
+  padding: 8px 0px !important;
 }
 
 ::v-deep

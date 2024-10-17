@@ -156,7 +156,7 @@
           </div> -->
 
           <!-- table -->
-          <div class="mb-12 ml-2">
+          <div class="mb-12  max-w-[70vw] ">
             <DataTableComponent
               :tableData="tableData"
               :filters="filters"
@@ -166,6 +166,7 @@
               @open-add-items="handleOpenAddItems"
               @open-list-options="openListOptions = true"
               calledFrom="root"
+              c_level = 0
             />
             <!-- <TempTable
               :tableData="tableData"

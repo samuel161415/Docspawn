@@ -374,6 +374,7 @@ const handleCreateSubSublist = (data) => {
 
 //
 const handleOpenAddItems = (title) => {
+  console.log('handle add item called',title)
   addItemsTitle.value = title;
   openAddItems.value = true;
 };
@@ -422,7 +423,7 @@ const handleAddItems = (data) => {
 };
 
 const handleEditItem = (data) => {
-  console.log('the data to be added to the existing list',data)
+  console.log('handle edit item called',data)
   editableItem.value = data;
   openItemOptions.value = true;
 
@@ -434,6 +435,7 @@ const handleEditItem = (data) => {
 };
 
 const handleOpenDelete = (data) => {
+  console.log('handle delete item called')
   deleteItem.value = data;
   openDeleteModal.value = true;
 };

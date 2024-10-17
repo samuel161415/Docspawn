@@ -200,3 +200,27 @@ export function useSettingItems() {
 
   return { settingItems }
 }
+
+export const actionItems = (emit, data) => [
+  {
+    label: 'Add Item',
+    icon: 'pi pi-plus',
+    command: () => {
+      emit('open-add-items', data.title);
+    },
+  },
+  {
+    label: 'Edit Item',
+    icon: 'pi pi-pencil',
+    command: () => {
+      emit('edit-item', data);
+    },
+  },
+  {
+    label: 'Delete Item',
+    icon: 'pi pi-trash',
+    command: () => {
+      emit('open-delete', data);
+    },
+  },
+];

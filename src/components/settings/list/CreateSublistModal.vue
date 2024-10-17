@@ -261,7 +261,8 @@ async function processFiles(data, fileType, file) {
           );
 
           dataSourceFileCompleteJSON.value = filteredData?.map((f, i) => {
-            return { ...f, auto_index_by_docspawn: i + 1 };
+            // return { ...f, auto_index_by_docspawn: i + 1 };
+            return { ...f };
           });
           // setCSVFileJSON(filteredData)
         },
@@ -299,7 +300,8 @@ async function processFiles(data, fileType, file) {
 
         // return jsonData
         dataSourceFileCompleteJSON.value = jsonData?.map((f, i) => {
-          return { ...f, auto_index_by_docspawn: i + 1 };
+          // return { ...f, auto_index_by_docspawn: i + 1 };
+          return { ...f };
         });
       } catch (error) {
         console.error("Error processing file:", error);

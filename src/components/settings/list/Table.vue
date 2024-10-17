@@ -64,11 +64,7 @@
           :field="column"
           :header="null"
           :sortable="false"
-          :headerStyle="{
-            height: '0px',
-            backgroundColor: 'blue',
-            border: '0 white',
-          }"
+          :class="headerClass"
         >
           <template #body="{ data, field }">
             <p class="font-poppins font-normal">
@@ -90,9 +86,7 @@
         >
           <template #body="{ data }">
             <div class="flex space-x-8">
-              <SplitButton
-                label="Actions"
-                class="p-button-success"
+              <SplitButton label="" icon="pi pi-cog"  @click="save" outlined severity="info" class="pl-5"
                 :model="[
                   {
                     label: 'Add Item',
@@ -114,7 +108,6 @@
             </div>
           </template>
         </Column>
-       
       </template>
 
       <template v-else>
@@ -130,47 +123,20 @@
           :field="column"
           :header="isSublistData ? column : null"
           :sortable="isSublistData ? true : false"
-          :headerStyle="
-            isSublistData
-              ? { height: 'auto' }
-              : { height: '0px', backgroundColor: 'blue', border: '0 white' }
-          "
+          :headerStyle="{
+            height: 'auto',
+            padding: '20px !important',
+          }"
+          :class="headerClass"
         >
           <template #body="{ data, field }">
-            <p class="font-poppins font-normal mr-14">{{ data[field] }}</p>
+            <p
+              class="font-poppins font-normal mr-14 mt-3 whitespace-nowrap py-2"
+            >
+              {{ data[field] }}
+            </p>
           </template>
         </Column>
-        <!-- <Column
-          :header="isSublistData ? 'Actions' : null"
-          icon="pi pi-trash"
-          style="width: 5%"
-          class="bg-white text-center"
-          :headerStyle="
-            isSublistData
-              ? { height: 'auto' }
-              : { height: '0px', backgroundColor: 'blue', border: '0 white' }
-          "
-        >
-          <template #body="{ data }">
-            <div class="flex space-x-8">
-              <font-awesome-icon
-                :icon="['fas', 'plus']"
-                class="text-primaryBlue cursor-pointer"
-                @click="$emit('open-add-items', tableData.title)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'pencil-alt']"
-                class="text-success text-lg cursor-pointer"
-                @click="$emit('edit-item', data)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'trash-alt']"
-                class="text-error text-lg cursor-pointer"
-                @click="$emit('open-delete', data)"
-              />
-            </div>
-          </template>
-        </Column> -->
       </template>
 
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
@@ -210,6 +176,9 @@ const expandedRows = ref({});
 const toast = useToast();
 const isAllExpanded = ref(false);
 
+const headerClass = computed(() => {
+  return isSublistData.value ? "sublist-padding" : "no-padding";
+});
 
 const showPaginator = computed(() => {
   return props.tableData.sublists?.length > 5;
@@ -308,7 +277,7 @@ const toggleRow = (data) => {
 
 ::v-deep .p-datatable-tbody > tr > td {
   border: none !important;
-  padding: 8px 0px !important;
+  padding: 8px 8px !important;
 }
 
 ::v-deep
@@ -323,5 +292,12 @@ const toggleRow = (data) => {
 ::v-deep .p-datatable-thead > tr > th {
   border: none !important;
   padding: 0 !important;
+  white-space: nowrap;
+}
+
+::v-deep .p-datatable-thead > tr > th.sublist-padding {
+  border: none !important;
+  padding: 10px !important;
+  white-space: nowrap;
 }
 </style>

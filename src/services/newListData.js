@@ -100,7 +100,7 @@ export const addNewListItem = ref([
                         isSublistSimple : true,
                         sublists:[
                             {
-                                id: 1,
+                                id: 2,
                                 title: 'Task data',
                                 isHovered: false,
                                 level: 3,

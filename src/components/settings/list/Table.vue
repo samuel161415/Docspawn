@@ -41,13 +41,20 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column
-          style="width: 5rem"
-          class="bg-white"
-        >
+        <Column style="width: 5rem" class="bg-white">
           <template #body="{ data }">
-            <span v-if="hasSublists(data, 'branch')" @click="toggleRow(data)" class=" cursor-pointer">
-              <i :class="expandedRows[data.id] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+            <span
+              v-if="hasSublists(data, 'branch')"
+              @click="toggleRow(data)"
+              class="cursor-pointer"
+            >
+              <i
+                :class="
+                  expandedRows[data.id]
+                    ? 'pi pi-chevron-down'
+                    : 'pi pi-chevron-right'
+                "
+              ></i>
             </span>
           </template>
         </Column>
@@ -57,45 +64,57 @@
           :field="column"
           :header="null"
           :sortable="false"
-          :headerStyle="{ height: '0px', backgroundColor: 'blue', border: '0 white' }"
+          :headerStyle="{
+            height: '0px',
+            backgroundColor: 'blue',
+            border: '0 white',
+          }"
         >
           <template #body="{ data, field }">
-            <p class="font-poppins font-normal ">
-              <font-awesome-icon
-                v-if="!hasSublists(data)"
-                :icon="['fas', 'minus']"
-                class="text-error mr-1"
-              />
-            {{ data[field] }}</p>
+            <p class="font-poppins font-normal">
+              <span v-if="!hasSublists(data)" class="mr-1">-</span>
+              {{ data[field] }}
+            </p>
           </template>
         </Column>
+
         <Column
           :header="null"
-          icon="pi pi-trash"
           style="width: 5%"
           class="bg-white text-center"
-          :headerStyle="{ height: '0px', backgroundColor: 'blue', border: '0 white' }"
+          :headerStyle="{
+            height: '0px',
+            backgroundColor: 'blue',
+            border: '0 white',
+          }"
         >
           <template #body="{ data }">
             <div class="flex space-x-8">
-              <font-awesome-icon
-                :icon="['fas', 'plus']"
-                class="text-primaryBlue cursor-pointer"
-                @click="$emit('open-add-items', tableData.title)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'pencil-alt']"
-                class="text-success text-lg cursor-pointer"
-                @click="$emit('edit-item', data)"
-              />
-              <font-awesome-icon
-                :icon="['fas', 'trash-alt']"
-                class="text-error text-lg cursor-pointer"
-                @click="$emit('open-delete', data)"
+              <SplitButton
+                label="Actions"
+                class="p-button-success"
+                :model="[
+                  {
+                    label: 'Add Item',
+                    icon: 'pi pi-plus',
+                    command: () => $emit('open-add-items', tableData.title),
+                  },
+                  {
+                    label: 'Edit',
+                    icon: 'pi pi-pencil',
+                    command: () => $emit('edit-item', data),
+                  },
+                  {
+                    label: 'Delete',
+                    icon: 'pi pi-trash',
+                    command: () => $emit('open-delete', data),
+                  },
+                ]"
               />
             </div>
           </template>
         </Column>
+       
       </template>
 
       <template v-else>
@@ -103,7 +122,7 @@
           v-if="!isSublistData"
           expander
           style="width: 5rem"
-          class="bg-blue-500 "
+          class="bg-blue-500"
         ></Column>
         <Column
           v-for="(column, index) in columns"
@@ -111,18 +130,26 @@
           :field="column"
           :header="isSublistData ? column : null"
           :sortable="isSublistData ? true : false"
-          :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
+          :headerStyle="
+            isSublistData
+              ? { height: 'auto' }
+              : { height: '0px', backgroundColor: 'blue', border: '0 white' }
+          "
         >
           <template #body="{ data, field }">
-            <p class="font-poppins font-normal mr-14 ">{{ data[field] }}</p>
+            <p class="font-poppins font-normal mr-14">{{ data[field] }}</p>
           </template>
         </Column>
-        <Column
+        <!-- <Column
           :header="isSublistData ? 'Actions' : null"
           icon="pi pi-trash"
           style="width: 5%"
           class="bg-white text-center"
-          :headerStyle="isSublistData ? { height: 'auto' } : { height: '0px', backgroundColor: 'blue', border: '0 white' }"
+          :headerStyle="
+            isSublistData
+              ? { height: 'auto' }
+              : { height: '0px', backgroundColor: 'blue', border: '0 white' }
+          "
         >
           <template #body="{ data }">
             <div class="flex space-x-8">
@@ -143,13 +170,13 @@
               />
             </div>
           </template>
-        </Column>
+        </Column> -->
       </template>
 
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-5 "
+          class="pl-5"
           :class="isSublistData ? 'max-w-[60vw]' : ''"
         >
           <Table
@@ -182,6 +209,7 @@ const filters = ref(props.filters);
 const expandedRows = ref({});
 const toast = useToast();
 const isAllExpanded = ref(false);
+
 
 const showPaginator = computed(() => {
   return props.tableData.sublists?.length > 5;
@@ -241,7 +269,7 @@ const hasSublists = (data, from) => {
 };
 
 const isSublistData = computed(() => {
-  console.log('is this simple list', props.tableData?.isSublistSimple);
+  console.log("is this simple list", props.tableData?.isSublistSimple);
   return !props.tableData?.isSublistSimple;
 });
 
@@ -283,7 +311,11 @@ const toggleRow = (data) => {
   padding: 8px 0px !important;
 }
 
-::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
+::v-deep
+  .p-datatable-tbody
+  > tr.p-row-expanded
+  > td
+  > .p-datatable-row-expansion {
   margin: 0 !important; /* Remove margin for expanded content */
   padding: 0 !important; /* Adjust padding for expanded content */
 }

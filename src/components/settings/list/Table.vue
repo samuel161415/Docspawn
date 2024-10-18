@@ -1,7 +1,6 @@
 <template>
-  <div 
- 
-  class="">
+  <div class="">
+  <!-- :showGridlines="calledFrom==='root' ? false:true" -->
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
@@ -9,7 +8,9 @@
       tableStyle="min-width: 60rem"
       :paginator="showPaginator"
       :rows="5"
-      :class="calledFrom && 'pr-3'"
+      class=""
+      showGridlines 
+      
     >
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
@@ -43,12 +44,12 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column style="width: 5rem" class="bg-white">
+        <Column class="w-[5%] bg-white ">
           <template #body="{ data }">
             <span
               v-if="hasSublists(data, 'branch')"
               @click="toggleRow(data)"
-              class="cursor-pointer"
+              class="cursor-pointer w-full"
             >
               <i
                 :class="
@@ -66,66 +67,70 @@
           :field="column"
           :header="null"
           :sortable="false"
+          class="w-[90%]"
           :class="headerClass"
         >
           <template #body="{ data, field }">
-            <p class="font-poppins font-normal">
-              <span v-if="!hasSublists(data)" class="mr-5">-</span>
+            <p
+              class="font-poppins fles justify-start p-0 font-normal"
+            >
+              <span
+                v-if="!hasSublists(data)"
+                icon="pi pi-minus"
+                class="pr-2 m-0"
+                ><font-awesome-icon :icon="['fas', 'minus']" />
+              </span>
+
               {{ data[field] }}
             </p>
           </template>
         </Column>
 
         <Column
-  :header="null"
-  style="width: 5%"
-  class="bg-white text-center"
-  :headerStyle="{
-    height: '0px',
-    backgroundColor: 'blue',
-    border: '0 white',
-  }"
->
-  <template #body="{ data }">
-    <div class="flex space-x-8 pr-5">
-      <Button
-        icon="pi pi-chevron-down"
-        outlined severity="info"
-        class="p-button-rounded p-button-info mr-5 flex justify-center items-center"
-        @click="$refs.menu.toggle($event)"
-      />
-      <Menu
-        ref="menu"
-        :model="[
-          {
-            label: 'Add Item',
-            icon: 'pi pi-plus',
-            command: () => $emit('open-add-items', tableData.title),
-          },
-          {
-            label: 'Edit',
-            icon: 'pi pi-pencil',
-            command: () => $emit('edit-item', data),
-          },
-          {
-            label: 'Delete',
-            icon: 'pi pi-trash',
-            command: () => $emit('open-delete', data),
-          },
-        ]"
-        popup
-      />
-    </div>
-  </template>
-</Column>
+          :header="null"
+          style="width: 5%"
+          class="bg-white text-center w-[5%]"
+        
+        >
+          <template #body="{ data }">
+            <div class="flex justify-center">
+              <Button
+                icon="pi pi-cog"
+                outlined
+                class="p-button-rounded p-button-success  flex justify-center items-center"
+                @click="$refs.menu.toggle($event)"
+              />
+              <Menu
+                ref="menu"
+                :model="[
+                  {
+                    label: 'Add Item',
+                    icon: 'pi pi-plus',
+                    command: () => $emit('open-add-items', tableData.title),
+                  },
+                  {
+                    label: 'Edit',
+                    icon: 'pi pi-pencil',
+                    command: () => $emit('edit-item', data),
+                  },
+                  {
+                    label: 'Delete',
+                    icon: 'pi pi-trash',
+                    command: () => $emit('open-delete', data),
+                  },
+                ]"
+                popup
+              />
+            </div>
+          </template>
+        </Column>
       </template>
 
       <template v-else>
         <Column
           v-if="!isSublistData"
           expander
-          style="width: 5rem"
-          class="bg-blue-500"
+          class=" w-[5%]"
         ></Column>
         <Column
           v-for="(column, index) in columns"
@@ -137,11 +142,12 @@
             height: 'auto',
             padding: '20px !important',
           }"
+          class="[95%]"
           :class="headerClass"
         >
           <template #body="{ data, field }">
             <p
-              class="font-poppins font-normal  flex justify-center mt-3 whitespace-nowrap py-2"
+              class="font-poppins font-normal flex justify-center mt-3 whitespace-nowrap py-2"
             >
               {{ data[field] }}
             </p>
@@ -152,7 +158,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-8 margin-end  w-full max-w-[68vw] overflow-hidden "
+          class="pl-10 flex margin-end w-full max-w-[68vw] overflow-hidden"
           :class="isSublistData ? '' : ''"
         >
           <Table
@@ -162,6 +168,7 @@
             @edit-item="$emit('edit-item', $event)"
             @open-delete="$emit('open-delete', $event)"
             calledFrom="nested"
+            class="w-full"
           />
         </div>
       </template>
@@ -177,7 +184,7 @@ import Table from "~/components/settings/list/Table.vue";
 const props = defineProps({
   tableData: Object,
   filters: Object,
-  calledFrom: String
+  calledFrom: String,
 });
 
 const emit = defineEmits();
@@ -188,6 +195,9 @@ const isAllExpanded = ref(false);
 
 const headerClass = computed(() => {
   return isSublistData.value ? "sublist-padding" : "no-padding";
+});
+const isRoot = computed(() => {
+  return props.calledFrom;
 });
 
 const showPaginator = computed(() => {
@@ -285,28 +295,29 @@ const toggleRow = (data) => {
   border: none !important;
 }
 
-::v-deep .p-datatable-tbody > tr > td {
+/* ::v-deep .p-datatable-tbody > tr > td {
   border: none !important;
-  padding: 8px 0px !important;
-}
+ 
+} */
+
 
 ::v-deep
   .p-datatable-tbody
   > tr.p-row-expanded
   > td
   > .p-datatable-row-expansion {
-  margin: 0 !important; /* Remove margin for expanded content */
-  padding: 0 !important; /* Adjust padding for expanded content */
+  margin: 0 !important; 
+  padding: 0 !important; 
 }
 
 ::v-deep .p-datatable-thead > tr > th {
-  border: none !important;
+  /* border: none !important; */
   padding: 0 !important;
   white-space: nowrap;
 }
 
 ::v-deep .p-datatable-thead > tr > th.sublist-padding {
-  border: none !important;
+  /* border: none !important; */
   padding: 10px !important;
   white-space: nowrap;
 }

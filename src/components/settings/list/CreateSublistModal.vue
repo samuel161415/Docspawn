@@ -19,13 +19,23 @@
         <label class="font-semibold w-6rem text-lg">List Type</label>
         <div class="flex gap-2">
           <button
-            :class="[listType === 'simple' ? 'bg-green-500 text-white' : 'bg-gray-200 text-black', 'px-4 py-2 rounded']"
+            :class="[
+              listType === 'simple'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 text-black',
+              'px-4 py-2 rounded',
+            ]"
             @click="listType = 'simple'"
           >
             Simple List
           </button>
           <button
-            :class="[listType === 'dataSource' ? 'bg-green-500 text-white' : 'bg-gray-200 text-black', 'px-4 py-2 rounded']"
+            :class="[
+              listType === 'dataSource'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-200 text-black',
+              'px-4 py-2 rounded',
+            ]"
             @click="listType = 'dataSource'"
           >
             Data Source
@@ -37,22 +47,64 @@
       <div v-if="listType === 'simple'">
         <!-- Simple list input fields -->
         <div class="flex flex-col align-items-center gap-2 mb-3">
-          <label for="sublistitems" class="font-semibold w-6rem text-lg">Sublist items <span class="text-red-400">*</span></label>
-          <span class="text-sm text-surface-500">Multiple entries are allowed <br />(Comma separated entries)</span>
-          <span v-if="addClicked && sublistItems.length === 0" class="text-sm text-error">
-            <font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="text-error mr-2"></font-awesome-icon>
+          <label for="sublistitems" class="font-semibold w-6rem text-lg"
+            >Sublist items <span class="text-red-400">*</span></label
+          >
+          <span class="text-sm text-surface-500"
+            >Multiple entries are allowed <br />(Comma separated entries)</span
+          >
+          <span
+            v-if="addClicked && sublistItems.length === 0"
+            class="text-sm text-error"
+          >
+            <font-awesome-icon
+              :icon="['fas', 'exclamation-triangle']"
+              class="text-error mr-2"
+            ></font-awesome-icon>
             You should Add Items!
           </span>
-          <Textarea id="sublistItems" v-model="sublistItem" rows="10" cols="30" placeholder="List item" :invalid="addClicked && sublistItem === ''" />
+          <Textarea
+            id="sublistItems"
+            v-model="sublistItem"
+            rows="10"
+            cols="30"
+            placeholder="List item"
+            :invalid="addClicked && sublistItem === ''"
+          />
         </div>
-        <Button label="Add" icon="pi pi-plus" @click="handleAdd" class="bg-success text-white hover:bg-success hover:border-success my-2" />
-        <DataTable :value="sublistItems" striped-rows show-gridlines :reorderableColumns="true" @rowReorder="onRowReorder" tableStyle="min-width: 30rem">
-          <Column field="index" :body-style="{ margin: '0rem', padding: '0rem' }" rowReorder style="width: 3%">
+        <Button
+          label="Add"
+          icon="pi pi-plus"
+          @click="handleAdd"
+          class="bg-success text-white hover:bg-success hover:border-success my-2"
+        />
+        <DataTable
+          :value="sublistItems"
+          striped-rows
+          show-gridlines
+          :reorderableColumns="true"
+          @rowReorder="onRowReorder"
+          tableStyle="min-width: 30rem"
+        >
+          <Column
+            field="index"
+            :body-style="{ margin: '0rem', padding: '0rem' }"
+            rowReorder
+            style="width: 3%"
+          >
             <template #rowreordericon>
-              <font-awesome-icon :icon="['fas', 'bars']" class="cursor-move p-6" data-pc-section="rowreordericon"></font-awesome-icon>
+              <font-awesome-icon
+                :icon="['fas', 'bars']"
+                class="cursor-move p-6"
+                data-pc-section="rowreordericon"
+              ></font-awesome-icon>
             </template>
           </Column>
-          <Column field="name" header="Name" :body-style="{ margin: '0rem', padding: '0rem' }">
+          <Column
+            field="name"
+            header="Name"
+            :body-style="{ margin: '0rem', padding: '0rem' }"
+          >
             <template #body="{ data }">
               <p class="ml-2">{{ data["name"] }}</p>
             </template>
@@ -60,7 +112,11 @@
           <Column field="action" header="Actions" style="width: 3%">
             <template #body="{ data }">
               <div class="flex justify-center">
-                <font-awesome-icon :icon="['fas', 'trash-alt']" class="text-error cursor-pointer" @click="deleteItem(data)"></font-awesome-icon>
+                <font-awesome-icon
+                  :icon="['fas', 'trash-alt']"
+                  class="text-error cursor-pointer"
+                  @click="deleteItem(data)"
+                ></font-awesome-icon>
               </div>
             </template>
           </Column>
@@ -69,26 +125,85 @@
 
       <div v-else>
         <!-- Data source input fields -->
-        <div v-if="selectedFiles.length === 0" class="custom-file-upload" :class="{ 'error-border': hasError }" @dragover.prevent @dragenter.prevent="handleDragEnter" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop">
-          <FileUpload ref="fileupload" mode="basic" name="demo[]" :multiple="false" accept=".csv, .xlsx" :max-file-size="100000000" choose-label="Browse" class="hidden-input" @select="onFileSelect" />
+        <div
+          v-if="selectedFiles.length === 0"
+          class="custom-file-upload"
+          :class="{ 'error-border': hasError }"
+          @dragover.prevent
+          @dragenter.prevent="handleDragEnter"
+          @dragleave.prevent="handleDragLeave"
+          @drop.prevent="handleDrop"
+        >
+          <FileUpload
+            ref="fileupload"
+            mode="basic"
+            name="demo[]"
+            :multiple="false"
+            accept=".csv, .xlsx"
+            :max-file-size="100000000"
+            choose-label="Browse"
+            class="hidden-input"
+            @select="onFileSelect"
+          />
           <div class="drop-zone py-6">
-            <span v-if="!hasError" class="font-poppins p-4">Drag and drop csv or xlsx files here to upload or</span>
-            <span v-else class="bg-red-50 p-4 text-red-400 font-poppins">{{ fileErrorText }}</span>
-            <Button label="Browse" icon="pi pi-plus" class="font-poppins mt-4" @click="triggerFileInput" />
+            <span v-if="!hasError" class="font-poppins p-4"
+              >Drag and drop csv or xlsx files here to upload or</span
+            >
+            <span v-else class="bg-red-50 p-4 text-red-400 font-poppins">{{
+              fileErrorText
+            }}</span>
+            <Button
+              label="Browse"
+              icon="pi pi-plus"
+              class="font-poppins mt-4"
+              @click="triggerFileInput"
+            />
           </div>
         </div>
 
-        <div v-else class="file-list custom-file-upload flex flex-col gap-6 items-center justify-center">
+        <div
+          v-else
+          class="file-list custom-file-upload flex flex-col gap-6 items-center justify-center"
+        >
           <ul>
-            <li v-for="file in selectedFiles" :key="file.name" class="font-poppins p-4">{{ file.name }}</li>
+            <li
+              v-for="file in selectedFiles"
+              :key="file.name"
+              class="font-poppins p-4"
+            >
+              {{ file.name }}
+            </li>
           </ul>
-          <Button severity="danger" outlined label="Remove" icon="pi pi-times" class="mt-4 font-poppins" @click="removeFiles" />
+          <Button
+            severity="danger"
+            outlined
+            label="Remove"
+            icon="pi pi-times"
+            class="mt-4 font-poppins"
+            @click="removeFiles"
+          />
         </div>
+
+        <!-- Table for Data Source Edit -->
+        <TableForDataSourceEdit
+          v-if="dataSourceFileCompleteJSON?.length > 0"
+          :data-source-file-complete-j-s-o-n="dataSourceFileCompleteJSON"
+          :data-source-column-names="dataSourceColumnNames"
+          :data-source-selected-columns="dataSourceSelectedColumns"
+          :data-source-selected-rows="dataSourceSelectedRows"
+          @change-selected-columns="handleChangeSelectedColumns"
+          @change-selected-rows="handleChangeSelectedRows"
+        />
       </div>
     </div>
 
     <div class="flex justify-center mt-5">
-      <Button label="Create sublist" icon="pi pi-check" class="bg-success text-white hover:bg-success hover:border-success flex justify-center text-center" @click="handleCreateList" />
+      <Button
+        label="Create sublist"
+        icon="pi pi-check"
+        class="bg-success text-white hover:bg-success hover:border-success flex justify-center text-center"
+        @click="handleCreateList"
+      />
     </div>
   </Dialog>
 </template>
@@ -102,6 +217,7 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import { useToast } from "primevue/usetoast";
 import ExcelJS from "exceljs";
+import TableForDataSourceEdit from '../data_source/TableForDataSourceEdit.vue'
 
 const emit = defineEmits(["createSubSubList", "cancel", "error", "success"]);
 const props = defineProps({
@@ -351,15 +467,26 @@ const handleCreateList = () => {
         title: item.name,
         isHovered: false,
         level: props.level + 1,
-        isSublistSimple : false,
+        isSublistSimple: false,
         sublists: [],
       };
     });
-    emit("createSubSubList", { sublistItems: sublistItems.value, isSublistSimple: isSublistSimple.value });
-  } else if (listType.value === "dataSource" && selectedFiles.value.length > 0) {
+    emit("createSubSubList", {
+      sublistItems: sublistItems.value,
+      isSublistSimple: isSublistSimple.value,
+    });
+    emit("success"); // Emit success event
+  } else if (
+    listType.value === "dataSource" &&
+    selectedFiles.value.length > 0
+  ) {
     isSublistSimple.value = false;
     // Handle data source creation
-    emit("createSubSubList", { sublistItems: dataSourceFileCompleteJSON.value, isSublistSimple: isSublistSimple.value });
+    emit("createSubSubList", {
+      sublistItems: dataSourceFileCompleteJSON.value,
+      isSublistSimple: isSublistSimple.value,
+    });
+    emit("success"); // Emit success event
   }
 };
 
@@ -378,35 +505,12 @@ const columns = ref([
 const onRowReorder = (event) => {
   sublistItems.value = event.value;
 };
+
+const handleChangeSelectedColumns = (data) => {
+  dataSourceSelectedColumns.value = data;
+};
+
+const handleChangeSelectedRows = (data) => {
+  dataSourceSelectedRows.value = data;
+};
 </script>
-
-<style>
-.custom-file-upload {
-  position: relative;
-  border: 2px dashed #c8c8c8;
-  border-radius: 4px;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.3s;
-}
-
-.custom-file-upload .hidden-input {
-  display: none;
-}
-
-.custom-file-upload .drop-zone {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.file-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.error-border {
-  border-color: red;
-}
-</style>

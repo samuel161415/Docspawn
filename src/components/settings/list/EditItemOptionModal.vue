@@ -6,14 +6,13 @@
     :style="{ width: '40rem' }"
   >
     <template #header>
-      <div class="flex justify-center items-center ml-5">
+      <div class="flex justify-center items-center ml-7">
         <p class="font-semibold text-xl flex justify-center text-center">
           Item options
         </p>
       </div>
     </template>
-
-    <div class="px-5 my-5">
+    <div class="px-7 mb-5">
       <div class="flex flex-col align-items-center gap-3 mb-5">
         <label for="listname" class="font-semibold w-6rem text-lg"
           >Item name <span class="text-red-400">*</span></label
@@ -22,60 +21,31 @@
           id="listname"
           class="flex-auto"
           v-model="listItemName"
-          placeholder="list Item Name"
+          placeholder="Item name"
           autocomplete="off"
         />
       </div>
     </div>
-<!--  v-if="props.editableItem?.level != 3" -->
-    <div
-     
-      class="flex align-items-center px-5 mt-5"
-    >
-      <Checkbox
-        v-model="containsublist"
-        inputId="containsublist"
-        name="sublist"
-        value="sublist"
-        :binary="true"
-      />
-      <label for="containsublist" class="ml-2">Contains sublist</label>
-    </div>
 
-    <div class="flex justify-center mt-5 mr-5">
+    <div class="px-7 mb-5">
+            <p class="text-lg font-medium">Used in</p>
+            <div class="ml-2 py-2">
+                <p v-for="list in listOptions" class=" text-lg"><i class="mr-2 pi pi-minus"></i> {{ list.option }}</p>
+               
+            </div>
+        <div>
+
+        </div>
+      </div>
+      
+    <div class="flex justify-center mt-10 mr-5">
       <Button
         label="Save"
         icon="pi pi-check"
-        class="bg-success text-white hover:bg-success hover:border-success w-28"
+        class="bg-success text-white hover:bg-success hover:border-success w-28 ml-2"
         @click="handleEditItem"
       />
     </div>
-
-    <Dialog
-      v-model:visible="containsublist"
-      header="Sublist"
-      modal
-      :style="{ width: '25rem' }"
-    >
-      <span class="p-text-secondary block mb-5"
-        >Do you want to create a new Sublist?</span
-      >
-
-      <div class="flex justify-end gap-2">
-        <Button
-          type="button"
-          label="No"
-          outlined
-          @click="containsublist = false"
-        ></Button>
-
-        <Button
-          type="button"
-          label="Yes"
-          @click="emitOpenCreateListModal"
-        ></Button>
-      </div>
-    </Dialog>
   </Dialog>
 </template>
 
@@ -90,7 +60,11 @@ const props = defineProps({
   },
 });
 
-const containsublist = ref(false);
+const listOptions = [
+    { option:"Form to doc" },
+    { option:"Table to doc" }
+  ]
+
 const visible = ref(false);
 const listItemName = ref(props.editableItem.title);
 
@@ -111,10 +85,5 @@ const handleEditItem = () => {
 
   listItemName.value = "";
   emit("cancel");
-};
-
-const emitOpenCreateListModal = () => {
-  containsublist.value = false;
-  emit("openCreateListModal", props.editableItem);
 };
 </script>

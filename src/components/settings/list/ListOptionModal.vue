@@ -27,12 +27,13 @@
       <div class="flex justify-center mt-10 mr-5">
         <Button 
           label="Syncing options" 
-           
+          disabled
+          severity="secondary"
           v-tooltip.top="{
                 value: 'Upcoming functionality'
           }"
           
-          class="bg-gray-400 hover:bg-gray-400 hover:border-gray-300 text-white w-40 cursor-default" @click="" />
+          class="whitespace-nowrap   hover:border-gray-300 text-white w-40 cursor-default" @click="" />
         <Button label="Save" icon="pi pi-check" class="bg-success text-white hover:bg-success hover:border-success w-28 ml-2" @click="handleAdd" />
       </div>
      

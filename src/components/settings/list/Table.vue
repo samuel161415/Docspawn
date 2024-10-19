@@ -8,6 +8,9 @@
       tableStyle="min-width: 60rem"
       :paginator="showPaginator"
       :rows="5"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords}"
       class=""
       showGridlines
     >
@@ -48,7 +51,7 @@
             <span
               v-if="hasSublists(data, 'branch')"
               @click="toggleRow(data)"
-              class="w-[14px]  cursor-pointer"
+              class="w-[14px] cursor-pointer"
             >
               <i
                 :class="
@@ -59,8 +62,8 @@
                 class="w-full"
               ></i>
             </span>
-            <span v-else class="w-[14px] ">
-              <font-awesome-icon :icon="['fas', 'minus']" class="w-full"/>
+            <span v-else class="w-[14px]">
+              <font-awesome-icon :icon="['fas', 'minus']" class="w-full" />
             </span>
           </template>
         </Column>
@@ -80,10 +83,7 @@
           </template>
         </Column>
 
-        <Column
-          :header="null"
-          class="bg-white text-center w-[80px]"
-        >
+        <Column :header="null" class="bg-white text-center w-[80px]">
           <template #body="{ data }">
             <div class="flex justify-center">
               <Button
@@ -100,7 +100,6 @@
               <Menu
                 :ref="`menu-${data.id}`"
                 :model="[
-                
                   {
                     label: 'Add Sublist',
                     icon: 'pi pi-plus',
@@ -130,14 +129,13 @@
       </template>
 
       <template v-else>
-        <Column v-if="!isSublistData" expander class="w-[80px] "></Column>
+        <Column v-if="!isSublistData" expander class="w-[80px]"></Column>
         <Column
           v-for="(column, index) in columns"
           :key="index"
           :field="column"
           :header="isSublistData ? column : null"
           :sortable="isSublistData ? true : false"
-          
           class="w-[calc(100% - 80px)] pl-[33px]"
           :class="headerClass"
         >
@@ -205,24 +203,6 @@ const showPaginator = computed(() => {
   return props.tableData.sublists?.length > 5;
 });
 
-const onRowExpand = (event) => {
-  toast.add({
-    severity: "info",
-    summary: "Row Expanded",
-    detail: event.data.title,
-    life: 3000,
-  });
-};
-
-const onRowCollapse = (event) => {
-  toast.add({
-    severity: "success",
-    summary: "Row Collapsed",
-    detail: event.data.title,
-    life: 3000,
-  });
-};
-
 const expandAll = () => {
   if (props.tableData?.sublists) {
     expandedRows.value = props.tableData.sublists.reduce(
@@ -243,14 +223,6 @@ const toggleExpandCollapse = () => {
 
 const collapseAll = () => {
   expandedRows.value = {};
-};
-
-const handleEditItem = (data) => {
-  emit("edit-item", data);
-};
-
-const handleOpenDelete = (data) => {
-  emit("open-delete", data);
 };
 
 const hasSublists = (data, from) => {
@@ -293,8 +265,6 @@ const toggleRow = (data) => {
 ::v-deep .p-datatable {
   border: none !important;
 }
-
-
 
 ::v-deep
   .p-datatable-tbody

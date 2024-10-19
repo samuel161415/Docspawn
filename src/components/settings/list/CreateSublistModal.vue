@@ -146,6 +146,7 @@
             @select="onFileSelect"
           />
           <div class="drop-zone py-6">
+          <p class="font-semibold  text-lg">{{title}}</p> 
             <span v-if="!hasError" class="font-poppins p-4"
               >Drag and drop csv or xlsx files here to upload or</span
             >
@@ -225,6 +226,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  title: {
+    type : String,
+    required: true,
+  }
 });
 
 const visible = ref(false);

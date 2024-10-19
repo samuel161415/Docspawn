@@ -138,7 +138,6 @@
 
         <!-- right section -->
         <div class="w-full md:max-w-[70vw] py-5 ml-2">
-         
           <div class="mb-12 max-w-[70vw]">
             <DataTableComponent
               :tableData="tableData"
@@ -152,7 +151,7 @@
               calledFrom="root"
               c_level="0"
             />
-           
+
             <Toast />
           </div>
         </div>
@@ -174,6 +173,7 @@
       v-if="openCreateSubList"
       v-model:visible="openCreateSubList"
       :level="currentListLevel"
+      :title="currentListTitle"
       @createSubSubList="handleCreateSubSublist"
       @cancel="openCreateSubList = false"
     />
@@ -259,6 +259,7 @@ const tableData = ref({});
 const deleteItem = ref();
 const openCreateSubList = ref(false);
 const currentListLevel = ref();
+const currentListTitle = ref()
 const isSublistSimple = ref(true);
 // sublist id
 const sublistId = ref();
@@ -307,7 +308,7 @@ const handleopensubmenu = (clickedItem) => {
 
 onMounted(() => {
   tableData.value = addNewListItem.value[0];
-  console.log("tableData after update", tableData.value);
+  // console.log("tableData after update", tableData.value);
 });
 
 const filters = ref({
@@ -320,61 +321,47 @@ const filters = ref({
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
-  console.log(
-    "createSubList called",
-    "data",
-    data,
-    "data.id",
-    data.id,
-    "data.level",
-    data.level,
-    "title",
-    data.title,
-    "path",
-    data.path
-  );
+  // console.log(
+  //   "createSubList called",
+  //   "data",
+  //   data,
+  //   "data.id",
+  //   data.id,
+  //   "data.level",
+  //   data.level,
+  //   "title",
+  //   data.title,
+  //   "path",
+  //   data.path
+  // );
   openItemOptions.value = false;
   openCreateSubList.value = true;
   sublistId.value = data.id;
   currentListLevel.value = data.level;
   sublistPath.value = data.path; // Store the unique path
+  currentListTitle.value = data.title;
 };
-
 
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
 
-  const parentList = findItemByPath(addNewListItem.value, sublistPath.value);
-  if (parentList) {
-    const newSublistItems = data.sublistItems.map((item, index) => {
-      const newPath = parentList.sublists.length === 0
-        ? `${parentList.path}-1`
-        : `${parentList.path}-${parentList.sublists.length + index + 1}`;
-      return { ...item, path: newPath };
-    });
 
-    if (!isSublistSimple.value) {
-      parentList.sublists = newSublistItems;
-    } else {
-      if (parentList.isSublistSimple) {
-        parentList.sublists = Array.isArray(parentList.sublists)
-          ? parentList.sublists.concat(newSublistItems)
-          : newSublistItems;
-      } else {
-        parentList.sublists = newSublistItems;
-      }
-    }
-    parentList.isSublistSimple = data.isSublistSimple;
-  }
 
   // Update tableData
   const tableDataList = findItemByPath(tableData.value, sublistPath.value);
   if (tableDataList) {
     const newSublistItems = data.sublistItems.map((item, index) => {
-      const newPath = tableDataList.sublists.length === 0
-        ? `${tableDataList.path}-1`
-        : `${tableDataList.path}-${tableDataList.sublists.length + index + 1}`;
-      return { ...item, path: newPath };
+      if (isSublistSimple.value) {
+        const newPath =
+          tableDataList.sublists.length === 0
+            ? `${tableDataList.path}-1`
+            : `${tableDataList.path}-${
+                tableDataList.sublists.length + index + 1
+              }`;
+        return { ...item, path: newPath };
+      } else {
+        return { ...item };
+      }
     });
 
     if (!isSublistSimple.value) {
@@ -389,7 +376,7 @@ const handleCreateSubSublist = (data) => {
       }
     }
     tableDataList.isSublistSimple = data.isSublistSimple;
-    openCreateSubList.value=false
+    openCreateSubList.value = false;
   }
 };
 const findItemByPath = (list, path) => {
@@ -407,13 +394,15 @@ const findItemByPath = (list, path) => {
   return null;
 };
 
-
 const handleEditItem = (data) => {
   editableItem.value = data;
   openItemOptions.value = true;
 
   // Update addNewListItem
-  const itemToEditInAddNewListItem = findItemByPath(addNewListItem.value, data.path);
+  const itemToEditInAddNewListItem = findItemByPath(
+    addNewListItem.value,
+    data.path
+  );
   if (itemToEditInAddNewListItem) {
     itemToEditInAddNewListItem.title = data.title;
   }
@@ -427,7 +416,6 @@ const handleEditItem = (data) => {
   // Force reactivity update
   tableData.value = { ...tableData.value };
 };
-
 
 //
 const handleOpenAddItems = (title) => {
@@ -477,8 +465,6 @@ const handleAddItems = (data) => {
     tableData.value.sublists.push(newItem);
   });
 };
-
-
 
 const handleOpenDelete = (data) => {
   deleteItem.value = data;

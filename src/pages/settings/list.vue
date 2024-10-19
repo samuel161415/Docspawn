@@ -138,25 +138,8 @@
 
         <!-- right section -->
         <div class="w-full md:max-w-[70vw] py-5 ml-2">
-          <!-- <div class="flex flex-col md:flex-row justify-end gap-2 border-t border-l border-r  bg-surface-50">
-            <Button
-              icon="pi pi-plus"
-              label="Add item(s)"
-              outlined
-              @click="openAddItems = true"
-              class="text-success border-success hover:bg-green-50"
-            />
-            <Button
-              icon="pi pi-cog"
-              label="List options"
-              class="p-button-success"
-              outlined
-              @click="openListOptions = true"
-            />
-          </div> -->
-
-          <!-- table -->
-          <div class="mb-12  max-w-[70vw] ">
+         
+          <div class="mb-12 max-w-[70vw]">
             <DataTableComponent
               :tableData="tableData"
               :filters="filters"
@@ -165,19 +148,11 @@
               @open-delete="handleOpenDelete"
               @open-add-items="handleOpenAddItems"
               @open-list-options="openListOptions = true"
+              @open-create-sublist-modal="createSubList"
               calledFrom="root"
-              c_level = 0
+              c_level="0"
             />
-            <!-- <TempTable
-              :tableData="tableData"
-              :filters="filters"
-              @row-reorder="onRowReorder"
-              @edit-item="handleEditItem"
-              @open-delete="handleOpenDelete"
-              @open-add-items="handleOpenAddItems"
-              @open-list-options="openListOptions = true"
-              calledFrom="root"
-            /> -->
+           
             <Toast />
           </div>
         </div>
@@ -262,7 +237,7 @@ import { ref, watch } from "vue";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import DataTableComponent from "~/components/settings/list/Table.vue";
-import TempTable from'~/components/settings/list/TempTable.vue'
+import TempTable from "~/components/settings/list/TempTable.vue";
 import CreateListModal from "~/components/settings/list/CreateListModal.vue";
 import AddItemsModal from "~/components/settings/list/AddItemsModal.vue";
 import EditItemOptionModal from "~/components/settings/list/EditItemOptionModal.vue";
@@ -287,6 +262,7 @@ const currentListLevel = ref();
 const isSublistSimple = ref(true);
 // sublist id
 const sublistId = ref();
+const sublistPath = ref();
 const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
 
@@ -331,6 +307,7 @@ const handleopensubmenu = (clickedItem) => {
 
 onMounted(() => {
   tableData.value = addNewListItem.value[0];
+  console.log("tableData after update", tableData.value);
 });
 
 const filters = ref({
@@ -343,39 +320,117 @@ const filters = ref({
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
+  console.log(
+    "createSubList called",
+    "data",
+    data,
+    "data.id",
+    data.id,
+    "data.level",
+    data.level,
+    "title",
+    data.title,
+    "path",
+    data.path
+  );
   openItemOptions.value = false;
   openCreateSubList.value = true;
   sublistId.value = data.id;
   currentListLevel.value = data.level;
+  sublistPath.value = data.path; // Store the unique path
 };
 
-// this is emitted from createSublistModal
+
 const handleCreateSubSublist = (data) => {
-  console.log("data to be created", data);
-  
   isSublistSimple.value = data.isSublistSimple;
-  tableData.value.sublists.map((list) => {
-    if (list.id === sublistId.value) {
-      console.log("existing sublistis is sublist", list.isSublistSimple);
-      if(!isSublistSimple.value){
-        list.sublists = data.sublistItems
+
+  const parentList = findItemByPath(addNewListItem.value, sublistPath.value);
+  if (parentList) {
+    const newSublistItems = data.sublistItems.map((item, index) => {
+      const newPath = parentList.sublists.length === 0
+        ? `${parentList.path}-1`
+        : `${parentList.path}-${parentList.sublists.length + index + 1}`;
+      return { ...item, path: newPath };
+    });
+
+    if (!isSublistSimple.value) {
+      parentList.sublists = newSublistItems;
+    } else {
+      if (parentList.isSublistSimple) {
+        parentList.sublists = Array.isArray(parentList.sublists)
+          ? parentList.sublists.concat(newSublistItems)
+          : newSublistItems;
+      } else {
+        parentList.sublists = newSublistItems;
       }
-      else{
-        if(list.isSublistSimple)
-        list.sublists = list.sublists.concat(data.sublistItems); 
-       else{
-        list.sublists = data.sublistItems
-       }
-      }
-      // Concatenate new items with existing sublist
-      list.isSublistSimple = data.isSublistSimple; // Set isSublistSimple property
     }
-  });
+    parentList.isSublistSimple = data.isSublistSimple;
+  }
+
+  // Update tableData
+  const tableDataList = findItemByPath(tableData.value, sublistPath.value);
+  if (tableDataList) {
+    const newSublistItems = data.sublistItems.map((item, index) => {
+      const newPath = tableDataList.sublists.length === 0
+        ? `${tableDataList.path}-1`
+        : `${tableDataList.path}-${tableDataList.sublists.length + index + 1}`;
+      return { ...item, path: newPath };
+    });
+
+    if (!isSublistSimple.value) {
+      tableDataList.sublists = newSublistItems;
+    } else {
+      if (tableDataList.isSublistSimple) {
+        tableDataList.sublists = Array.isArray(tableDataList.sublists)
+          ? tableDataList.sublists.concat(newSublistItems)
+          : newSublistItems;
+      } else {
+        tableDataList.sublists = newSublistItems;
+      }
+    }
+    tableDataList.isSublistSimple = data.isSublistSimple;
+    openCreateSubList.value=false
+  }
 };
+const findItemByPath = (list, path) => {
+  if (list.path === path) {
+    return list;
+  }
+  if (Array.isArray(list.sublists)) {
+    for (const sublist of list.sublists) {
+      const found = findItemByPath(sublist, path);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
+};
+
+
+const handleEditItem = (data) => {
+  editableItem.value = data;
+  openItemOptions.value = true;
+
+  // Update addNewListItem
+  const itemToEditInAddNewListItem = findItemByPath(addNewListItem.value, data.path);
+  if (itemToEditInAddNewListItem) {
+    itemToEditInAddNewListItem.title = data.title;
+  }
+
+  // Update tableData
+  const itemToEditInTableData = findItemByPath(tableData.value, data.path);
+  if (itemToEditInTableData) {
+    itemToEditInTableData.title = data.title;
+  }
+
+  // Force reactivity update
+  tableData.value = { ...tableData.value };
+};
+
 
 //
 const handleOpenAddItems = (title) => {
-  console.log('handle add item called',title)
   addItemsTitle.value = title;
   openAddItems.value = true;
 };
@@ -423,20 +478,9 @@ const handleAddItems = (data) => {
   });
 };
 
-const handleEditItem = (data) => {
-  console.log('handle edit item called',data)
-  editableItem.value = data;
-  openItemOptions.value = true;
 
-  tableData.value.sublists.map((sublist) => {
-    if (sublist.id === data.id) {
-      sublist.title = data.title;
-    }
-  });
-};
 
 const handleOpenDelete = (data) => {
-  console.log('handle delete item called')
   deleteItem.value = data;
   openDeleteModal.value = true;
 };

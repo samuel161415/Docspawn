@@ -1,6 +1,6 @@
 <template>
   <div class="">
-  <!-- :showGridlines="calledFrom==='root' ? false:true" -->
+    <!-- :showGridlines="calledFrom==='root' ? false:true" -->
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
@@ -9,8 +9,7 @@
       :paginator="showPaginator"
       :rows="5"
       class=""
-      showGridlines 
-      
+      showGridlines
     >
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
@@ -44,12 +43,12 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column class="w-[5%] bg-white ">
+        <Column class="w-[80px] bg-white text-center">
           <template #body="{ data }">
             <span
               v-if="hasSublists(data, 'branch')"
               @click="toggleRow(data)"
-              class="cursor-pointer w-full"
+              class="w-[14px]  cursor-pointer"
             >
               <i
                 :class="
@@ -57,7 +56,11 @@
                     ? 'pi pi-chevron-down'
                     : 'pi pi-chevron-right'
                 "
+                class="w-full"
               ></i>
+            </span>
+            <span v-else class="w-[14px] ">
+              <font-awesome-icon :icon="['fas', 'minus']" class="w-full"/>
             </span>
           </template>
         </Column>
@@ -67,20 +70,11 @@
           :field="column"
           :header="null"
           :sortable="false"
-          class="w-[90%]"
+          class="w-[calc(100% - 160px)] pl-[33px]"
           :class="headerClass"
         >
           <template #body="{ data, field }">
-            <p
-              class="font-poppins fles justify-start p-0 font-normal"
-            >
-              <span
-                v-if="!hasSublists(data)"
-                icon="pi pi-minus"
-                class="pr-2 m-0"
-                ><font-awesome-icon :icon="['fas', 'minus']" />
-              </span>
-
+            <p class="font-poppins fles justify-start p font-normal">
               {{ data[field] }}
             </p>
           </template>
@@ -88,30 +82,39 @@
 
         <Column
           :header="null"
-          style="width: 5%"
-          class="bg-white text-center w-[5%]"
-        
+          class="bg-white text-center w-[80px]"
         >
           <template #body="{ data }">
             <div class="flex justify-center">
               <Button
                 icon="pi pi-cog"
                 outlined
-                class="p-button-rounded p-button-success  flex justify-center items-center"
-                @click="$refs.menu.toggle($event)"
+                class="p-button-rounded p-button-success flex justify-center items-center"
+                @click="$refs[`menu-${data.id}`].toggle($event)"
               />
-              <Menu
-                ref="menu"
-                :model="[
-                  {
+              <!--   {
                     label: 'Add Item',
                     icon: 'pi pi-plus',
                     command: () => $emit('open-add-items', tableData.title),
+                  }, -->
+              <Menu
+                :ref="`menu-${data.id}`"
+                :model="[
+                
+                  {
+                    label: 'Add Sublist',
+                    icon: 'pi pi-plus',
+                    command: () =>
+                      $emit('open-create-sublist-modal', {
+                        ...data,
+                        path: data.path,
+                      }),
                   },
                   {
                     label: 'Edit',
                     icon: 'pi pi-pencil',
-                    command: () => $emit('edit-item', data),
+                    command: () =>
+                      $emit('edit-item', { ...data, path: data.path }),
                   },
                   {
                     label: 'Delete',
@@ -127,22 +130,15 @@
       </template>
 
       <template v-else>
-        <Column
-          v-if="!isSublistData"
-          expander
-          class=" w-[5%]"
-        ></Column>
+        <Column v-if="!isSublistData" expander class="w-[80px] "></Column>
         <Column
           v-for="(column, index) in columns"
           :key="index"
           :field="column"
           :header="isSublistData ? column : null"
           :sortable="isSublistData ? true : false"
-          :headerStyle="{
-            height: 'auto',
-            padding: '20px !important',
-          }"
-          class="[95%]"
+          
+          class="w-[calc(100% - 80px)] pl-[33px]"
           :class="headerClass"
         >
           <template #body="{ data, field }">
@@ -158,7 +154,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-10 flex margin-end w-full max-w-[68vw] overflow-hidden"
+          class="pl-[66px] flex margin-end w-full max-w-[68vw] overflow-hidden"
           :class="isSublistData ? '' : ''"
         >
           <Table
@@ -167,6 +163,9 @@
             @open-list-options="$emit('open-list-options')"
             @edit-item="$emit('edit-item', $event)"
             @open-delete="$emit('open-delete', $event)"
+            @open-create-sublist-modal="
+              $emit('open-create-sublist-modal', $event)
+            "
             calledFrom="nested"
             class="w-full"
           />
@@ -186,6 +185,8 @@ const props = defineProps({
   filters: Object,
   calledFrom: String,
 });
+
+console.log("tableData", props.tableData);
 
 const emit = defineEmits();
 const filters = ref(props.filters);
@@ -232,7 +233,6 @@ const expandAll = () => {
 };
 
 const toggleExpandCollapse = () => {
-  console.log("data table", props?.tableData);
   if (isAllExpanded.value) {
     collapseAll();
   } else {
@@ -258,7 +258,6 @@ const hasSublists = (data, from) => {
 };
 
 const isSublistData = computed(() => {
-  console.log("is this simple list", props.tableData?.isSublistSimple);
   return !props.tableData?.isSublistSimple;
 });
 
@@ -295,10 +294,6 @@ const toggleRow = (data) => {
   border: none !important;
 }
 
-/* ::v-deep .p-datatable-tbody > tr > td {
-  border: none !important;
- 
-} */
 
 
 ::v-deep
@@ -306,8 +301,8 @@ const toggleRow = (data) => {
   > tr.p-row-expanded
   > td
   > .p-datatable-row-expansion {
-  margin: 0 !important; 
-  padding: 0 !important; 
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 ::v-deep .p-datatable-thead > tr > th {

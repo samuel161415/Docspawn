@@ -5,14 +5,14 @@
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
       dataKey="id"
-      tableStyle="min-width: 60rem"
       :paginator="showPaginator"
       :rows="5"
       :rowsPerPageOptions="[5, 10, 20, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
-      class=""
+      class="border border-blue-500"
       showGridlines
+
     >
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
@@ -152,7 +152,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-[66px] flex margin-end w-full max-w-[68vw] overflow-hidden"
+          class="pl-[65px] border-none  max-w-[calc(70vw-65px)]  mt-[-14px] mb-[-15px]    overflow-hidden"
           :class="isSublistData ? '' : ''"
         >
           <Table
@@ -264,25 +264,40 @@ const toggleRow = (data) => {
 
 ::v-deep .p-datatable {
   border: none !important;
+  padding: 0 !important;
 }
 
-::v-deep
-  .p-datatable-tbody
-  > tr.p-row-expanded
-  > td
-  > .p-datatable-row-expansion {
+::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
   margin: 0 !important;
   padding: 0 !important;
 }
 
+::v-deep .p-datatable-thead > tr {
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* ::v-deep .p-datatable-tbody > tr {
+  border-top: none !important;
+  border-bottom: none !important;
+} */
+
 ::v-deep .p-datatable-thead > tr > th {
-  /* border: none !important; */
+  border: none !important;
   padding: 0 !important;
   white-space: nowrap;
 }
 
+::v-deep .p-datatable-tbody > tr > td {
+  border-top: none !important;
+  /* border-bottom: none !important; */
+}
+
+::v-deep .p-datatable-tbody > tr.p-row-expanded {
+  border-bottom: none !important;
+}
+
 ::v-deep .p-datatable-thead > tr > th.sublist-padding {
-  /* border: none !important; */
   padding: 10px !important;
   white-space: nowrap;
 }

@@ -152,7 +152,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-[65px] border-none  max-w-[calc(70vw-65px)]  mt-[-14px] mb-[-15px]    overflow-hidden"
+          class="pl-[65px] border-none  w-[calc(100%-65px)]  mt-[-14px] mb-[-15px]    overflow-hidden"
           :class="isSublistData ? '' : ''"
         >
           <Table

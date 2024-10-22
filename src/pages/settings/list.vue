@@ -138,7 +138,7 @@
 
         <!-- right section -->
         <div class="w-full md:max-w-[70vw] py-5 ml-2">
-          <div class="mb-12 max-w-[70vw]">
+          <div class="mb-12 max-w-[70vw]  relative">
             <DataTableComponent
               :tableData="tableData"
               :filters="filters"
@@ -149,9 +149,9 @@
               @open-list-options="openListOptions = true"
               @open-create-sublist-modal="createSubList"
               calledFrom="root"
-              c_level="0"
+              :c_level="0"
             />
-
+           
             <Toast />
           </div>
         </div>
@@ -237,13 +237,13 @@ import { ref, watch } from "vue";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import DataTableComponent from "~/components/settings/list/Table.vue";
-import TempTable from "~/components/settings/list/TempTable.vue";
 import CreateListModal from "~/components/settings/list/CreateListModal.vue";
 import AddItemsModal from "~/components/settings/list/AddItemsModal.vue";
 import EditItemOptionModal from "~/components/settings/list/EditItemOptionModal.vue";
 import ListOptionModal from "~/components/settings/list/ListOptionModal.vue";
 import CreateSublistModal from "~/components/settings/list/CreateSublistModal.vue";
 import { addNewListItem } from "~/services/newListData.js";
+import TempTable from "~/components/settings/list/TempTable.vue";
 
 const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
 
@@ -344,9 +344,7 @@ const createSubList = (data) => {
 
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-
-
-
+    console.log("data.name",data.name)
   // Update tableData
   const tableDataList = findItemByPath(tableData.value, sublistPath.value);
   if (tableDataList) {
@@ -366,6 +364,7 @@ const handleCreateSubSublist = (data) => {
 
     if (!isSublistSimple.value) {
       tableDataList.sublists = newSublistItems;
+      tableDataList.name = data.name;
     } else {
       if (tableDataList.isSublistSimple) {
         tableDataList.sublists = Array.isArray(tableDataList.sublists)
@@ -377,6 +376,7 @@ const handleCreateSubSublist = (data) => {
     }
     tableDataList.isSublistSimple = data.isSublistSimple;
     openCreateSubList.value = false;
+    console.log('tableDataList',tableDataList)
   }
 };
 const findItemByPath = (list, path) => {

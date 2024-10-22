@@ -1,21 +1,25 @@
 <template>
-  <div>
-    <!-- DataTable with manual row expansion -->
+  <div 
+  class="">
     <DataTable
+      v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
+      dataKey="id"
       :paginator="showPaginator"
       :rows="5"
-      class="border border-white"
-      dataKey="id"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords}"
+      class="border border-blue-500"
+      showGridlines
+
     >
-      <!-- Header with Expand/Collapse All button and other actions -->
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
           <p class="font-poppins font-normal text-lg">
             {{ tableData.title }}
           </p>
           <div class="flex flex-col md:flex-row justify-end gap-2">
-            <!-- Expand/Collapse All Button -->
             <Button
               :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
               :label="isAllExpanded ? 'Collapse' : 'Expand'"
@@ -23,7 +27,6 @@
               outlined
               @click="toggleExpandCollapse"
             />
-            <!-- Add Item Button -->
             <Button
               icon="pi pi-plus"
               label="Add item(s)"
@@ -31,7 +34,6 @@
               @click="$emit('open-add-items', tableData.title)"
               class="text-success border-success hover:bg-green-50 w-40"
             />
-            <!-- List Options Button -->
             <Button
               icon="pi pi-cog"
               label="List options"
@@ -42,93 +44,139 @@
           </div>
         </div>
       </template>
+      <template v-if="isSublistData" #header>
+        <div class="flex justify-start border-b bg-white m-[-14px]   flex-wrap  items-center">
+          <div class="w-[80px] px-[35px] py-[21px] border-r h-full"><font-awesome-icon :icon="['fas', 'minus']" class="w-full" /></div>
+          <p class="font-poppins p-[35px] py-[21px] whitespace-nowrap font-normal text-lg">
+            {{ tableData.name }}
+          </p>
+         
+        </div>
+      </template>
 
-      <!-- Custom Expander Column -->
-      <Column style="width: 5rem" class="bg-white">
-        <template #body="{ data }">
-          <!-- Only show expander icon if the row has sublists -->
-          <span
-            v-if="hasSublists(data)"
-            class="cursor-pointer"
-            @click="toggleRowExpansion(data)"
-          >
-            <i
-              :class="
-                expandedRows[data.id]
-                  ? 'pi pi-chevron-down'
-                  : 'pi pi-chevron-right'
-              "
-            ></i>
-          </span>
-        </template>
-      </Column>
+      <template v-if="!isSublistData">
+        <Column class="w-[80px] bg-white text-center">
+          <template #body="{ data }">
+            <span
+              v-if="hasSublists(data, 'branch')"
+              @click="toggleRow(data)"
+              class="w-[14px] cursor-pointer"
+            >
+              <i
+                :class="
+                  expandedRows[data.id]
+                    ? 'pi pi-chevron-down'
+                    : 'pi pi-chevron-right'
+                "
+                class="w-full"
+              ></i>
+            </span>
+            <span v-else class="w-[14px]">
+              <font-awesome-icon :icon="['fas', 'minus']" class="w-full" />
+            </span>
+          </template>
+        </Column>
+        <Column
+          v-for="(column, index) in columns"
+          :key="index"
+          :field="column"
+          :header="null"
+          :sortable="false"
+          class="w-[calc(100% - 193px)] pl-[33px]"
+          :class="headerClass"
+        >
+          <template #body="{ data, field }">
+            <p class="font-poppins fles justify-start p font-normal">
+              {{ data[field] }}
+            </p>
+          </template>
+        </Column>
 
-      <!-- Data Columns -->
-      <Column
-        v-for="(column, index) in columns"
-        :key="index"
-        :field="column"
-        :header="isSublistData ? column : null"
-        :sortable="isSublistData ? true : false"
-        :headerStyle="
-          isSublistData
-            ? { height: 'auto' }
-            : { height: '0px', backgroundColor: 'blue', border: '0 white' }
-        "
-      >
-        <template #body="{ data, field }">
-          <p class="font-poppins font-normal">{{ data[field] }}</p>
-        </template>
-      </Column>
-
-      <!-- Actions Column -->
-      <Column
-        :header="isSublistData ? 'Actions' : null"
-        style="width: 5%"
-        class="bg-white text-center"
-        :headerStyle="
-          isSublistData
-            ? { height: 'auto' }
-            : { height: '0px', backgroundColor: 'blue', border: '0 white' }
-        "
-      >
-        <template #body="{ data }">
-          <div class="flex space-x-8">
-            <font-awesome-icon
-              :icon="['fas', 'plus']"
-              class="text-primaryBlue cursor-pointer"
-              @click="$emit('open-add-items', tableData.title)"
-            />
-            <font-awesome-icon
-              :icon="['fas', 'pencil-alt']"
-              class="text-success text-lg cursor-pointer"
-              @click="$emit('edit-item', data)"
-            />
-            <font-awesome-icon
-              :icon="['fas', 'trash-alt']"
-              class="text-error text-lg cursor-pointer"
-              @click="$emit('open-delete', data)"
-            />
-          </div>
-        </template>
-      </Column>
-
-      <!-- Expanded Row Content (Recursive TempTable) -->
-      <template #body-expanded="{ data }">
-        <tr v-if="expandedRows[data.id]">
-          <td :colspan="columns.length + 1">
-            <!-- Call TempTable recursively if sublists exist -->
-            <div v-if="hasSublists(data)" class="pl-5">
-              <TempTable
-                :tableData="data"
-                @open-add-items="$emit('open-add-items', $event)"
-                @edit-item="$emit('edit-item', $event)"
-                @open-delete="$emit('open-delete', $event)"
-                calledFrom="nested"
+        <Column :header="null" class="bg-white text-center w-[80px]">
+          <template #body="{ data }">
+            <div class="flex justify-center">
+              <Button
+                icon="pi pi-cog"
+                outlined
+                class="p-button-rounded p-button-success flex justify-center items-center"
+                @click="$refs[`menu-${data.id}`].toggle($event)"
+              />
+              <!--   {
+                    label: 'Add Item',
+                    icon: 'pi pi-plus',
+                    command: () => $emit('open-add-items', tableData.title),
+                  }, -->
+              <Menu
+                :ref="`menu-${data.id}`"
+                :model="[
+                  {
+                    label: 'Add Sublist',
+                    icon: 'pi pi-plus',
+                    command: () =>
+                      $emit('open-create-sublist-modal', {
+                        ...data,
+                        path: data.path,
+                      }),
+                  },
+                  {
+                    label: 'Edit',
+                    icon: 'pi pi-pencil',
+                    command: () =>
+                      $emit('edit-item', { ...data, path: data.path }),
+                  },
+                  {
+                    label: 'Delete',
+                    icon: 'pi pi-trash',
+                    command: () => $emit('open-delete', data),
+                  },
+                ]"
+                popup
               />
             </div>
-          </td>
-        </tr>
+          </template>
+        </Column>
+      </template>
+
+      <template v-else>
+        <Column v-if="!isSublistData" expander class="w-[80px]"></Column>
+        <Column
+          v-for="(column, index) in columns"
+          :key="index"
+          :field="column"
+          :header="isSublistData ? column : null"
+          :sortable="isSublistData ? true : false"
+          class="w-[calc(100% - 80px)] pl-[33px]"
+          :class="headerClass"
+        >
+          <template #body="{ data, field }">
+            <p
+              class="font-poppins font-normal flex justify-center mt-3 whitespace-nowrap py-2"
+            >
+              {{ data[field] }}
+            </p>
+          </template>
+        </Column>
+      </template>
+
+      <template v-if="tableData?.sublists?.length" #expansion="{ data }">
+        <div
+          v-if="hasSublists(data, 'branch')"
+          class="pl-[65px] max-w-[calc(70vw-65px)] border-none    mt-[-14px] mb-[-15px]    overflow-auto"
+          
+        >
+          <Table
+            :tableData="data"
+            @open-add-items="$emit('open-add-items', $event)"
+            @open-list-options="$emit('open-list-options')"
+            @edit-item="$emit('edit-item', $event)"
+            @open-delete="$emit('open-delete', $event)"
+            @open-create-sublist-modal="
+              $emit('open-create-sublist-modal', $event)
+            "
+            calledFrom="nested"
+            class="w-full"
+          />
+        </div>
       </template>
     </DataTable>
   </div>
@@ -136,80 +184,135 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import TempTable from "~/components/settings/list/TempTable.vue"; // Recursive TempTable
+import { useToast } from "primevue/usetoast";
+import Table from "~/components/settings/list/Table.vue";
 
-// Props and Emits
 const props = defineProps({
   tableData: Object,
+  filters: Object,
   calledFrom: String,
 });
-const emit = defineEmits();
 
-// State to track expanded rows and global expansion
+const emit = defineEmits();
+const filters = ref(props.filters);
 const expandedRows = ref({});
+const toast = useToast();
 const isAllExpanded = ref(false);
 
-// Toggle individual row expansion
-const toggleRowExpansion = (row) => {
-  expandedRows.value[row.id] = !expandedRows.value[row.id];
+const headerClass = computed(() => {
+  return isSublistData.value ? "sublist-padding" : "no-padding";
+});
+
+
+const showPaginator = computed(() => {
+  return props.tableData.sublists?.length > 5;
+});
+
+const expandAll = () => {
+  if (props.tableData?.sublists) {
+    expandedRows.value = props.tableData.sublists.reduce(
+      (acc, item) => (acc[item.id] = true) && acc,
+      {}
+    );
+  }
 };
 
-// Expand or collapse all rows
-const expandAll = () => {
-  expandedRows.value = props.tableData.sublists.reduce(
-    (acc, item) => ((acc[item.id] = true), acc),
-    {}
-  );
-  isAllExpanded.value = true;
+const toggleExpandCollapse = () => {
+  if (isAllExpanded.value) {
+    collapseAll();
+  } else {
+    expandAll();
+  }
+  isAllExpanded.value = !isAllExpanded.value;
 };
 
 const collapseAll = () => {
   expandedRows.value = {};
-  isAllExpanded.value = false;
 };
 
-// Toggle between expanding and collapsing all rows
-const toggleExpandCollapse = () => {
-  isAllExpanded.value ? collapseAll() : expandAll();
+const hasSublists = (data, from) => {
+  return data?.sublists?.length > 0;
+};
+const isChildSublistSimple = (data) => {
+  const sublists = data?.sublists;
+  if (Array.isArray(sublists) && sublists.length > 0) {
+    // Check if any of the sublists have isSublistSimple set to true
+    return sublists.some(sublist => sublist.isSublistSimple);
+  }
+  return false;
 };
 
-// Check if a row has sublists
-const hasSublists = (data) => {
-  return Array.isArray(data?.sublists) && data.sublists.length > 0;
-};
-
-// Define columns based on whether the table has simple or complex data
 const isSublistData = computed(() => {
   return !props.tableData?.isSublistSimple;
 });
+const isCalleFromRoot = computed(() => {
+  return props.calledFrom;
+});
 
 const columns = computed(() => {
-  if (props.tableData?.sublists?.length > 0) {
+  if (
+    !props.tableData.isSublistSimple &&
+    props.tableData.sublists?.length > 0
+  ) {
     return Object.keys(props.tableData.sublists[0]).filter(
       (key) => key !== "sublists"
     );
+  } else if (props.tableData.sublists?.length > 0) {
+    return ["title"];
   }
-  return ["title"];
+  return [];
 });
 
-// Determine whether to show paginator based on the number of sublists
-const showPaginator = computed(() => {
-  return props.tableData.sublists?.length > 5;
-});
+const toggleRow = (data) => {
+  if (expandedRows.value[data.id]) {
+    delete expandedRows.value[data.id];
+  } else {
+    expandedRows.value[data.id] = true;
+  }
+};
 </script>
 
 <style scoped>
-.pi-chevron-right {
-  font-size: 1.2rem;
-  color: #6b7280; /* Customize icon color */
+::v-deep .p-datatable-row-expansion {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-.pi-chevron-down {
-  font-size: 1.2rem;
-  color: #6b7280;
+::v-deep .p-datatable {
+  border: none !important;
+  padding: 0 !important;
 }
 
-.cursor-pointer {
-  cursor: pointer;
+::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+::v-deep .p-datatable-thead > tr {
+  padding: 0 !important;
+  border: none !important;
+}
+
+
+
+::v-deep .p-datatable-thead > tr > th {
+  border: none !important;
+  padding: 0 !important;
+  white-space: nowrap;
+}
+
+::v-deep .p-datatable-tbody > tr > td {
+  border-top: none !important;
+  padding-right:0 ;
+  /* border-bottom: none !important; */
+}
+
+::v-deep .p-datatable-tbody > tr.p-row-expanded {
+  border-bottom: none !important;
+}
+
+::v-deep .p-datatable-thead > tr > th.sublist-padding {
+  padding: 10px !important;
+  white-space: nowrap;
 }
 </style>

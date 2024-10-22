@@ -1,6 +1,9 @@
 <template>
-  <div class="">
-    <!-- :showGridlines="calledFrom==='root' ? false:true" -->
+  <div
+    :class="
+    isSublistData ? `max-w-[calc(70vw-${c_level * 65}px)]`: ''  "
+    class=""
+  >
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
@@ -12,7 +15,6 @@
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
       class="border border-blue-500"
       showGridlines
-
     >
       <template v-if="calledFrom === 'root'" #header>
         <div class="flex flex-wrap justify-between items-center">
@@ -44,6 +46,21 @@
           </div>
         </div>
       </template>
+      <template v-if="isSublistData" #header>
+        <div
+          class="flex justify-start border-b bg-white m-[-14px] pl-4 flex-wrap items-center"
+        >
+          <div class="w-[80px] px-[35px] py-[21px] border-r  h-full">
+            <!-- <font-awesome-icon :icon="['fas', 'minus']" class="w-full" /> -->
+            <i class="pi pi-minus "></i>
+          </div>
+          <p
+            class="font-poppins p-[35px] py-[21px] whitespace-nowrap font-normal text-lg"
+          >
+            {{ tableData.name }}
+          </p>
+        </div>
+      </template>
 
       <template v-if="!isSublistData">
         <Column class="w-[80px] bg-white text-center">
@@ -63,7 +80,8 @@
               ></i>
             </span>
             <span v-else class="w-[14px]">
-              <font-awesome-icon :icon="['fas', 'minus']" class="w-full" />
+              <!-- <font-awesome-icon :icon="['fas', 'minus']" class="w-full" /> -->
+              <i class="pi pi-minus w-full "></i>
             </span>
           </template>
         </Column>
@@ -73,7 +91,7 @@
           :field="column"
           :header="null"
           :sortable="false"
-          class="w-[calc(100% - 160px)] pl-[33px]"
+          class="w-[calc(100% - 193px)] custom-padding"
           :class="headerClass"
         >
           <template #body="{ data, field }">
@@ -152,8 +170,8 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data, 'branch')"
-          class="pl-[65px] border-none  w-[calc(100%-65px)]  mt-[-14px] mb-[-15px]    overflow-hidden"
-          :class="isSublistData ? '' : ''"
+          :class="isChildSublistSimple(data) ? '' : 'max-w-[calc(70vw-65px)]'"
+          class="pl-[79px] border-none mt-[-14px] mb-[-15px] overflow-auto"
         >
           <Table
             :tableData="data"
@@ -166,6 +184,7 @@
             "
             calledFrom="nested"
             class="w-full"
+            :c_level="Number(c_level) + 1"
           />
         </div>
       </template>
@@ -182,9 +201,8 @@ const props = defineProps({
   tableData: Object,
   filters: Object,
   calledFrom: String,
+  c_level: Number,
 });
-
-console.log("tableData", props.tableData);
 
 const emit = defineEmits();
 const filters = ref(props.filters);
@@ -194,9 +212,6 @@ const isAllExpanded = ref(false);
 
 const headerClass = computed(() => {
   return isSublistData.value ? "sublist-padding" : "no-padding";
-});
-const isRoot = computed(() => {
-  return props.calledFrom;
 });
 
 const showPaginator = computed(() => {
@@ -228,9 +243,20 @@ const collapseAll = () => {
 const hasSublists = (data, from) => {
   return data?.sublists?.length > 0;
 };
+const isChildSublistSimple = (data) => {
+  const sublists = data?.sublists;
+  if (Array.isArray(sublists) && sublists.length > 0) {
+    // Check if any of the sublists have isSublistSimple set to true
+    return sublists.some((sublist) => sublist.isSublistSimple);
+  }
+  return false;
+};
 
 const isSublistData = computed(() => {
   return !props.tableData?.isSublistSimple;
+});
+const isCalleFromRoot = computed(() => {
+  return props.calledFrom;
 });
 
 const columns = computed(() => {
@@ -267,7 +293,11 @@ const toggleRow = (data) => {
   padding: 0 !important;
 }
 
-::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
+::v-deep
+  .p-datatable-tbody
+  > tr.p-row-expanded
+  > td
+  > .p-datatable-row-expansion {
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -277,11 +307,6 @@ const toggleRow = (data) => {
   border: none !important;
 }
 
-/* ::v-deep .p-datatable-tbody > tr {
-  border-top: none !important;
-  border-bottom: none !important;
-} */
-
 ::v-deep .p-datatable-thead > tr > th {
   border: none !important;
   padding: 0 !important;
@@ -290,7 +315,13 @@ const toggleRow = (data) => {
 
 ::v-deep .p-datatable-tbody > tr > td {
   border-top: none !important;
+  padding-right: 0;
+  padding-left: 0;
+
   /* border-bottom: none !important; */
+}
+::v-deep .p-datatable-tbody > tr > td.custom-padding {
+  padding-left: 33px !important;
 }
 
 ::v-deep .p-datatable-tbody > tr.p-row-expanded {

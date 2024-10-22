@@ -376,6 +376,7 @@ const handleCreateSubSublist = (data) => {
     }
     tableDataList.isSublistSimple = data.isSublistSimple;
     openCreateSubList.value = false;
+    console.log('tableDataList',tableDataList)
   }
 };
 const findItemByPath = (list, path) => {

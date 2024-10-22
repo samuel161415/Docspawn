@@ -123,8 +123,18 @@
         </DataTable>
       </div>
 
-      <div v-else>
+      <div class="py-2" v-else>
         <!-- Data source input fields -->
+        <div class="  gap-2 mb-3">
+          <!-- <label for="sublistName" class="font-semibold w-6rem text-lg"
+                >Sublist Name</label
+              > -->
+          <InputText
+            id="sublistName"
+            v-model="sublistName"
+            placeholder="Enter table name"
+          />
+        </div>
         <div
           v-if="selectedFiles.length === 0"
           class="custom-file-upload"
@@ -147,16 +157,7 @@
           />
           <div class="drop-zone py-6">
             <!-- <p class="font-semibold text-lg">{{ title }}</p> -->
-            <div class="flex flex-col align-items-center gap-2 mb-3">
-              <!-- <label for="sublistName" class="font-semibold w-6rem text-lg"
-                >Sublist Name</label
-              > -->
-              <InputText
-                id="sublistName"
-                v-model="sublistName"
-                placeholder="Enter sublist name"
-              />
-            </div>
+
             <span v-if="!hasError" class="font-poppins p-4"
               >Drag and drop csv or xlsx files here to upload or</span
             >
@@ -258,7 +259,7 @@ const dataSourceSelectedRows = ref([]);
 const fileName = ref();
 const fileupload = ref(null); // Define the fileupload reference
 const isSublistSimple = ref(true);
-const sublistName = ref()
+const sublistName = ref();
 
 const handleAdd = () => {
   const items = sublistItem.value

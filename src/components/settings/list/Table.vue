@@ -1,18 +1,23 @@
 <template>
-  <div :class="isSublistData ? `max-w-[calc(70vw-${c_level * 65}px)]` : ''" class="">
+  <div
+    :class="isSublistData ? `max-w-[calc(70vw-${c_level * 65}px)]` : ''"
+    class=""
+  >
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
       dataKey="id"
       :paginator="showPaginator"
-      :rows="5"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
+      :rows="10"
+      :rowsPerPageOptions="[10, 25, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
       class="border border-blue-500"
     >
       <template v-if="calledFrom === 'root'" #header>
-        <div class="flex flex-wrap justify-between items-center mt-3 py-3 rounded-lg mx-[16px]">
+        <div
+          class="flex flex-wrap justify-between items-center mt-3 py-3 rounded-lg mx-[16px]"
+        >
           <p class="font-poppins font-normal text-lg">{{ tableData.title }}</p>
           <div class="flex flex-col md:flex-row justify-end gap-2">
             <Button
@@ -43,8 +48,19 @@
       <template v-if="!isSublistData">
         <Column class="w-[48px] bg-white text-center">
           <template #body="{ data }">
-            <span v-if="hasSublists(data, 'branch')" @click="toggleRow(data)" class="w-[14px] cursor-pointer">
-              <i :class="expandedRows[data.id] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" class="w-full"></i>
+            <span
+              v-if="hasSublists(data)"
+              @click="toggleRow(data)"
+              class="w-[14px] cursor-pointer"
+            >
+              <i
+                :class="
+                  expandedRows[data.id]&&!isChildSublistSimple(data)
+                    ? 'pi pi-chevron-down'
+                    : 'pi pi-chevron-right'
+                "
+                class="w-full"
+              ></i>
             </span>
             <span v-else class="w-[14px]">
               <i class="pi pi-minus w-[14px]"></i>
@@ -61,36 +77,55 @@
           :class="headerClass"
         >
           <template #body="{ data, field }">
-            <div class="flex ">
-              <p class="font-poppins fles justify-start p font-normal">{{ data[field] }}</p>
-              <span v-if="!isChildSublistSimple(data)" class="w-[14px] ml-4 cursor-pointer">
-                <i class="pi pi-file-excel text-success" @click="showModal(data)"></i>
-              </span>
+            <div class="flex " >
+              <p
+                v-if="!isChildSublistSimple(data)"
+                class="font-poppins fles justify-start p font-normal cursor-pointer"
+                @click="showModal(data)"
+              >
+                {{ data[field] }}
+                <span class="w-[14px] ml-1">
+                  <i class="pi pi-file-excel text-success"></i>
+                </span>
+              </p>
+              <p 
+              v-else
+              class="font-poppins fles justify-start p font-normal cur">
+                {{ data[field] }}
+              </p>
             </div>
           </template>
         </Column>
 
         <Column :header="null" class="bg-white text-center w-[46px]">
           <template #body="{ data }">
-            <div class="flex justify-center py-3 px-4">
-              <Button
-                icon="pi pi-cog"
-                outlined
-                class="p-button-rounded p-button-success w-8 h-8 flex justify-center items-center"
-                @click="$refs[`menu-${data.id}`].toggle($event)"
-              />
+            <div class="flex justify-center py-3 px-4 min-w-8 min-h-8">
+              <div class="w-8 h-8">
+                <Button
+                  v-if="tableData?.level < 3"
+                  icon="pi pi-cog"
+                  outlined
+                  class="p-button-rounded p-button-success w-full h-full flex justify-center items-center"
+                  @click="$refs[`menu-${data.id}`].toggle($event)"
+                />
+              </div>
               <Menu
                 :ref="`menu-${data.id}`"
                 :model="[
                   {
                     label: 'Add Sublist',
                     icon: 'pi pi-plus',
-                    command: () => $emit('open-create-sublist-modal', { ...data, path: data.path }),
+                    command: () =>
+                      $emit('open-create-sublist-modal', {
+                        ...data,
+                        path: data.path,
+                      }),
                   },
                   {
                     label: 'Edit',
                     icon: 'pi pi-pencil',
-                    command: () => $emit('edit-item', { ...data, path: data.path }),
+                    command: () =>
+                      $emit('edit-item', { ...data, path: data.path }),
                   },
                   {
                     label: 'Delete',
@@ -107,9 +142,9 @@
 
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
-          v-if="hasSublists(data, 'branch')"
+          v-if="hasSublists(data)"
           :class="isChildSublistSimple(data) ? '' : 'max-w-[calc(70vw-34px)]'"
-          class="pl-[47px] border-none mb-[-1px] overflow-auto"
+          class="pl-[47px] border-none mb-[-1px] overflow-x-auto"
         >
           <Table
             :tableData="data"
@@ -117,7 +152,9 @@
             @open-list-options="$emit('open-list-options')"
             @edit-item="$emit('edit-item', $event)"
             @open-delete="$emit('open-delete', $event)"
-            @open-create-sublist-modal="$emit('open-create-sublist-modal', $event)"
+            @open-create-sublist-modal="
+              $emit('open-create-sublist-modal', $event)
+            "
             calledFrom="nested"
             class="w-full"
             :c_level="Number(c_level) + 1"
@@ -126,7 +163,6 @@
       </template>
     </DataTable>
 
-    <!-- <DataSourceModal v-if="isSublistData" :visible.sync="isModalVisible" :tableData="modalTableData" /> -->
     <DataSourceModal
       v-if="isModalVisible"
       v-model:visible="isModalVisible"
@@ -137,10 +173,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useToast } from 'primevue/usetoast';
-import Table from '~/components/settings/list/Table.vue';
-import DataSourceModal from '~/components/settings/list/DataSourceModal.vue';
+import { ref, computed, watch } from "vue";
+import { useToast } from "primevue/usetoast";
+import Table from "~/components/settings/list/Table.vue";
+import DataSourceModal from "~/components/settings/list/DataSourceModal.vue";
 
 const props = defineProps({
   tableData: Object,
@@ -158,7 +194,7 @@ const isModalVisible = ref(false);
 const modalTableData = ref({});
 
 const headerClass = computed(() => {
-  return isSublistData.value ? 'sublist-padding' : 'no-padding';
+  return isSublistData.value ? "sublist-padding" : "no-padding";
 });
 
 const showPaginator = computed(() => {
@@ -167,7 +203,10 @@ const showPaginator = computed(() => {
 
 const expandAll = () => {
   if (props.tableData?.sublists) {
-    expandedRows.value = props.tableData.sublists.reduce((acc, item) => (acc[item.id] = true) && acc, {});
+    expandedRows.value = props.tableData.sublists.reduce(
+      (acc, item) => (acc[item.id] = true) && acc,
+      {}
+    );
   }
 };
 
@@ -184,50 +223,76 @@ const collapseAll = () => {
   expandedRows.value = {};
 };
 
-const hasSublists = (data, from) => {
+const hasSublists = (data) => {
   return data?.sublists?.length > 0;
 };
 
 const isChildSublistSimple = (data) => {
   // console.log('data is',data)
   const sublists = data?.sublists;
-  console.log('the data',data, 'its sublsit',sublists)
-  if(!data.isSublistSimple && sublists?.length > 0)
-   return false
+  if (!data.isSublistSimple && sublists?.length > 0) return false;
 
   return true;
 };
 
+watch(
+  () => props.tableData.sublists,
+  (newSublists) => {
+    newSublists.forEach((data) => {
+      if (!isChildSublistSimple(data) && expandedRows.value[data.id]) {
+        delete expandedRows.value[data.id];
+      }
+    });
+  },
+  { deep: true }
+);
+
 const isSublistData = computed(() => {
-  
   return !props.tableData?.isSublistSimple;
+});
+const isLabelWithinRange = computed(() => {
+  return !props.tableData?.label;
 });
 
 const columns = computed(() => {
-  if (!props.tableData.isSublistSimple && props.tableData.sublists?.length > 0) {
-    return Object.keys(props.tableData.sublists[0]).filter((key) => key !== 'sublists');
+  if (
+    !props.tableData.isSublistSimple &&
+    props.tableData.sublists?.length > 0
+  ) {
+    return Object.keys(props.tableData.sublists[0]).filter(
+      (key) => key !== "sublists"
+    );
   } else if (props.tableData.sublists?.length > 0) {
-    return ['title'];
+    return ["title"];
   }
   return [];
 });
 
 const toggleRow = (data) => {
-  if(!isChildSublistSimple(data)){
-    showModal(data)
+  console.log(
+    "lis evel greater than 3",
+    props.tableData.level,
+    props.tableData.title
+  );
+  if (props.tableData.level > 2) {
+    return; // Prevent expanding if level is greater than 3
   }
-  else{
-    if (expandedRows.value[data.id]) {
-    delete expandedRows.value[data.id];
+  if (!isChildSublistSimple(data)) {
+     if (expandedRows.value[data.id]) {
+      delete expandedRows.value[data.id];
+    }
+    showModal(data);
   } else {
-    expandedRows.value[data.id] = true;
+    if (expandedRows.value[data.id]) {
+      delete expandedRows.value[data.id];
+    } else {
+      expandedRows.value[data.id] = true;
+    }
   }
-  }
- 
 };
 
 const showModal = (data) => {
-  console.log('show modal is clicked and the passed props is',data)
+  console.log("show modal is clicked and the passed props is", data);
   modalTableData.value = data;
   isModalVisible.value = true;
 };
@@ -239,6 +304,10 @@ const showModal = (data) => {
   margin: 0 !important;
   border: none !important;
 }
+/* For removing the scroll vertical feature of the table */
+::v-deep .p-datatable-wrapper {
+  overflow-y: hidden !important; /* Prevent vertical scrolling */
+}
 
 ::v-deep .p-datatable {
   border: none !important;
@@ -249,7 +318,11 @@ const showModal = (data) => {
   border: none !important;
 }
 
-::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
+::v-deep
+  .p-datatable-tbody
+  > tr.p-row-expanded
+  > td
+  > .p-datatable-row-expansion {
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;

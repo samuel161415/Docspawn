@@ -13,33 +13,36 @@
       </div>
     </template>
 
-    <div class="px-5">
+    <div
+      class="px-5 overflow-y-auto h-[70vh]"
+      style="max-height: calc(100% - 4rem)"
+    >
       <!-- Add option to choose between simple list and data source -->
       <div class="flex flex-col align-items-center gap-3 mb-5">
         <label class="font-semibold w-6rem text-lg">List Type</label>
         <div class="flex gap-2">
-          <button
+          <Button
+          label="Simple List"
             :class="[
               listType === 'simple'
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-200 text-black',
+                ? '  bg-success text-white hover:bg-success hover:border-success'
+                : 'bg-secondary text-primaryBlack hover:bg-success hover:border-success hover:text-white',
               'px-4 py-2 rounded',
             ]"
             @click="listType = 'simple'"
-          >
-            Simple List
-          </button>
-          <button
+          />
+            
+          <Button
+            label="Data Source"
             :class="[
               listType === 'dataSource'
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-200 text-black',
+                ? 'bg-success text-white hover:bg-success hover:border-success'
+                : 'bg-secondary text-primaryBlack hover:bg-success hover:border-success hover:text-white',
               'px-4 py-2 rounded',
             ]"
             @click="listType = 'dataSource'"
-          >
-            Data Source
-          </button>
+         />
+          
         </div>
       </div>
 
@@ -125,14 +128,22 @@
 
       <div class="py-2" v-else>
         <!-- Data source input fields -->
-        <div class="  gap-2 mb-3">
-          <!-- <label for="sublistName" class="font-semibold w-6rem text-lg"
-                >Sublist Name</label
-              > -->
+        <div class="flex flex-col gap-2 mb-3">
+          <label for="tableName" class="font-semibold w-6rem text-lg">
+            Table Name <span class="text-red-400">*</span>
+          </label>
+          <span
+            v-if="addClicked && tableName === ''"
+            class="text-sm text-error"
+          >
+            <i class="pi pi-exclamation-triangle text-error mr-2"></i>
+            Table name should not be empty!
+          </span>
           <InputText
-            id="sublistName"
-            v-model="sublistName"
+            id="tableName"
+            v-model="tableName"
             placeholder="Enter table name"
+            :invalid="addClicked && tableName === ''"
           />
         </div>
         <div
@@ -259,7 +270,7 @@ const dataSourceSelectedRows = ref([]);
 const fileName = ref();
 const fileupload = ref(null); // Define the fileupload reference
 const isSublistSimple = ref(true);
-const sublistName = ref();
+const tableName = ref();
 
 const handleAdd = () => {
   const items = sublistItem.value
@@ -476,36 +487,47 @@ watch(dataSourceFileCompleteJSON, () => {
 
 const handleCreateList = () => {
   addClicked.value = true;
-  if (listType.value === "simple" && sublistItems.value.length > 0) {
-    isSublistSimple.value = true;
-    sublistItems.value = sublistItems.value.map((item, index) => {
-      return {
-        id: index,
-        title: item.name,
-        isHovered: false,
-        level: props.level + 1,
-        isSublistSimple: false,
-        sublists: [],
-      };
+  // if (tableName.value) {
+    if (listType.value === "simple" && sublistItems.value.length > 0) {
+      isSublistSimple.value = true;
+      sublistItems.value = sublistItems.value.map((item, index) => {
+        return {
+          id: index,
+          title: item.name,
+          isHovered: false,
+          level: props.level + 1,
+          isSublistSimple: false,
+          sublists: [],
+        };
+      });
+      emit("createSubSubList", {
+        sublistItems: sublistItems.value,
+        isSublistSimple: isSublistSimple.value,
+      });
+      emit("success"); // Emit success event
+    } else if (
+      listType.value === "dataSource" &&
+      selectedFiles.value.length > 0 &&
+      tableName.value !== ""
+    ) {
+      isSublistSimple.value = false;
+      // Handle data source creation
+      emit("createSubSubList", {
+        sublistItems: dataSourceFileCompleteJSON.value,
+        isSublistSimple: isSublistSimple.value,
+        name: tableName.value,
+      });
+      emit("success"); // Emit success event
+    }
+    else if(!tableName.value && listType.value === "dataSource"){
+      toast.add({
+      severity: "error",
+      summary: "Error",
+      detail: "Table name is required",
+      life: 3000,
     });
-    emit("createSubSubList", {
-      sublistItems: sublistItems.value,
-      isSublistSimple: isSublistSimple.value,
-    });
-    emit("success"); // Emit success event
-  } else if (
-    listType.value === "dataSource" &&
-    selectedFiles.value.length > 0
-  ) {
-    isSublistSimple.value = false;
-    // Handle data source creation
-    emit("createSubSubList", {
-      sublistItems: dataSourceFileCompleteJSON.value,
-      isSublistSimple: isSublistSimple.value,
-      name: sublistName.value,
-    });
-    emit("success"); // Emit success event
-  }
+    }
+  
 };
 
 const deleteItem = (data) => {

@@ -54,15 +54,22 @@ export const addNewListItem = ref([
                                 isSublistSimple : true,
                                 path: '1-1-1-1',
                                 sublists:[
-                                    {
-                                        id: 1,
-                                        title: 'Inside data',
-                                        isHovered: false,
-                                        level: 4,
-                                        isSublistSimple : true,
-                                        path: '1-1-1-1-1',
-                                        sublists:[]
-                                    }
+                                    // {
+                                    //     id: 1,
+                                    //     title: 'Inside data',
+                                    //     isHovered: false,
+                                    //     level: 4,
+                                    //     isSublistSimple : true,
+                                    //     path: '1-1-1-1-1',
+                                    //     sublists:[
+                                    //         {   id: 1,
+                                    //             title: 'inner data',
+                                    //             isHovered: false,
+                                    //             level: 5,
+                                    //             isSublistSimple : true,
+                                    //             path: '1-1-1-1-1-1',}
+                                    //     ]
+                                    // }
                                 ]
                             }
                         ]  

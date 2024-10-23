@@ -52,7 +52,7 @@
             <span
               v-if="hasSublists(data)"
               @click="toggleRow(data)"
-              class="w-[14px] cursor-pointer"
+              class="w-[10px] text-sm  cursor-pointer"
             >
               <i
                 :class="
@@ -60,11 +60,11 @@
                     ? 'pi pi-chevron-down'
                     : 'pi pi-chevron-right'
                 "
-                class="w-full"
+                class=""
               ></i>
             </span>
-            <span v-else class="w-[14px]">
-              <i class="pi pi-minus w-[14px]"></i>
+            <span v-else class="w-[10px] text-sm ">
+              <i class="pi pi-minus "></i>
             </span>
           </template>
         </Column>
@@ -81,7 +81,7 @@
             <div class="flex">
               <p
                 v-if="!isChildSublistSimple(data)"
-                class="font-poppins fles justify-start p font-normal cursor-pointer"
+                class="font-poppins fles justify-start  font-normal cursor-pointer"
                 @click="showModal(data)"
               >
                 {{ data[field] }}
@@ -91,7 +91,7 @@
               </p>
               <p
                 v-else
-                class="font-poppins fles justify-start p font-normal cur"
+                class="font-poppins fles justify-start  font-normal cur"
               >
                 {{ data[field] }}
               </p>

@@ -170,37 +170,6 @@
       :tableData="modalTableData"
       @cancel="isModalVisible = false"
     />
-    <!-- <div v-if="calledFrom === 'root' && isSublistData">
-      <DataTable
-        :value="modalTableData.sublists"
-        dataKey="id"
-        striped-rows
-        :paginator="showPaginator"
-        :rows="10"
-        :rowsPerPageOptions="[10, 25, 50]"
-        paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-        currentPageReportTemplate="{first} to {last} of {totalRecords}"
-        class="border border-blue-500"
-      >
-        <Column
-          v-for="(column, index) in columns"
-          :key="index"
-          :field="column"
-          :header="column"
-          :sortable="true"
-          class="w-[calc(100% - 80px)] pl-[33px]"
-          :class="headerClass"
-        >
-          <template #body="{ data, field }">
-            <p
-              class="font-poppins font-normal flex justify-center mt-3 whitespace-nowrap py-2"
-            >
-              {{ data[field] }}
-            </p>
-          </template>
-        </Column>
-      </DataTable>
-    </div> -->
   </div>
 </template>
 

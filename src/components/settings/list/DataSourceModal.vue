@@ -8,6 +8,7 @@
     modal
     :draggable="false"
     :style="{ width: '80vw' }"
+    dismissableMask
   >
     <template #header>
       <div

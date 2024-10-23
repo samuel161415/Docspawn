@@ -3,7 +3,7 @@
     v-model:visible="visible"
     modal
     :draggable="false"
-    :style="{ width: '40rem' }"
+    :style="{ width: '40rem', height: '60rem' }"
   >
     <template #header>
       <div class="flex justify-center items-center ml-5">
@@ -21,28 +21,49 @@
       <div class="flex flex-col align-items-center gap-3 mb-5">
         <label class="font-semibold w-6rem text-lg">List Type</label>
         <div class="flex gap-2">
-          <Button
-          label="Simple List"
+          <!-- <Button
+            label="Simple List"
             :class="[
               listType === 'simple'
-                ? '  bg-success text-white hover:bg-success hover:border-success'
-                : 'bg-secondary text-primaryBlack hover:bg-success hover:border-success hover:text-white',
+                ? 'bg-success text-white hover:bg-success hover:border-success'
+                : ' p-button-rounded p-button-success',
               'px-4 py-2 rounded',
             ]"
             @click="listType = 'simple'"
-          />
-            
-          <Button
+          /> -->
+          <button
+            :class="[
+              listType === 'simple'
+                ? 'bg-success text-white hover:bg-success hover:border-success'
+                : '  hover:bg-success hover:scale-105 transition-all transform duration-300 ease-in-out hover:text-white',
+              'px-4 py-2 rounded-lg border ',
+            ]"
+            @click="listType = 'simple'"
+          >
+            Simple List
+          </button>
+
+          <!-- <Button
             label="Data Source"
             :class="[
               listType === 'dataSource'
                 ? 'bg-success text-white hover:bg-success hover:border-success'
-                : 'bg-secondary text-primaryBlack hover:bg-success hover:border-success hover:text-white',
+                : ' p-button-success ',
               'px-4 py-2 rounded',
             ]"
             @click="listType = 'dataSource'"
-         />
-          
+          /> -->
+          <button
+            :class="[
+              listType === 'dataSource'
+                ? 'bg-success text-white hover:bg-success hover:border-success'
+                : '  hover:bg-success hover:scale-105 transition-all transform duration-300 ease-in-out hover:text-white',
+              'px-4 py-2 rounded-lg border ',
+            ]"
+            @click="listType = 'dataSource'"
+          >
+            Data Source
+          </button>
         </div>
       </div>
 
@@ -146,6 +167,14 @@
             :invalid="addClicked && tableName === ''"
           />
         </div>
+
+        <span
+          v-if="addClicked && selectedFiles.length === 0"
+          class="text-sm text-error"
+        >
+          <i class="pi pi-exclamation-triangle text-error mr-2"></i>
+          You should select a file!
+        </span>
         <div
           v-if="selectedFiles.length === 0"
           class="custom-file-upload"
@@ -220,8 +249,11 @@
       </div>
     </div>
 
+
+    
     <div class="flex justify-center mt-5">
       <Button
+        v-if="listType !== 'dataSource' || tableName"
         label="Create sublist"
         icon="pi pi-check"
         class="bg-success text-white hover:bg-success hover:border-success flex justify-center text-center"
@@ -487,47 +519,44 @@ watch(dataSourceFileCompleteJSON, () => {
 
 const handleCreateList = () => {
   addClicked.value = true;
-  // if (tableName.value) {
-    if (listType.value === "simple" && sublistItems.value.length > 0) {
-      isSublistSimple.value = true;
-      sublistItems.value = sublistItems.value.map((item, index) => {
-        return {
-          id: index,
-          title: item.name,
-          isHovered: false,
-          level: props.level + 1,
-          isSublistSimple: false,
-          sublists: [],
-        };
-      });
-      emit("createSubSubList", {
-        sublistItems: sublistItems.value,
-        isSublistSimple: isSublistSimple.value,
-      });
-      emit("success"); // Emit success event
-    } else if (
-      listType.value === "dataSource" &&
-      selectedFiles.value.length > 0 &&
-      tableName.value !== ""
-    ) {
-      isSublistSimple.value = false;
-      // Handle data source creation
-      emit("createSubSubList", {
-        sublistItems: dataSourceFileCompleteJSON.value,
-        isSublistSimple: isSublistSimple.value,
-        name: tableName.value,
-      });
-      emit("success"); // Emit success event
-    }
-    else if(!tableName.value && listType.value === "dataSource"){
-      toast.add({
+  if (listType.value === "simple" && sublistItems.value.length > 0) {
+    isSublistSimple.value = true;
+    sublistItems.value = sublistItems.value.map((item, index) => {
+      return {
+        id: index,
+        title: item.name,
+        isHovered: false,
+        level: props.level + 1,
+        isSublistSimple: false,
+        sublists: [],
+      };
+    });
+    emit("createSubSubList", {
+      sublistItems: sublistItems.value,
+      isSublistSimple: isSublistSimple.value,
+    });
+    emit("success"); // Emit success event
+  } else if (
+    listType.value === "dataSource" &&
+    selectedFiles.value.length > 0 &&
+    tableName.value !== ""
+  ) {
+    isSublistSimple.value = false;
+    // Handle data source creation
+    emit("createSubSubList", {
+      sublistItems: dataSourceFileCompleteJSON.value,
+      isSublistSimple: isSublistSimple.value,
+      name: tableName.value,
+    });
+    emit("success"); // Emit success event
+  } else if (listType.value === "dataSource" && !tableName.value) {
+    toast.add({
       severity: "error",
       summary: "Error",
       detail: "Table name is required",
       life: 3000,
     });
-    }
-  
+  }
 };
 
 const deleteItem = (data) => {

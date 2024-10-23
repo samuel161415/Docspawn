@@ -7,6 +7,7 @@
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
       dataKey="id"
+      striped-rows
       :paginator="showPaginator"
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
@@ -46,7 +47,7 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column class="w-[48px] bg-white text-center">
+        <Column class="w-[48px] text-center">
           <template #body="{ data }">
             <span
               v-if="hasSublists(data)"
@@ -55,7 +56,7 @@
             >
               <i
                 :class="
-                  expandedRows[data.id]&&!isChildSublistSimple(data)
+                  expandedRows[data.id] && !isChildSublistSimple(data)
                     ? 'pi pi-chevron-down'
                     : 'pi pi-chevron-right'
                 "
@@ -77,7 +78,7 @@
           :class="headerClass"
         >
           <template #body="{ data, field }">
-            <div class="flex " >
+            <div class="flex">
               <p
                 v-if="!isChildSublistSimple(data)"
                 class="font-poppins fles justify-start p font-normal cursor-pointer"
@@ -88,21 +89,21 @@
                   <i class="pi pi-file-excel text-success"></i>
                 </span>
               </p>
-              <p 
-              v-else
-              class="font-poppins fles justify-start p font-normal cur">
+              <p
+                v-else
+                class="font-poppins fles justify-start p font-normal cur"
+              >
                 {{ data[field] }}
               </p>
             </div>
           </template>
         </Column>
 
-        <Column :header="null" class="bg-white text-center w-[46px]">
+        <Column :header="null" class="text-center w-[46px]">
           <template #body="{ data }">
             <div class="flex justify-center py-3 px-4 min-w-8 min-h-8">
               <div class="w-8 h-8">
                 <Button
-                  v-if="tableData?.level < 3"
                   icon="pi pi-cog"
                   outlined
                   class="p-button-rounded p-button-success w-full h-full flex justify-center items-center"
@@ -111,28 +112,7 @@
               </div>
               <Menu
                 :ref="`menu-${data.id}`"
-                :model="[
-                  {
-                    label: 'Add Sublist',
-                    icon: 'pi pi-plus',
-                    command: () =>
-                      $emit('open-create-sublist-modal', {
-                        ...data,
-                        path: data.path,
-                      }),
-                  },
-                  {
-                    label: 'Edit',
-                    icon: 'pi pi-pencil',
-                    command: () =>
-                      $emit('edit-item', { ...data, path: data.path }),
-                  },
-                  {
-                    label: 'Delete',
-                    icon: 'pi pi-trash',
-                    command: () => $emit('open-delete', data),
-                  },
-                ]"
+                :model="getMenuModel(data)"
                 popup
               />
             </div>
@@ -235,6 +215,35 @@ const isChildSublistSimple = (data) => {
   return true;
 };
 
+const getMenuModel = (data) => {
+  const model = [
+    {
+      label: "Edit",
+      icon: "pi pi-pencil",
+      command: () => emit("edit-item", { ...data, path: data.path }),
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-trash",
+      command: () => emit("open-delete", data),
+    },
+  ];
+
+  if (props.tableData?.level < 3) {
+    model.unshift({
+      label: "Add Sublist",
+      icon: "pi pi-plus",
+      command: () =>
+        emit("open-create-sublist-modal", {
+          ...data,
+          path: data.path,
+        }),
+    });
+  }
+
+  return model;
+};
+
 watch(
   () => props.tableData.sublists,
   (newSublists) => {
@@ -278,7 +287,7 @@ const toggleRow = (data) => {
     return; // Prevent expanding if level is greater than 3
   }
   if (!isChildSublistSimple(data)) {
-     if (expandedRows.value[data.id]) {
+    if (expandedRows.value[data.id]) {
       delete expandedRows.value[data.id];
     }
     showModal(data);

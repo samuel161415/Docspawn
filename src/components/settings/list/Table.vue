@@ -7,6 +7,7 @@
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
       dataKey="id"
+      striped-rows
       :paginator="showPaginator"
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
@@ -46,24 +47,24 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column class="w-[48px] bg-white text-center">
+        <Column class="w-[48px] text-center">
           <template #body="{ data }">
             <span
               v-if="hasSublists(data)"
               @click="toggleRow(data)"
-              class="w-[14px] cursor-pointer"
+              class="w-[10px] text-sm  cursor-pointer"
             >
               <i
                 :class="
-                  expandedRows[data.id]&&!isChildSublistSimple(data)
+                  expandedRows[data.id] && !isChildSublistSimple(data)
                     ? 'pi pi-chevron-down'
                     : 'pi pi-chevron-right'
                 "
-                class="w-full"
+                class=""
               ></i>
             </span>
-            <span v-else class="w-[14px]">
-              <i class="pi pi-minus w-[14px]"></i>
+            <span v-else class="w-[10px] text-sm ">
+              <i class="pi pi-minus "></i>
             </span>
           </template>
         </Column>
@@ -77,10 +78,10 @@
           :class="headerClass"
         >
           <template #body="{ data, field }">
-            <div class="flex " >
+            <div class="flex">
               <p
                 v-if="!isChildSublistSimple(data)"
-                class="font-poppins fles justify-start p font-normal cursor-pointer"
+                class="font-poppins fles justify-start  font-normal cursor-pointer"
                 @click="showModal(data)"
               >
                 {{ data[field] }}
@@ -88,21 +89,21 @@
                   <i class="pi pi-file-excel text-success"></i>
                 </span>
               </p>
-              <p 
-              v-else
-              class="font-poppins fles justify-start p font-normal cur">
+              <p
+                v-else
+                class="font-poppins fles justify-start  font-normal cur"
+              >
                 {{ data[field] }}
               </p>
             </div>
           </template>
         </Column>
 
-        <Column :header="null" class="bg-white text-center w-[46px]">
+        <Column :header="null" class="text-center w-[46px]">
           <template #body="{ data }">
             <div class="flex justify-center py-3 px-4 min-w-8 min-h-8">
               <div class="w-8 h-8">
                 <Button
-                  v-if="tableData?.level < 3"
                   icon="pi pi-cog"
                   outlined
                   class="p-button-rounded p-button-success w-full h-full flex justify-center items-center"
@@ -111,31 +112,31 @@
               </div>
               <Menu
                 :ref="`menu-${data.id}`"
-                :model="[
-                  {
-                    label: 'Add Sublist',
-                    icon: 'pi pi-plus',
-                    command: () =>
-                      $emit('open-create-sublist-modal', {
-                        ...data,
-                        path: data.path,
-                      }),
-                  },
-                  {
-                    label: 'Edit',
-                    icon: 'pi pi-pencil',
-                    command: () =>
-                      $emit('edit-item', { ...data, path: data.path }),
-                  },
-                  {
-                    label: 'Delete',
-                    icon: 'pi pi-trash',
-                    command: () => $emit('open-delete', data),
-                  },
-                ]"
+                :model="getMenuModel(data)"
                 popup
               />
             </div>
+          </template>
+        </Column>
+      </template>
+
+      <!-- For the data source table called form the root(list.vue) -->
+      <template v-if="calledFrom === 'root' && isSublistData">
+        <Column
+          v-for="(column, index) in columns"
+          :key="index"
+          :field="column"
+          :header="column"
+          :sortable="true"
+          class="w-[calc(100% - 80px)] pl-[33px] header-white"
+          :class="headerClass"
+        >
+          <template #body="{ data, field }">
+            <p
+              class="font-poppins font-normal flex justify-center mt-3 whitespace-nowrap py-2"
+            >
+              {{ data[field] }}
+            </p>
           </template>
         </Column>
       </template>
@@ -235,6 +236,35 @@ const isChildSublistSimple = (data) => {
   return true;
 };
 
+const getMenuModel = (data) => {
+  const model = [
+    {
+      label: "Edit",
+      icon: "pi pi-pencil",
+      command: () => emit("edit-item", { ...data, path: data.path }),
+    },
+    {
+      label: "Delete",
+      icon: "pi pi-trash",
+      command: () => emit("open-delete", data),
+    },
+  ];
+
+  if (props.tableData?.level < 3) {
+    model.unshift({
+      label: "Add Sublist",
+      icon: "pi pi-plus",
+      command: () =>
+        emit("open-create-sublist-modal", {
+          ...data,
+          path: data.path,
+        }),
+    });
+  }
+
+  return model;
+};
+
 watch(
   () => props.tableData.sublists,
   (newSublists) => {
@@ -278,7 +308,7 @@ const toggleRow = (data) => {
     return; // Prevent expanding if level is greater than 3
   }
   if (!isChildSublistSimple(data)) {
-     if (expandedRows.value[data.id]) {
+    if (expandedRows.value[data.id]) {
       delete expandedRows.value[data.id];
     }
     showModal(data);
@@ -337,6 +367,10 @@ const showModal = (data) => {
   border: none !important;
   padding: 0 !important;
   white-space: nowrap;
+}
+::v-deep .p-datatable-thead > tr > th.header-white {
+  background-color: white;
+  border-bottom: 1.5px solide
 }
 
 ::v-deep .p-datatable-tbody > tr > td {

@@ -35,7 +35,7 @@
             :class="[
               listType === 'simple'
                 ? 'bg-success text-white hover:bg-success hover:border-success'
-                : '  hover:bg-success hover:scale-105 transition-all transform duration-300 ease-in-out hover:text-white',
+                : 'border border-success text-success hover:bg-primary-50  transition-all transform duration-200 ease-in-out ',
               'px-4 py-2 rounded-lg border ',
             ]"
             @click="listType = 'simple'"
@@ -57,7 +57,7 @@
             :class="[
               listType === 'dataSource'
                 ? 'bg-success text-white hover:bg-success hover:border-success'
-                : '  hover:bg-success hover:scale-105 transition-all transform duration-300 ease-in-out hover:text-white',
+                : 'border border-success text-success hover:bg-primary-50  transition-all transform duration-200 ease-in-out ',
               'px-4 py-2 rounded-lg border ',
             ]"
             @click="listType = 'dataSource'"

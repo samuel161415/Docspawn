@@ -31,7 +31,14 @@
             </span>
           </div>
 
-          <ul class="">
+          <ejs-treeview
+            :fields="treeFields"
+            @nodeClicked="onNodeClicked"
+            @nodeDragStop="onNodeDragStop"
+            :allowDragAndDrop='true'
+          ></ejs-treeview>
+          <!-- <ejs-treeview :fields="treeFields"></ejs-treeview> -->
+          <!-- <ul class="">
             <li
               v-for="items in filteredLists"
               :key="items.title"
@@ -133,12 +140,12 @@
                 </li>
               </ul>
             </li>
-          </ul>
+          </ul> -->
         </div>
 
         <!-- right section -->
         <div class="w-full md:max-w-[70vw] py-5 ml-2">
-          <div class="mb-12 max-w-[70vw]  relative">
+          <div class="mb-12 max-w-[70vw] relative">
             <DataTableComponent
               :tableData="tableData"
               :filters="filters"
@@ -151,7 +158,7 @@
               calledFrom="root"
               :c_level="0"
             />
-           
+
             <Toast />
           </div>
         </div>
@@ -259,7 +266,7 @@ const tableData = ref({});
 const deleteItem = ref();
 const openCreateSubList = ref(false);
 const currentListLevel = ref();
-const currentListTitle = ref()
+const currentListTitle = ref();
 const isSublistSimple = ref(true);
 // sublist id
 const sublistId = ref();
@@ -277,6 +284,8 @@ const filteredList = computed(() => {
     }, []);
   };
 
+  console.log("fileteredList is ", filteredList.value);
+
   if (!searchQuery.value) return copiedList.value;
   return filterItems(addNewListItem.value, (item) => {
     return item.title.toLowerCase().includes(searchQuery.value.toLowerCase());
@@ -290,6 +299,125 @@ watch(searchQuery, (newValue, oldValue) => {
     filteredLists.value = filteredList.value;
   }
 });
+
+const treeData = computed(() => {
+  const transformData = (items) => {
+    return items.map((item) => ({
+      nodeId: item.path,
+      nodeText: item.title,
+      nodeChild: item.sublists ? transformData(item.sublists) : [],
+      cssClass: item.sublists && item.sublists.length > 0 ? 'clickable' : 'non-clickable'
+    }));
+  };
+  console.log("filteredLists inside the treeData", filteredLists.value);
+  return transformData(filteredLists.value);
+});
+
+console.log("treeData outside the treeData", filteredLists.value);
+
+const treeFields = ref({
+  dataSource: treeData,
+  id: "nodeId",
+  text: "nodeText",
+  child: "nodeChild",
+});
+
+const onNodeClicked = (args) => {
+  const clickedNode = args.node;
+  console.log("clickedNode", clickedNode);
+  const nodeId = clickedNode.getAttribute("data-uid");
+  const clickedItem = findItemByPath(addNewListItem.value, nodeId, "treeView");
+  // console.log("clickedItem", clickedItem, 'nodeId', nodeId);
+  if (!clickedItem || !clickedItem.sublists || clickedItem.sublists.length === 0) {
+    args.event.preventDefault();
+    return;
+  }
+  if (clickedItem) {
+    handleopensubmenu(clickedItem);
+  }
+};
+
+const onNodeDragStop = (args) => {
+  const draggedNodeId = args.draggedNodeData.id;
+  const droppedNodeId = args.droppedNodeData.id;
+  const dropPosition = args.dropPosition;
+
+  // Find the dragged item
+  const draggedItem = findItemByPath(addNewListItem.value, draggedNodeId, "treeView");
+
+  // Remove the dragged item from its original position
+  removeItemByPath(addNewListItem.value, draggedNodeId);
+
+  // Find the dropped item
+  const droppedItem = findItemByPath(addNewListItem.value, droppedNodeId, "treeView");
+
+  // Insert the dragged item into its new position
+  if (dropPosition === "before") {
+    insertBefore(addNewListItem.value, droppedItem, draggedItem);
+  } else if (dropPosition === "after") {
+    insertAfter(addNewListItem.value, droppedItem, draggedItem);
+  } else if (dropPosition === "inside") {
+    insertInside(droppedItem, draggedItem);
+  }
+
+  // Update the table data
+  tableData.value = { ...tableData.value };
+};
+
+const removeItemByPath = (list, path) => {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].path === path) {
+      list.splice(i, 1);
+      return true;
+    }
+    if (Array.isArray(list[i].sublists) && list[i].sublists.length > 0) {
+      const found = removeItemByPath(list[i].sublists, path);
+      if (found) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const insertBefore = (list, referenceItem, newItem) => {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].path === referenceItem.path) {
+      list.splice(i, 0, newItem);
+      return true;
+    }
+    if (Array.isArray(list[i].sublists) && list[i].sublists.length > 0) {
+      const found = insertBefore(list[i].sublists, referenceItem, newItem);
+      if (found) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const insertAfter = (list, referenceItem, newItem) => {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].path === referenceItem.path) {
+      list.splice(i + 1, 0, newItem);
+      return true;
+    }
+    if (Array.isArray(list[i].sublists) && list[i].sublists.length > 0) {
+      const found = insertAfter(list[i].sublists, referenceItem, newItem);
+      if (found) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const insertInside = (parentItem, newItem) => {
+  if (!Array.isArray(parentItem.sublists)) {
+    parentItem.sublists = [];
+  }
+  parentItem.sublists.push(newItem);
+};
 
 const highlight = (data) => {
   if (searchQuery.value) {
@@ -344,9 +472,13 @@ const createSubList = (data) => {
 
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-    console.log("data.name",data.name)
+  console.log("data.name", data.name);
   // Update tableData
-  const tableDataList = findItemByPath(tableData.value, sublistPath.value);
+  const tableDataList = findItemByPath(
+    tableData.value,
+    sublistPath.value,
+    "tableEdit"
+  );
   if (tableDataList) {
     const newSublistItems = data.sublistItems.map((item, index) => {
       if (isSublistSimple.value) {
@@ -376,22 +508,38 @@ const handleCreateSubSublist = (data) => {
     }
     tableDataList.isSublistSimple = data.isSublistSimple;
     openCreateSubList.value = false;
-    console.log('tableDataList',tableDataList)
+    console.log("tableDataList", tableDataList);
   }
 };
-const findItemByPath = (list, path) => {
-  if (list.path === path) {
-    return list;
-  }
-  if (Array.isArray(list.sublists)) {
-    for (const sublist of list.sublists) {
-      const found = findItemByPath(sublist, path);
-      if (found) {
-        return found;
+const findItemByPath = (list, path, from) => {
+  if (from === "tableEdit") {
+    console.log("list is ", list, " path is ", path);
+    if (list.path === path) {
+      return list;
+    }
+    if (Array.isArray(list.sublists)) {
+      for (const sublist of list.sublists) {
+        const found = findItemByPath(sublist, path, from);
+        if (found) {
+          return found;
+        }
       }
     }
+    return null;
+  } else if (from === "treeView") {
+    for (const item of list) {
+      if (item.path === path) {
+        return item;
+      }
+      if (Array.isArray(item.sublists) && item.sublists.length > 0) {
+        const found = findItemByPath(item.sublists, path, from);
+        if (found) {
+          return found;
+        }
+      }
+    }
+    return null;
   }
-  return null;
 };
 
 const handleEditItem = (data) => {
@@ -400,15 +548,20 @@ const handleEditItem = (data) => {
 
   // Update addNewListItem
   const itemToEditInAddNewListItem = findItemByPath(
-    addNewListItem.value,
-    data.path
+    tableData.value,
+    data.path,
+    "tableEdit"
   );
   if (itemToEditInAddNewListItem) {
     itemToEditInAddNewListItem.title = data.title;
   }
 
   // Update tableData
-  const itemToEditInTableData = findItemByPath(tableData.value, data.path);
+  const itemToEditInTableData = findItemByPath(
+    tableData.value,
+    data.path,
+    "tableEdit"
+  );
   if (itemToEditInTableData) {
     itemToEditInTableData.title = data.title;
   }
@@ -496,5 +649,23 @@ const showSuccess = () => {
 .highlight {
   background-color: yellow;
   color: black;
+}
+
+::v-deep .e-list-text {
+  color: black; /* Default color for all text */
+}
+
+::v-deep .clickable .e-list-text {
+  cursor: pointer;
+}
+
+/* ::v-deep .e-active .e-list-text {
+  color: #009EE2 !important; 
+} */
+
+::v-deep .non-clickable .e-list-text {
+  pointer-events: none;
+  color: gray; /* Change the text color of non-clickable nodes to gray */
+  cursor: not-allowed; /* Change the cursor to not-allowed for non-clickable nodes */
 }
 </style>

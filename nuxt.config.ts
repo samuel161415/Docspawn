@@ -10,6 +10,9 @@ export default defineNuxtConfig({
   experimental: {
     asyncEntry: true,
   },
+  build: {
+    transpile: [/@syncfusion/]
+  },
 
   vite: {
     build: {
@@ -17,6 +20,7 @@ export default defineNuxtConfig({
       modulePreload: false,
       minify: false,
       cssCodeSplit: false,
+      
     },
     esbuild: {
       target: "es2022",
@@ -74,10 +78,12 @@ export default defineNuxtConfig({
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
+      
     },
   },
 
-  plugins: ["~/plugins/fontawesome.js"],
+  plugins: ["~/plugins/fontawesome.js","~/plugins/syncfusion.js",
+    "~/plugins/syncfusion-components.js"],
 
   app: {
     layoutTransition: {
@@ -90,6 +96,12 @@ export default defineNuxtConfig({
     "@fortawesome/fontawesome-svg-core/styles.css",
     "primeicons/primeicons.css",
     "~/assets/scss/main.scss",
+    "@syncfusion/ej2-base/styles/material.css",
+    "@syncfusion/ej2-buttons/styles/material.css",
+    "@syncfusion/ej2-inputs/styles/material.css",
+    "@syncfusion/ej2-vue-navigations/styles/material.css",
+    
+    
   ],
 
   runtimeConfig: {

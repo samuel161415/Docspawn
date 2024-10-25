@@ -52,7 +52,7 @@
             <span
               v-if="hasSublists(data)"
               @click="toggleRow(data)"
-              class="w-[10px] text-sm  cursor-pointer"
+              class="w-[10px] text-sm cursor-pointer"
             >
               <i
                 :class="
@@ -63,8 +63,8 @@
                 class=""
               ></i>
             </span>
-            <span v-else class="w-[10px] text-sm ">
-              <i class="pi pi-minus "></i>
+            <span v-else class="w-[10px] text-sm">
+              <i class="pi pi-minus"></i>
             </span>
           </template>
         </Column>
@@ -81,7 +81,7 @@
             <div class="flex">
               <p
                 v-if="!isChildSublistSimple(data)"
-                class="font-poppins fles justify-start  font-normal cursor-pointer"
+                class="font-poppins fles justify-start font-normal cursor-pointer"
                 @click="showModal(data)"
               >
                 {{ data[field] }}
@@ -89,10 +89,7 @@
                   <i class="pi pi-file-excel text-success"></i>
                 </span>
               </p>
-              <p
-                v-else
-                class="font-poppins fles justify-start  font-normal cur"
-              >
+              <p v-else class="font-poppins fles justify-start font-normal cur">
                 {{ data[field] }}
               </p>
             </div>
@@ -170,6 +167,7 @@
       :tableData="modalTableData"
       @cancel="isModalVisible = false"
     />
+    <!-- <TreeViewComponent /> -->
   </div>
 </template>
 
@@ -178,6 +176,7 @@ import { ref, computed, watch } from "vue";
 import { useToast } from "primevue/usetoast";
 import Table from "~/components/settings/list/Table.vue";
 import DataSourceModal from "~/components/settings/list/DataSourceModal.vue";
+// import TreeViewComponent from "~/components/settings/list/TreeViewComponent.vue";
 
 const props = defineProps({
   tableData: Object,
@@ -370,7 +369,7 @@ const showModal = (data) => {
 }
 ::v-deep .p-datatable-thead > tr > th.header-white {
   background-color: white;
-  border-bottom: 1.5px solide
+  border-bottom: 1.5px solide;
 }
 
 ::v-deep .p-datatable-tbody > tr > td {

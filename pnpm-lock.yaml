@@ -38,6 +38,9 @@ importers:
       '@nuxtjs/i18n':
         specifier: ^8.3.1
         version: 8.5.5(magicast@0.3.5)(rollup@4.24.0)(vue@3.5.11(typescript@5.6.2))
+      '@syncfusion/ej2-vue-navigations':
+        specifier: ^27.1.56
+        version: 27.1.56
       exceljs:
         specifier: ^4.4.0
         version: 4.4.0
@@ -1161,6 +1164,40 @@ packages:
   '@sindresorhus/merge-streams@2.3.0':
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
+
+  '@syncfusion/ej2-base@27.1.55':
+    resolution: {integrity: sha512-ZHtP1SGPfGrMtweYyvJk80piLcoFJCkmEQ/jg82NEldYeVfwYrw9W9OrPphkrzELu1WysrviwccUngWxAhykLA==}
+    hasBin: true
+
+  '@syncfusion/ej2-buttons@27.1.53':
+    resolution: {integrity: sha512-iB1XTkTocC4HX7Gzokp/SdqI451Iav1uBz/Jt+Ygmwci3mKw/JiqblUx4jgd2EYyRPY+/IIspz5FUeqxbWnG5A==}
+
+  '@syncfusion/ej2-data@27.1.52':
+    resolution: {integrity: sha512-ELtIAXoGd28sVreoxdul2GFPQh/Kf46wUA8JsHZlNHGyekSolRf2vhTofkDMaF0E7GIV6yUpFS7gd3aiRtkKSg==}
+
+  '@syncfusion/ej2-icons@27.1.50':
+    resolution: {integrity: sha512-LisXluEss0VnFuSh+pNSgHqT/Cg1FKTvkxdKWoSvqAma3dpcuCfrWP4svyMKPAsCi/hxAGdyy3ShKHu0PUP9iA==}
+
+  '@syncfusion/ej2-inputs@27.1.55':
+    resolution: {integrity: sha512-RtzRE0RV57EYNG8YUEOXqvb7KBXGqoFGevTI9J01daZrVF5Z5/pphcDOby0ej3YPc1khdSHDbFW1lMd5SdQ/Wg==}
+
+  '@syncfusion/ej2-lists@27.1.50':
+    resolution: {integrity: sha512-CbTdJz4pz9k+/sYTeT5xJ6VZDKGzo9KF7oEeOqhXjRNm1qQd5ANonxsuOVAWLojJwhKQcfQxGTVrOjE/D+YBoA==}
+
+  '@syncfusion/ej2-navigations@27.1.56':
+    resolution: {integrity: sha512-tdMijrY0dBV1H2uR/XkFMtNDNR1Cf+c0TI+S2v04mCt4gm/kQxnuNGMcrdXjiPv/3UV+qOstG0RvCqRxgcEk9Q==}
+
+  '@syncfusion/ej2-popups@27.1.56':
+    resolution: {integrity: sha512-TUD7lc1rUi8vkdA2+Ir+EM3FVQP+M14S7yZA04iECX186qx70EWX4iqIJkxrxAbf2MmsQHXeH9/C29Et7qd0Dg==}
+
+  '@syncfusion/ej2-splitbuttons@27.1.56':
+    resolution: {integrity: sha512-AjcakqBqzNgBrbsiFPZMcLGIyTMmt/UnJzHwEvObahpA2t7Atox+5B6YZoufdkEZA6FGZ1huz7KPVb5Ud9DQwQ==}
+
+  '@syncfusion/ej2-vue-base@27.1.50':
+    resolution: {integrity: sha512-ltXnhLD9kJGwBOLRlK73gmjOmiBhotTpbYHIRu3V4yMJyRJJpa0MheG8X6SZvaXX6l+gvMadbF6X4pFXOqSQCQ==}
+
+  '@syncfusion/ej2-vue-navigations@27.1.56':
+    resolution: {integrity: sha512-GD6kijkOmmD8j0hnC3rbk07Rrj7ymsGaUcCkDOEeKJL+hBipr12RKMpyGcbfLgRqZzU6k5bCHFqhajqrs167Gg==}
 
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -5224,6 +5261,63 @@ snapshots:
   '@sinclair/typebox@0.27.8': {}
 
   '@sindresorhus/merge-streams@2.3.0': {}
+
+  '@syncfusion/ej2-base@27.1.55':
+    dependencies:
+      '@syncfusion/ej2-icons': 27.1.50
+
+  '@syncfusion/ej2-buttons@27.1.53':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+
+  '@syncfusion/ej2-data@27.1.52':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+
+  '@syncfusion/ej2-icons@27.1.50': {}
+
+  '@syncfusion/ej2-inputs@27.1.55':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+      '@syncfusion/ej2-buttons': 27.1.53
+      '@syncfusion/ej2-popups': 27.1.56
+      '@syncfusion/ej2-splitbuttons': 27.1.56
+
+  '@syncfusion/ej2-lists@27.1.50':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+      '@syncfusion/ej2-buttons': 27.1.53
+      '@syncfusion/ej2-data': 27.1.52
+      '@syncfusion/ej2-popups': 27.1.56
+
+  '@syncfusion/ej2-navigations@27.1.56':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+      '@syncfusion/ej2-buttons': 27.1.53
+      '@syncfusion/ej2-data': 27.1.52
+      '@syncfusion/ej2-inputs': 27.1.55
+      '@syncfusion/ej2-lists': 27.1.50
+      '@syncfusion/ej2-popups': 27.1.56
+
+  '@syncfusion/ej2-popups@27.1.56':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+      '@syncfusion/ej2-buttons': 27.1.53
+
+  '@syncfusion/ej2-splitbuttons@27.1.56':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+      '@syncfusion/ej2-popups': 27.1.56
+
+  '@syncfusion/ej2-vue-base@27.1.50':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+
+  '@syncfusion/ej2-vue-navigations@27.1.56':
+    dependencies:
+      '@syncfusion/ej2-base': 27.1.55
+      '@syncfusion/ej2-navigations': 27.1.56
+      '@syncfusion/ej2-vue-base': 27.1.50
 
   '@tootallnate/once@2.0.0':
     optional: true

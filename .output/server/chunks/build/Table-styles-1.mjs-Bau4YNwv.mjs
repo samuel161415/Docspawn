@@ -1,0 +1,4 @@
+const Table_vue_vue_type_style_index_0_scoped_48a1105b_lang = ".expanded-table-container[data-v-48a1105b]{max-height:500px;max-width:100%;overflow:auto}.loading-indicator[data-v-48a1105b]{align-items:center;color:#888;display:flex;font-size:1.2rem;height:100%;justify-content:center}[data-v-48a1105b] .p-datatable-scrollable-body{overflow:auto!important}[data-v-48a1105b] .p-datatable-scrollable-header{overflow:hidden!important}[data-v-48a1105b] .p-datatable-header{border-radius:.4rem .4rem 0 0!important}[data-v-48a1105b] .p-datatable-table>tbody>tr:last-of-type>td:first-of-type{border-radius:0 0 0 .5rem!important}[data-v-48a1105b] .p-datatable-table>tbody>tr:last-of-type>td:last-of-type{border-radius:0 0 .5rem 0!important}";
+
+export { Table_vue_vue_type_style_index_0_scoped_48a1105b_lang as T };
+//# sourceMappingURL=Table-styles-1.mjs-Bau4YNwv.mjs.map

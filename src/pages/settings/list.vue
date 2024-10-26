@@ -4,144 +4,17 @@
       <p class="font-semibold text-surface-700 text-xl my-5 ml-1">List</p>
       <div class="flex flex-col md:flex-row md:justify-between w-full">
         <!-- left side menu -->
-        <div
-          class="flex md:max-w-[30vw] flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
-        >
-          <div class="flex max-md:justify-center ml-1">
-            <Button
-              icon="pi pi-plus"
-              label="Create new list"
-              outlined
-              class="text-success border-success hover:bg-green-50 hover:border-success max-md:w-3/4 w-48"
-              @click="visible = true"
-            />
-          </div>
-
-          <div class="mt-4 flex max-md:justify-center">
-            <span class="relative flex h-10 ml-1 max-md:w-3/4">
-              <i
-                class="pi pi-search absolute top-2/4 -mt-2 left-2 text-surface-400 dark:text-surface-600 text-sm"
-                style="color: rgb(117, 119, 120)"
-              ></i>
-              <InputText
-                v-model="searchQuery"
-                placeholder="Search"
-                class="pl-7 font-normal rounded-md border-gray-300 font-poppins max-md:w-full w-48"
-              />
-            </span>
-          </div>
-
-          <ejs-treeview
-            :fields="treeFields"
-            @nodeClicked="onNodeClicked"
-            @nodeDragStop="onNodeDragStop"
-            :allowDragAndDrop='true'
-          ></ejs-treeview>
-          <!-- <ejs-treeview :fields="treeFields"></ejs-treeview> -->
-          <!-- <ul class="">
-            <li
-              v-for="items in filteredLists"
-              :key="items.title"
-              class="cursor-pointer flex flex-col max-md:items-center mt-4 w-full mr-4"
-            >
-              <div
-                :key="items.title"
-                class="flex max-md:justify-start max-md:w-3/4 px-2 py-2 ml-1 hover:bg-surface-100 rounded font-poppins"
-                @click="handleopensubmenu(items)"
-              >
-                <i
-                  class="pt-1 text-gray-500"
-                  :class="{
-                    'pi pi-chevron-down': items.opensubmenu,
-                    'text-primaryBlue': items.title === tableData.title,
-                    'pi pi-chevron-right': !items.opensubmenu,
-                  }"
-                  @click="items.opensubmenu = !items.opensubmenu"
-                ></i>
-                <span
-                  class="text-lg font-normal ml-3"
-                  v-html="highlight(items.title) || items.title"
-                  :class="{
-                    'text-surface-600': items.isHovered,
-                    'text-primaryBlue': items.title === tableData.title,
-                    'text-gray-500': !items.isHovered,
-                  }"
-                />
-              </div>
-
-              <ul
-                v-if="items.opensubmenu"
-                class="ml-3 flex flex-col max-md:w-3/4"
-              >
-                <li v-for="subItem in items.sublists" :key="subItem.id">
-                  <div
-                    v-if="subItem?.sublists && subItem.sublists.length > 0"
-                    :key="subItem.id"
-                    class="flex py-2 pl-1 hover:bg-surface-100 ml-4 font-poppins"
-                    @click="handleopensubmenu(subItem)"
-                  >
-                    <i
-                      class="text-gray-500"
-                      :class="{
-                        'pi pi-chevron-down': subItem.opensubmenu,
-                        'text-primaryBlue': subItem.title === tableData.title,
-                        'pi pi-chevron-right': !subItem.opensubmenu,
-                      }"
-                      @click="subItem.opensubmenu = !subItem.opensubmenu"
-                    ></i>
-
-                    <p
-                      class="text-base font-normal ml-3 text-gray-500"
-                      :class="{
-                        'text-primaryBlue': subItem.title === tableData.title,
-                      }"
-                      v-html="highlight(subItem.title) || subItem.title"
-                    ></p>
-                  </div>
-
-                  <ul v-if="subItem.opensubmenu" class="ml-3">
-                    <li
-                      v-for="subsubItem in subItem.sublists"
-                      :key="subsubItem.title"
-                    >
-                      <div
-                        v-if="
-                          subsubItem?.sublists && subsubItem.sublists.length > 0
-                        "
-                        :key="subsubItem.title"
-                        class="ml-5 font-poppins flex py-2 pl-1 hover:bg-surface-100 items-center"
-                        @click="handleopensubmenu(subsubItem)"
-                      >
-                        <i
-                          class="text-gray-500"
-                          :class="{
-                            'pi pi-chevron-down': subsubItem.opensubmenu,
-                            'text-primaryBlue':
-                              subsubItem.title === tableData.title,
-                            'pi pi-chevron-right': !subsubItem.opensubmenu,
-                          }"
-                          @click="
-                            subsubItem.opensubmenu = !subsubItem.opensubmenu
-                          "
-                        ></i>
-                        <p
-                          class="text-base font-normal ml-4 text-gray-500"
-                          :class="{
-                            'text-primaryBlue':
-                              subsubItem.title === tableData.title,
-                          }"
-                          v-html="
-                            highlight(subsubItem.title) || subsubItem.title
-                          "
-                        ></p>
-                      </div>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul> -->
-        </div>
+        <LeftSideMenu
+          :tableData="tableData"
+          :filters="filters"
+          :visible="visible"
+          :findItemByPath="findItemByPath"
+          @update:visible="visible = $event"
+          @update:searchQuery="searchQuery = $event"
+          @update:filteredLists="filteredLists = $event"
+          @update:tableData="tableData = $event"
+          @handleopensubmenu="handleopensubmenu"
+        />
 
         <!-- right section -->
         <div class="w-full md:max-w-[70vw] py-5 ml-2">
@@ -240,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed, onMounted } from "vue";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import { useToast } from "primevue/usetoast";
 import DataTableComponent from "~/components/settings/list/Table.vue";
@@ -250,9 +123,7 @@ import EditItemOptionModal from "~/components/settings/list/EditItemOptionModal.
 import ListOptionModal from "~/components/settings/list/ListOptionModal.vue";
 import CreateSublistModal from "~/components/settings/list/CreateSublistModal.vue";
 import { addNewListItem } from "~/services/newListData.js";
-import TempTable from "~/components/settings/list/TempTable.vue";
-
-const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
+import LeftSideMenu from "~/components/settings/list/LeftSideMenu.vue";
 
 const toast = useToast();
 const visible = ref(false);
@@ -268,167 +139,10 @@ const openCreateSubList = ref(false);
 const currentListLevel = ref();
 const currentListTitle = ref();
 const isSublistSimple = ref(true);
-// sublist id
 const sublistId = ref();
 const sublistPath = ref();
 const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
-
-const filteredList = computed(() => {
-  const filterItems = (items, fn) => {
-    return items.reduce((r, o) => {
-      const sublists = filterItems(o.sublists || [], fn);
-      if (fn(o) || sublists.length)
-        r.push(Object.assign({}, o, sublists.length && { sublists }));
-      return r;
-    }, []);
-  };
-
-  console.log("fileteredList is ", filteredList.value);
-
-  if (!searchQuery.value) return copiedList.value;
-  return filterItems(addNewListItem.value, (item) => {
-    return item.title.toLowerCase().includes(searchQuery.value.toLowerCase());
-  });
-});
-
-watch(searchQuery, (newValue, oldValue) => {
-  if (newValue === "") {
-    filteredLists.value = addNewListItem.value;
-  } else {
-    filteredLists.value = filteredList.value;
-  }
-});
-
-const treeData = computed(() => {
-  const transformData = (items) => {
-    return items.map((item) => ({
-      nodeId: item.path,
-      nodeText: item.title,
-      nodeChild: item.sublists ? transformData(item.sublists) : [],
-      cssClass: item.sublists && item.sublists.length > 0 ? 'clickable' : 'non-clickable'
-    }));
-  };
-  console.log("filteredLists inside the treeData", filteredLists.value);
-  return transformData(filteredLists.value);
-});
-
-console.log("treeData outside the treeData", filteredLists.value);
-
-const treeFields = ref({
-  dataSource: treeData,
-  id: "nodeId",
-  text: "nodeText",
-  child: "nodeChild",
-});
-
-const onNodeClicked = (args) => {
-  const clickedNode = args.node;
-  console.log("clickedNode", clickedNode);
-  const nodeId = clickedNode.getAttribute("data-uid");
-  const clickedItem = findItemByPath(addNewListItem.value, nodeId, "treeView");
-  // console.log("clickedItem", clickedItem, 'nodeId', nodeId);
-  if (!clickedItem || !clickedItem.sublists || clickedItem.sublists.length === 0) {
-    args.event.preventDefault();
-    return;
-  }
-  if (clickedItem) {
-    handleopensubmenu(clickedItem);
-  }
-};
-
-const onNodeDragStop = (args) => {
-  const draggedNodeId = args.draggedNodeData.id;
-  const droppedNodeId = args.droppedNodeData.id;
-  const dropPosition = args.dropPosition;
-
-  // Find the dragged item
-  const draggedItem = findItemByPath(addNewListItem.value, draggedNodeId, "treeView");
-
-  // Remove the dragged item from its original position
-  removeItemByPath(addNewListItem.value, draggedNodeId);
-
-  // Find the dropped item
-  const droppedItem = findItemByPath(addNewListItem.value, droppedNodeId, "treeView");
-
-  // Insert the dragged item into its new position
-  if (dropPosition === "before") {
-    insertBefore(addNewListItem.value, droppedItem, draggedItem);
-  } else if (dropPosition === "after") {
-    insertAfter(addNewListItem.value, droppedItem, draggedItem);
-  } else if (dropPosition === "inside") {
-    insertInside(droppedItem, draggedItem);
-  }
-
-  // Update the table data
-  tableData.value = { ...tableData.value };
-};
-
-const removeItemByPath = (list, path) => {
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].path === path) {
-      list.splice(i, 1);
-      return true;
-    }
-    if (Array.isArray(list[i].sublists) && list[i].sublists.length > 0) {
-      const found = removeItemByPath(list[i].sublists, path);
-      if (found) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-const insertBefore = (list, referenceItem, newItem) => {
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].path === referenceItem.path) {
-      list.splice(i, 0, newItem);
-      return true;
-    }
-    if (Array.isArray(list[i].sublists) && list[i].sublists.length > 0) {
-      const found = insertBefore(list[i].sublists, referenceItem, newItem);
-      if (found) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-const insertAfter = (list, referenceItem, newItem) => {
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].path === referenceItem.path) {
-      list.splice(i + 1, 0, newItem);
-      return true;
-    }
-    if (Array.isArray(list[i].sublists) && list[i].sublists.length > 0) {
-      const found = insertAfter(list[i].sublists, referenceItem, newItem);
-      if (found) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-const insertInside = (parentItem, newItem) => {
-  if (!Array.isArray(parentItem.sublists)) {
-    parentItem.sublists = [];
-  }
-  parentItem.sublists.push(newItem);
-};
-
-const highlight = (data) => {
-  if (searchQuery.value) {
-    const pattern = new RegExp(searchQuery.value, "i");
-    const highlightedData = data.replace(
-      pattern,
-      `<span class="bg-primary-100 capitalize">${searchQuery.value}</span>`
-    );
-    return highlightedData;
-  }
-};
 
 const handleopensubmenu = (clickedItem) => {
   tableData.value = clickedItem;
@@ -436,7 +150,6 @@ const handleopensubmenu = (clickedItem) => {
 
 onMounted(() => {
   tableData.value = addNewListItem.value[0];
-  // console.log("tableData after update", tableData.value);
 });
 
 const filters = ref({
@@ -449,19 +162,6 @@ const filters = ref({
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
-  // console.log(
-  //   "createSubList called",
-  //   "data",
-  //   data,
-  //   "data.id",
-  //   data.id,
-  //   "data.level",
-  //   data.level,
-  //   "title",
-  //   data.title,
-  //   "path",
-  //   data.path
-  // );
   openItemOptions.value = false;
   openCreateSubList.value = true;
   sublistId.value = data.id;
@@ -570,7 +270,6 @@ const handleEditItem = (data) => {
   tableData.value = { ...tableData.value };
 };
 
-//
 const handleOpenAddItems = (title) => {
   addItemsTitle.value = title;
   openAddItems.value = true;

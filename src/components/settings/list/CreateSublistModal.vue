@@ -235,19 +235,20 @@
           label="Create sublist"
           icon="pi pi-check"
           :class="[
-            'flex justify-center text-center',
+            ' flex justify-center text-center',
             {
               'bg-success text-white hover:bg-success hover:border-success':
                 (listType === 'simple' && sublistItems.length > 0) ||
                 (listType === 'dataSource' &&
                   selectedFiles.length > 0 &&
                   tableName),
-              'bg-gray-300 text-gray-500 cursor-not-allowed':
+              'bg-gray-300 text-gray-500  disable':
                 (listType === 'simple' && sublistItems.length === 0) ||
                 (listType === 'dataSource' &&
                   (selectedFiles.length === 0 || !tableName)),
             },
           ]"
+         
           :disabled="
             (listType === 'simple' && sublistItems.length === 0) ||
             (listType === 'dataSource' &&
@@ -590,6 +591,10 @@ const handleChangeSelectedRows = (data) => {
   border: solid blue 1.5px;
 }
 
+::v-deep .disable {
+  background-color : gray;
+  cursor: not-allowed;
+}
 ::v-deep .p-dialog-content {
   overflow-y: hidden !important;
 }

@@ -3,7 +3,8 @@
     v-model:visible="visible"
     modal
     :draggable="false"
-    :style="{ width: '40rem', height: '60rem' }"
+    class="shadow-none w-[50vw] md:ww-[60vw]"
+    :style="{ height: '90vh', overflow: 'hidden' }"
   >
     <template #header>
       <div class="flex justify-center items-center ml-5">
@@ -13,24 +14,11 @@
       </div>
     </template>
 
-    <div
-      class="px-5 overflow-y-auto h-[70vh]"
-      style="max-height: calc(100% - 4rem)"
-    >
+    <div class="h-full overflow-hidden">
       <!-- Add option to choose between simple list and data source -->
-      <div class="flex flex-col align-items-center gap-3 mb-5">
-        <label class="font-semibold w-6rem text-lg">List Type</label>
+      <div class="flex flex-col align-items-center gap-3 px-5 mb-5 mt-2">
+        <label class="font-semibold w-6rem text-lg">List type</label>
         <div class="flex gap-2">
-          <!-- <Button
-            label="Simple List"
-            :class="[
-              listType === 'simple'
-                ? 'bg-success text-white hover:bg-success hover:border-success'
-                : ' p-button-rounded p-button-success',
-              'px-4 py-2 rounded',
-            ]"
-            @click="listType = 'simple'"
-          /> -->
           <button
             :class="[
               listType === 'simple'
@@ -40,19 +28,9 @@
             ]"
             @click="listType = 'simple'"
           >
-            Simple List
+            Simple list
           </button>
 
-          <!-- <Button
-            label="Data Source"
-            :class="[
-              listType === 'dataSource'
-                ? 'bg-success text-white hover:bg-success hover:border-success'
-                : ' p-button-success ',
-              'px-4 py-2 rounded',
-            ]"
-            @click="listType = 'dataSource'"
-          /> -->
           <button
             :class="[
               listType === 'dataSource'
@@ -62,13 +40,13 @@
             ]"
             @click="listType = 'dataSource'"
           >
-            Data Source
+            Data source
           </button>
         </div>
       </div>
 
       <!-- Conditional rendering based on listType -->
-      <div v-if="listType === 'simple'">
+      <div v-if="listType === 'simple'" class="h-[50vh] overflow-auto px-5">
         <!-- Simple list input fields -->
         <div class="flex flex-col align-items-center gap-2 mb-3">
           <label for="sublistitems" class="font-semibold w-6rem text-lg"
@@ -85,7 +63,7 @@
               :icon="['fas', 'exclamation-triangle']"
               class="text-error mr-2"
             ></font-awesome-icon>
-            You should Add Items!
+            You should add items
           </span>
           <Textarea
             id="sublistItems"
@@ -147,11 +125,11 @@
         </DataTable>
       </div>
 
-      <div class="py-2" v-else>
+      <div class="py-2 h-[60vh] overflow-auto px-5" v-else>
         <!-- Data source input fields -->
-        <div class="flex flex-col gap-2 mb-3">
+        <div class="flex flex-col gap-2 mb-6">
           <label for="tableName" class="font-semibold w-6rem text-lg">
-            Table Name <span class="text-red-400">*</span>
+            Table name <span class="text-red-400">*</span>
           </label>
           <span
             v-if="addClicked && tableName === ''"
@@ -167,17 +145,19 @@
             :invalid="addClicked && tableName === ''"
           />
         </div>
-
-        <span
+        <label for="tableName" class="font-semibold w-6rem text-lg">
+          Drage your file <span class="text-red-400">*</span>
+        </label>
+        <!-- <span
           v-if="addClicked && selectedFiles.length === 0"
           class="text-sm text-error"
         >
           <i class="pi pi-exclamation-triangle text-error mr-2"></i>
-          You should select a file!
-        </span>
+          You should select a file
+        </span> -->
         <div
           v-if="selectedFiles.length === 0"
-          class="custom-file-upload"
+          class="custom-file-upload mt-2"
           :class="{ 'error-border': hasError }"
           @dragover.prevent
           @dragenter.prevent="handleDragEnter"
@@ -249,17 +229,34 @@
       </div>
     </div>
 
-
-    
-    <div class="flex justify-center mt-5">
-      <Button
-        v-if="listType !== 'dataSource' || tableName"
-        label="Create sublist"
-        icon="pi pi-check"
-        class="bg-success text-white hover:bg-success hover:border-success flex justify-center text-center"
-        @click="handleCreateList"
-      />
-    </div>
+    <template #footer>
+      <div class="flex justify-center items-center mt-6 h-full w-full">
+        <Button
+          label="Create sublist"
+          icon="pi pi-check"
+          :class="[
+            'flex justify-center text-center',
+            {
+              'bg-success text-white hover:bg-success hover:border-success':
+                (listType === 'simple' && sublistItems.length > 0) ||
+                (listType === 'dataSource' &&
+                  selectedFiles.length > 0 &&
+                  tableName),
+              'bg-gray-300 text-gray-500 cursor-not-allowed':
+                (listType === 'simple' && sublistItems.length === 0) ||
+                (listType === 'dataSource' &&
+                  (selectedFiles.length === 0 || !tableName)),
+            },
+          ]"
+          :disabled="
+            (listType === 'simple' && sublistItems.length === 0) ||
+            (listType === 'dataSource' &&
+              (selectedFiles.length === 0 || !tableName))
+          "
+          @click="handleCreateList"
+        />
+      </div>
+    </template>
   </Dialog>
 </template>
 
@@ -305,6 +302,7 @@ const isSublistSimple = ref(true);
 const tableName = ref();
 
 const handleAdd = () => {
+  addClicked.value = true;
   const items = sublistItem.value
     .split(/[\n,]+/)
     .map((item) => item.trim())
@@ -583,3 +581,16 @@ const handleChangeSelectedRows = (data) => {
   dataSourceSelectedRows.value = data;
 };
 </script>
+
+<style scoped>
+.p-dialog {
+  padding: 0px !important;
+  overflow: hidden !important;
+  height: 60vh;
+  border: solid blue 1.5px;
+}
+
+::v-deep .p-dialog-content {
+  overflow-y: hidden !important;
+}
+</style>

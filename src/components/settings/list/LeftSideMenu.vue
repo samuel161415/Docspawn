@@ -281,6 +281,9 @@ const updateSearchQuery = (event) => {
 ::v-deep .e-active > .e-text-content > .e-list-text {
   color: #009EE2 !important; 
 }
+::v-deep .e-drag-item.e-dragging::before {
+  background-color: #009EE2 !important; /* Change the color of the drag indicator dot */
+}
 
 ::v-deep .non-clickable .e-list-text {
   pointer-events: none;

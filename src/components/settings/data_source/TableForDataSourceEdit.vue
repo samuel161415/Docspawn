@@ -6,9 +6,12 @@
       v-model:selection="selectedRows"
       :value="completeData"
       lazy
-      :paginator="completeData?.length > 0"
-      :first="first"
+      :paginator="selectedRows?.length > 0"
       :rows="10"
+      :rowsPerPageOptions="[10, 25, 50]"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords}"
+      :first="first"
       data-key="auto_index_by_docspawn"
       :total-records="totalRecords"
       :loading="loading"
@@ -41,12 +44,14 @@
     <DataTable
       v-else
       ref="dt"
-
       :value="selectedRows"
       lazy
       :paginator="selectedRows?.length > 0"
+      :rows="5"
+      :rowsPerPageOptions="[5, 10, 25]"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords}"
       :first="first"
-      :rows="10"
       data-key="auto_index_by_docspawn"
       :total-records="totalRecords"
       :loading="loading"
@@ -115,6 +120,9 @@ onMounted(() => {
   selectedRows.value = props?.dataSourceSelectedRows?.length > 0 ? props?.dataSourceSelectedRows : props?.dataSourceFileCompleteJSON
   selectedColumns.value = props?.dataSourceSelectedColumns
 })
+const showPaginator = computed(() => {
+  return props.selectedRows?.length > 5;
+});
 
 function loadLazyData(event) {
   loading.value = true

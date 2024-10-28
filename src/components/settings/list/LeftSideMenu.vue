@@ -31,13 +31,13 @@
       @nodeClicked="onNodeClicked"
       @nodeDragStop="onNodeDragStop"
       :allowDragAndDrop="true"
-      cssClass="font-poppins text-lg text-gray-500"
+      cssClass="font-poppins text-lg text-gray-500 py-2"
     ></ejs-treeview>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, nextTick } from "vue";
 import { useToast } from "primevue/usetoast";
 import { addNewListItem } from "~/services/newListData.js";
 
@@ -45,10 +45,14 @@ const transformData = (items) => {
   return items.map((item) => ({
     nodeId: item.path,
     nodeText: item.title,
-    nodeChild: item.sublists ? transformData(item.sublists) : [],
+    nodeChild: item.isSublistSimple ? (item.sublists ? transformData(item.sublists) : []) : [],
+    iconCss: item.isSublistSimple ? "" : "pi pi-file-excel text-success",
     cssClass:
       item.sublists && item.sublists.length > 0 ? "clickable" : "non-clickable",
   }));
+};
+const nodeTemplate = (data) => {
+  return `<span>${data.nodeText} <i class="${data.iconCss}"></i></span>`;
 };
 
 const props = defineProps({
@@ -68,25 +72,34 @@ const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
 const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
 const treeData = ref(transformData(filteredLists.value));
+
 const treeFields = ref({
   dataSource: treeData,
   id: "nodeId",
   text: "nodeText",
   child: "nodeChild",
+  iconCss: "iconCss",
+  nodeTemplate: nodeTemplate,
 });
 
-console.log("treeFields", treeFields.value);
 
 const filteredList = computed(() => {
   const filterItems = (items, fn) => {
-    return items.reduce((r, o) => {
-      const sublists = filterItems(o.sublists || [], fn);
-      if (fn(o) || sublists.length)
-        r.push(Object.assign({}, o, sublists.length && { sublists }));
-      return r;
+    return items.reduce((result, item) => {
+      const sublists = filterItems(item.sublists || [], fn);
+      if (fn(item)) {
+        // If the item itself matches, include it with all its sublists
+        result.push(Object.assign({}, item, { sublists: item.sublists }));
+      } else if (sublists.length) {
+        // If any sublists match, include only the matching sublists
+        result.push(...sublists);
+      }
+      return result;
     }, []);
   };
+
   if (!searchQuery.value) return copiedList.value;
+
   return filterItems(addNewListItem.value, (item) => {
     return item.title.toLowerCase().includes(searchQuery.value.toLowerCase());
   });
@@ -96,6 +109,9 @@ watch(searchQuery, (newValue) => {
   if (newValue === "") {
     filteredLists.value = addNewListItem.value;
   } else {
+    console.log("searchQuery",searchQuery)
+    console.log("filteredLists",filteredLists.value)
+    console.log("single filteredList",filteredList.value)
     filteredLists.value = filteredList.value;
   }
 });
@@ -103,6 +119,7 @@ watch(searchQuery, (newValue) => {
 watch(
   filteredLists,
   (newValue) => {
+    
     treeData.value = transformData(newValue);
   },
   { deep: true }
@@ -127,8 +144,8 @@ watch(addNewListItem, (newValue) => {
 
 const onNodeClicked = (args) => {
   const clickedNode = args.node;
-  console.log("clickedNode", clickedNode);
   const nodeId = clickedNode.getAttribute("data-uid");
+  console.log("clicked node",nodeId)
   const clickedItem = props.findItemByPath(
     addNewListItem.value,
     nodeId,
@@ -155,7 +172,15 @@ const onNodeClicked = (args) => {
 
 const onNodeDragStop = (args) => {
   const draggedNodeId = args.draggedNodeData.id;
-  const droppedNodeId = args.droppedNodeData.id;
+  const droppedNodeData = args.droppedNodeData;
+
+  // Check if droppedNodeData is null
+  if (!droppedNodeData) {
+    console.error("Dropped node data is null");
+    return;
+  }
+
+  const droppedNodeId = droppedNodeData.id;
   const dropPosition = args.position;
 
   const draggedItem = props.findItemByPath(
@@ -183,6 +208,36 @@ const onNodeDragStop = (args) => {
   emit("update:addNewListItem", [...addNewListItem.value]);
   filteredLists.value = JSON.parse(JSON.stringify(addNewListItem.value));
   emit("update:tableData", { ...props.tableData });
+
+  // Expand the parent node of the dropped item
+  // expandParentNodeById(droppedNodeId);
+};
+
+const expandParentNodeById = (nodeId) => {
+  nextTick(() => {
+    setTimeout(() => {
+      const treeView = document.querySelector(".e-treeview");
+      console.log("treeView", treeView);
+      const node = treeView.querySelector(`[data-uid="${nodeId}"]`);
+      console.log('nodeId', nodeId);
+      console.log("node ", node);
+      if (node) {
+        const parentNode = node.closest('li.e-list-item.e-level-1');
+        console.log("parentNode ", parentNode);
+        if (parentNode) {
+          try {
+            treeView.ej2_instances[0].expandNode(parentNode);
+          } catch (error) {
+            console.error("Error expanding parent node:", error);
+          }
+        } else {
+          console.warn("Parent node not found for nodeId:", nodeId);
+        }
+      } else {
+        console.warn("Node not found for nodeId:", nodeId);
+      }
+    }, 500); // Adjust the delay as needed
+  });
 };
 
 const updatePaths = (list, parentPath = "") => {
@@ -250,20 +305,7 @@ const insertInside = (parentItem, newItem) => {
   parentItem.sublists.push(newItem);
 };
 
-const highlight = (data) => {
-  if (searchQuery.value) {
-    const pattern = new RegExp(searchQuery.value, "i");
-    const highlightedData = data.replace(
-      pattern,
-      `<span class="bg-primary-100 capitalize">${searchQuery.value}</span>`
-    );
-    return highlightedData;
-  }
-};
 
-const updateSearchQuery = (event) => {
-  searchQuery.value = event.target.value;
-};
 </script>
 
 <style scoped>

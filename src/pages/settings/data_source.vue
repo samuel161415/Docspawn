@@ -4,7 +4,7 @@
       <div id="lists">
         <List />
       </div>
-      <div id="databases">
+      <div id="databases" class="">
         <DataSources />
       </div>
     </div>

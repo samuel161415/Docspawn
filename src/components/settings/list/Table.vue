@@ -125,7 +125,7 @@
           :field="column"
           :header="column"
           :sortable="true"
-          class="w-[calc(100% - 80px)] pl-[33px] header-white"
+          class="w-[calc(100% - 80px)]  pl-[33px] header-white"
           :class="headerClass"
         >
           <template #body="{ data, field }">
@@ -298,11 +298,11 @@ const columns = computed(() => {
 });
 
 const toggleRow = (data) => {
-  console.log(
-    "lis evel greater than 3",
-    props.tableData.level,
-    props.tableData.title
-  );
+ 
+
+  console.log("toggleRow called for data:", data);
+  console.log("expandedRows before toggle:", expandedRows.value);
+  console.log("isChildSublistSimple:", isChildSublistSimple(data));
   if (props.tableData.level > 2) {
     return; // Prevent expanding if level is greater than 3
   }
@@ -318,6 +318,7 @@ const toggleRow = (data) => {
       expandedRows.value[data.id] = true;
     }
   }
+  console.log("expandedRows after toggle:", expandedRows.value);
 };
 
 const showModal = (data) => {

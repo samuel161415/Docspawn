@@ -146,7 +146,7 @@
           />
         </div>
         <label for="tableName" class="font-semibold w-6rem text-lg">
-          Drage your file <span class="text-red-400">*</span>
+          Drag your file <span class="text-red-400">*</span>
         </label>
         <!-- <span
           v-if="addClicked && selectedFiles.length === 0"
@@ -311,6 +311,9 @@ const handleAdd = () => {
     .map((item) => ({ name: item }));
 
   sublistItems.value = sublistItems.value.concat(items);
+  if (sublistItems.value.length > 0) {
+    sublistItem.value = ""; // Clear the textarea
+  }
 };
 
 const onFileSelect = (event) => {

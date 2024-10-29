@@ -71,7 +71,7 @@
             rows="10"
             cols="30"
             placeholder="List item"
-            :invalid="addClicked && sublistItem === ''"
+            :invalid="addClicked && sublistItem.trim() === ''"
           />
         </div>
         <Button
@@ -146,7 +146,7 @@
           />
         </div>
         <label for="tableName" class="font-semibold w-6rem text-lg">
-          Drag your file <span class="text-red-400">*</span>
+          Upload a file <span class="text-red-400">*</span>
         </label>
         <!-- <span
           v-if="addClicked && selectedFiles.length === 0"
@@ -235,26 +235,24 @@
           label="Create sublist"
           icon="pi pi-check"
           :class="[
-            ' flex justify-center text-center',
+            'flex justify-center text-center',
             {
               'bg-success text-white hover:bg-success hover:border-success':
                 (listType === 'simple' && sublistItems.length > 0) ||
                 (listType === 'dataSource' &&
                   selectedFiles.length > 0 &&
                   tableName),
-              'bg-gray-300 text-gray-500  disable':
+              'bg-gray-300 text-gray-500 disable':
                 (listType === 'simple' && sublistItems.length === 0) ||
                 (listType === 'dataSource' &&
                   (selectedFiles.length === 0 || !tableName)),
             },
           ]"
-         
-          :disabled="
-            (listType === 'simple' && sublistItems.length === 0) ||
-            (listType === 'dataSource' &&
-              (selectedFiles.length === 0 || !tableName))
-          "
           @click="handleCreateList"
+          v-tooltip.top="{
+            value: getTooltipMessage(),
+            disabled: isTooltipDisabled(),
+          }"
         />
       </div>
     </template>
@@ -303,7 +301,12 @@ const isSublistSimple = ref(true);
 const tableName = ref();
 
 const handleAdd = () => {
-  addClicked.value = true;
+  if (sublistItem.value.trim() === "") {
+    addClicked.value = true;
+    return;
+  }
+
+  addClicked.value = false;
   const items = sublistItem.value
     .split(/[\n,]+/)
     .map((item) => item.trim())
@@ -520,6 +523,7 @@ watch(dataSourceFileCompleteJSON, () => {
 });
 
 const handleCreateList = () => {
+  console.log("yes I am inside handlecreatelist")
   addClicked.value = true;
   if (listType.value === "simple" && sublistItems.value.length > 0) {
     isSublistSimple.value = true;
@@ -584,6 +588,33 @@ const handleChangeSelectedColumns = (data) => {
 const handleChangeSelectedRows = (data) => {
   dataSourceSelectedRows.value = data;
 };
+
+const getTooltipMessage = () => {
+  if (listType.value === "simple" && sublistItems.value.length === 0) {
+    return "Please enter items in the text area";
+  } else if (listType.value === "dataSource") {
+    if (selectedFiles.value.length === 0 && !tableName.value) {
+      return "Please provide a table name and upload a file.";
+    } else if (selectedFiles.value.length === 0) {
+      return "Please upload a file.";
+    } else if (!tableName.value) {
+      return "Please provide a table name.";
+    }
+  }
+  return "";
+};
+
+const isTooltipDisabled = () => {
+  if (listType.value === "simple" && sublistItems.value.length === 0) {
+    return false;
+  } else if (
+    listType.value === "dataSource" &&
+    (selectedFiles.value.length === 0 || !tableName.value)
+  ) {
+    return false;
+  }
+  return true;
+};
 </script>
 
 <style scoped>
@@ -595,8 +626,9 @@ const handleChangeSelectedRows = (data) => {
 }
 
 ::v-deep .disable {
-  background-color : gray;
+  background-color: rgb(169, 167, 167);
   cursor: not-allowed;
+  border: none;
 }
 ::v-deep .p-dialog-content {
   overflow-y: hidden !important;

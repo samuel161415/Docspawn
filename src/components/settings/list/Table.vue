@@ -7,27 +7,26 @@
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
       dataKey="id"
-      striped-rows
       :paginator="showPaginator"
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
-      class="border border-blue-500"
+      class="border border-blue-500 my-3"
     >
       <template v-if="calledFrom === 'root'" #header>
         <div
-          class="flex flex-wrap justify-between items-center mt-3 py-3 rounded-lg mx-[16px]"
+          class="flex flex-wrap justify-between items-center my-3 py-3 rounded-lg mx-[16px]"
         >
           <p class="font-poppins font-normal text-lg">{{ tableData.title }}</p>
           <div class="flex flex-col md:flex-row justify-end gap-2">
-            <Button
+            <!-- <Button
               :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
               :label="isAllExpanded ? 'Collapse' : 'Expand'"
               class="p-button-success w-36"
               outlined
               @click="toggleExpandCollapse"
-            />
+            /> -->
             <Button
               icon="pi pi-plus"
               label="Add item(s)"
@@ -56,7 +55,7 @@
             >
               <i
                 :class="
-                  expandedRows[data.id] && !isChildSublistSimple(data)
+                  expandedRows[data.id]
                     ? 'pi pi-chevron-down'
                     : 'pi pi-chevron-right'
                 "
@@ -125,7 +124,7 @@
           :field="column"
           :header="column"
           :sortable="true"
-          class="w-[calc(100% - 80px)]  pl-[33px] header-white"
+          class="w-[calc(100% - 80px)] pl-[33px] header-white"
           :class="headerClass"
         >
           <template #body="{ data, field }">
@@ -298,8 +297,6 @@ const columns = computed(() => {
 });
 
 const toggleRow = (data) => {
- 
-
   console.log("toggleRow called for data:", data);
   console.log("expandedRows before toggle:", expandedRows.value);
   console.log("isChildSublistSimple:", isChildSublistSimple(data));
@@ -329,9 +326,11 @@ const showModal = (data) => {
 </script>
 
 <style scoped>
+
+
 ::v-deep .p-datatable-row-expansion {
   padding: 0 !important;
-  margin: 0 !important;
+  margin: 10 !important;
   border: none !important;
 }
 /* For removing the scroll vertical feature of the table */

@@ -26,6 +26,16 @@
       </span>
     </div>
 
+    <div class="flex justify-left mt-3 pl-1">
+      <Button
+        :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
+        :label="isAllExpanded ? 'Collapse' : 'Expand'"
+        class="p-button-success w-36"
+        outlined
+        @click="toggleExpandCollapse"
+      />
+    </div>
+
     <ejs-treeview
       :fields="treeFields"
       @nodeClicked="onNodeClicked"
@@ -211,6 +221,22 @@ const onNodeDragStop = (args) => {
 
   // Expand the parent node of the dropped item
   // expandParentNodeById(droppedNodeId);
+};
+
+const isAllExpanded = ref(false);
+
+const toggleExpandCollapse = () => {
+  nextTick(() => {
+    const treeView = document.querySelector(".e-treeview");
+    if (treeView && treeView.ej2_instances && treeView.ej2_instances[0]) {
+      if (isAllExpanded.value) {
+        treeView.ej2_instances[0].collapseAll();
+      } else {
+        treeView.ej2_instances[0].expandAll();
+      }
+      isAllExpanded.value = !isAllExpanded.value;
+    }
+  });
 };
 
 const expandParentNodeById = (nodeId) => {

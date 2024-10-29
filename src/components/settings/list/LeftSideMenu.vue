@@ -12,6 +12,16 @@
       />
     </div>
 
+    <div class="flex justify-left mt-3 pl-1">
+      <Button
+        :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
+        :label="isAllExpanded ? 'Collapse' : 'Expand'"
+        class="p-button-success w-48"
+        outlined
+        @click="toggleExpandCollapse"
+      />
+    </div>
+
     <div class="mt-4 flex max-md:justify-center">
       <span class="relative flex h-10 ml-1 max-md:w-3/4">
         <i
@@ -26,15 +36,7 @@
       </span>
     </div>
 
-    <div class="flex justify-left mt-3 pl-1">
-      <Button
-        :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
-        :label="isAllExpanded ? 'Collapse' : 'Expand'"
-        class="p-button-success w-36"
-        outlined
-        @click="toggleExpandCollapse"
-      />
-    </div>
+  
 
     <ejs-treeview
       :fields="treeFields"
@@ -62,7 +64,7 @@ const transformData = (items) => {
   }));
 };
 const nodeTemplate = (data) => {
-  return `<span>${data.nodeText} <i class="${data.iconCss}"></i></span>`;
+  return `<span>${data.nodeText} <i class="${data.iconCss}" style="margin-right: 5px;"></i></span>`;
 };
 
 const props = defineProps({
@@ -335,11 +337,17 @@ const insertInside = (parentItem, newItem) => {
 </script>
 
 <style scoped>
+
+
+::v-deep .e-treeview .e-ul .e-level-1 {
+  margin-left: -14px !important
+}
+
 ::v-deep .e-treeview .e-list-text {
-  font-family: 'Poppins', sans-serif; /* font-poppins */
+  font-family: "Poppins", sans-serif; /* font-poppins */
   font-weight: 400; /* font-normal */
   font-size: 14px !important; /* Ensure font size is applied */
-  color: #4B5563 !important; /* Ensure color is applied */
+  color: #4b5563 !important; /* Ensure color is applied */
 }
 
 ::v-deep .clickable .e-list-text {
@@ -347,15 +355,15 @@ const insertInside = (parentItem, newItem) => {
 }
 
 ::v-deep .e-active > .e-text-content > .e-list-text {
-  color: #009EE2 !important; 
+  color: #009ee2 !important;
 }
 ::v-deep .e-drag-item.e-dragging::before {
-  background-color: #009EE2 !important; /* Change the color of the drag indicator dot */
+  background-color: #009ee2 !important; /* Change the color of the drag indicator dot */
 }
 
 ::v-deep .non-clickable .e-list-text {
   pointer-events: none;
-  color: #4B5563 !important; /* Ensure color is applied */
+  color: #4b5563 !important; /* Ensure color is applied */
   cursor: not-allowed; /* Change the cursor to not-allowed for non-clickable nodes */
 }
 </style>

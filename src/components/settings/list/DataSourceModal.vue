@@ -12,22 +12,26 @@
   >
     <template #header>
       <div
-        class="custom-header flex justify-start  bg-white  flex-wrap items-center"
+        class="custom-header flex justify-start bg-white flex-wrap items-center"
       >
-       
-        <p class="font-poppins  whitespace-nowrap  text-xl font-semibold">
+        <p class="font-poppins whitespace-nowrap text-xl font-semibold">
           {{ tableData.name }}
         </p>
       </div>
     </template>
     <DataTable
+      :value="tableData.sublists.slice(1)"
+      :frozenValue="[tableData.sublists[0]]"
+      scrollable
+      scrollHeight="450px"
       :paginator="showPaginator"
       :rows="5"
       :rowsPerPageOptions="[5, 10, 20, 50]"
-      :value="tableData.sublists"
+      paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="{first} to {last} of {totalRecords}"
       striped-rows
       show-gridlines
-      class=" border  rounded-lg overflow-hidden"
+      class="border rounded-lg overflow-hidden"
     >
       <Column
         v-for="(column, index) in columns"
@@ -36,9 +40,10 @@
         :header="column"
         :sortable="true"
       >
-        <template #body="{ data, field }">
+        <template #body="{ data, field, frozenRow }">
           <p
             class="font-poppins font-normal flex justify-center whitespace-nowrap py-2"
+            :class="{ 'font-bold': frozenRow }"
           >
             {{ data[field] }}
           </p>
@@ -84,10 +89,8 @@ const updateVisible = (value) => {
 .custom-header {
   display: flex;
   align-items: center;
-  padding:0;
-  
+  padding: 0;
 }
-
 
 ::v-deep .p-datatable-thead > tr {
   border: none !important;

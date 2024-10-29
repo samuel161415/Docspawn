@@ -1,18 +1,21 @@
 <template>
   <div
-    :class="isSublistData ? `max-w-[calc(70vw-${c_level * 65}px)]` : ''"
+    :class="isSublistData ? `max-w-[calc(60vw-${c_level * 65}px)]` : 'w-full'"
     class=""
   >
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="tableData?.sublists"
+      :value="tableData?.sublists?.slice(1)"
+      :frozenValue="tableData?.sublists?.length ? [tableData.sublists[0]] : []"
       dataKey="id"
+      scrollable
+      scrollHeight="450px"
       :paginator="showPaginator"
-      :rows="10"
-      :rowsPerPageOptions="[10, 25, 50]"
+      :rows="5"
+      :rowsPerPageOptions="[5, 25, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
-      class="border border-blue-500 my-3"
+      class="my-3"
     >
       <template v-if="calledFrom === 'root'" #header>
         <div
@@ -140,7 +143,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data)"
-          :class="isChildSublistSimple(data) ? '' : 'max-w-[calc(70vw-34px)]'"
+          :class="isChildSublistSimple(data) ? '' : 'max-w-[calc(60vw-34px)]'"
           class="pl-[47px] border-none mb-[-1px] overflow-x-auto"
         >
           <Table
@@ -326,17 +329,15 @@ const showModal = (data) => {
 </script>
 
 <style scoped>
-
-
 ::v-deep .p-datatable-row-expansion {
   padding: 0 !important;
   margin: 10 !important;
   border: none !important;
 }
 /* For removing the scroll vertical feature of the table */
-::v-deep .p-datatable-wrapper {
-  overflow-y: hidden !important; /* Prevent vertical scrolling */
-}
+/* ::v-deep .p-datatable-wrapper {
+  overflow-y: hidden !important; //Prevent vertical scrolling
+} */
 
 ::v-deep .p-datatable {
   border: none !important;

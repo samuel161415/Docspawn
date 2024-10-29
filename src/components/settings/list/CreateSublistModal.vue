@@ -81,9 +81,12 @@
           class="bg-success text-white hover:bg-success hover:border-success my-2"
         />
         <DataTable
-          :value="sublistItems"
+          :value="sublistItems?.slice(1)"
+          :frozenValue="sublistItems?.length ? [sublistItems[0]] : []"
           striped-rows
           show-gridlines
+          scrollable
+          scrollHeight="400px"
           :reorderableColumns="true"
           @rowReorder="onRowReorder"
           tableStyle="min-width: 30rem"
@@ -107,12 +110,14 @@
             header="Name"
             :body-style="{ margin: '0rem', padding: '0rem' }"
           >
-            <template #body="{ data }">
-              <p class="ml-2">{{ data["name"] }}</p>
+            <template #body="{ data, frozenRow }">
+              <p class="ml-2" :class="{ 'font-bold': frozenRow }">
+                {{ data["name"] }}
+              </p>
             </template>
           </Column>
           <Column field="action" header="Actions" style="width: 3%">
-            <template #body="{ data }">
+            <template #body="{ data, frozenRow }">
               <div class="flex justify-center">
                 <font-awesome-icon
                   :icon="['fas', 'trash-alt']"
@@ -523,7 +528,7 @@ watch(dataSourceFileCompleteJSON, () => {
 });
 
 const handleCreateList = () => {
-  console.log("yes I am inside handlecreatelist")
+  console.log("yes I am inside handlecreatelist");
   addClicked.value = true;
   if (listType.value === "simple" && sublistItems.value.length > 0) {
     isSublistSimple.value = true;

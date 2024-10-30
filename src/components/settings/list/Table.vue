@@ -5,14 +5,15 @@
   >
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="tableData?.sublists?.slice(1)"
-      :frozenValue="tableData?.sublists?.length ? [tableData.sublists[0]] : []"
+      :value="tableData?.sublists"
       dataKey="id"
       scrollable
-      scrollHeight="450px"
+      :scrollHeight="calledFrom === 'root' ? '550px':'400px'"
+      scrollDirection="both"
+      frozenHeader
       :paginator="showPaginator"
-      :rows="5"
-      :rowsPerPageOptions="[5, 25, 50]"
+      :rows="10"
+      :rowsPerPageOptions="[10, 25, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
       class="my-3"
@@ -49,7 +50,7 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column class="w-[48px] text-center">
+        <Column class="w-[48px] text-center" >
           <template #body="{ data }">
             <span
               v-if="hasSublists(data)"
@@ -127,6 +128,7 @@
           :field="column"
           :header="column"
           :sortable="true"
+          :frozen="index === 0"
           class="w-[calc(100% - 80px)] pl-[33px] header-white"
           :class="headerClass"
         >
@@ -334,10 +336,16 @@ const showModal = (data) => {
   margin: 10 !important;
   border: none !important;
 }
-/* For removing the scroll vertical feature of the table */
-/* ::v-deep .p-datatable-wrapper {
-  overflow-y: hidden !important; //Prevent vertical scrolling
-} */
+::v-deep .p-datatable-wrapper {
+  overflow-y: scroll !important; /* Enable vertical scrolling */
+  -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+}
+
+/* Hide scrollbar in WebKit browsers (Chrome, Safari) */
+::v-deep .p-datatable-wrapper::-webkit-scrollbar {
+  display: none;
+}
 
 ::v-deep .p-datatable {
   border: none !important;

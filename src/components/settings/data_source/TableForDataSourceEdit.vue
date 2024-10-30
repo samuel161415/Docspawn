@@ -1,12 +1,12 @@
 <template>
-  <div class="card p-fluid mt-8">
+  <div class="card p-fluid mt-8 border border-red-500">
     <DataTable
       v-if="props?.tableViewType === 'Editable View'"
       ref="dt"
       v-model:selection="selectedRows"
-      :value="completeData?.slice(1)"
-      :frozenValue="completeData?.length ? [completeData[0]] : []"
+      :value="completeData"
       lazy
+      frozenValue
       :paginator="selectedRows?.length > 0"
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
@@ -46,14 +46,12 @@
             />
             <p class="font-poppins whitespace-nowrap">
               {{ columnName }}
+              <!-- {{ selectedColumns?.includes(columnName) }} -->
             </p>
           </div>
         </template>
-        <template #body="{ data, field, frozenRow }">
-          <p
-            class="font-poppins whitespace-nowrap"
-            :class="{ 'font-bold': frozenRow }"
-          >
+        <template #body="{ data, field }">
+          <p class="font-poppins whitespace-nowrap">
             {{ data[field] }}
           </p>
         </template>
@@ -62,8 +60,7 @@
     <DataTable
       v-else
       ref="dt"
-      :value="selectedRows?.slice(1)"
-      :frozenValue="selectedRows?.length ? [selectedRows[0]] : []"
+      :value="selectedRows"
       lazy
       :paginator="selectedRows?.length > 0"
       :rows="5"
@@ -71,6 +68,7 @@
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
       :first="first"
+      frozenHeader
       data-key="auto_index_by_docspawn"
       :total-records="totalRecords"
       :loading="loading"
@@ -80,25 +78,24 @@
       scrollHeight="300px"
       @page="onPage($event)"
       @sort="onSort($event)"
-      class=""
+      
     >
       <Column
         v-for="(columnName, index) in selectedColumns"
         :key="index"
         :field="columnName"
+        :frozen="index === 0"
       >
         <template #header>
           <div class="flex flex-col items-center gap-2">
             <p class="font-poppins whitespace-nowrap">
               {{ columnName }}
+              <!-- {{ selectedColumns?.includes(columnName) }} -->
             </p>
           </div>
         </template>
-        <template #body="{ data, field, frozenRow }">
-          <p
-            class="font-poppins whitespace-nowrap"
-            :class="{ 'font-bold': frozenRow }"
-          >
+        <template #body="{ data, field }">
+          <p class="font-poppins whitespace-nowrap">
             {{ data[field] }}
           </p>
         </template>

@@ -337,6 +337,12 @@ const insertInside = (parentItem, newItem) => {
 </script>
 
 <style scoped>
+::v-deep .e-treeview {
+  max-height: 600px; /* Set the fixed height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
+  scrollbar-width: none;
+}
 
 
 ::v-deep .e-treeview .e-ul .e-level-1 {

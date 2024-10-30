@@ -81,8 +81,7 @@
           class="bg-success text-white hover:bg-success hover:border-success my-2"
         />
         <DataTable
-          :value="sublistItems?.slice(1)"
-          :frozenValue="sublistItems?.length ? [sublistItems[0]] : []"
+          :value="sublistItems"
           striped-rows
           show-gridlines
           scrollable
@@ -110,14 +109,12 @@
             header="Name"
             :body-style="{ margin: '0rem', padding: '0rem' }"
           >
-            <template #body="{ data, frozenRow }">
-              <p class="ml-2" :class="{ 'font-bold': frozenRow }">
-                {{ data["name"] }}
-              </p>
+            <template #body="{ data }">
+              <p class="ml-2">{{ data["name"] }}</p>
             </template>
           </Column>
           <Column field="action" header="Actions" style="width: 3%">
-            <template #body="{ data, frozenRow }">
+            <template #body="{ data }">
               <div class="flex justify-center">
                 <font-awesome-icon
                   :icon="['fas', 'trash-alt']"
@@ -254,9 +251,10 @@
             },
           ]"
           @click="handleCreateList"
-          v-tooltip.top="{
+          v-tooltip.top.html="{
             value: getTooltipMessage(),
             disabled: isTooltipDisabled(),
+            escape: false,
           }"
         />
       </div>
@@ -595,17 +593,28 @@ const handleChangeSelectedRows = (data) => {
 };
 
 const getTooltipMessage = () => {
+  let messages = [];
+
   if (listType.value === "simple" && sublistItems.value.length === 0) {
-    return "Please enter items in the text area";
+    messages.push("Please enter items in the text area");
   } else if (listType.value === "dataSource") {
     if (selectedFiles.value.length === 0 && !tableName.value) {
-      return "Please provide a table name and upload a file.";
+      messages.push("Enter table name", "Upload a file");
     } else if (selectedFiles.value.length === 0) {
-      return "Please upload a file.";
+      messages.push("Please upload a file.");
     } else if (!tableName.value) {
-      return "Please provide a table name.";
+      messages.push("Please provide a table name.");
     }
   }
+
+  if (messages.length === 1) {
+    return messages[0];
+  } else if (messages.length > 1) {
+    return `<ul style="list-style-type: disc; padding-left: 20px;">
+              ${messages.map((msg) => `<li style="margin-bottom: 5px;">${msg}</li>`).join("")}
+            </ul>`;
+  }
+
   return "";
 };
 

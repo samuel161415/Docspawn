@@ -149,7 +149,23 @@ const handleopensubmenu = (clickedItem) => {
 };
 
 onMounted(() => {
-  tableData.value = addNewListItem.value[0];
+  // tableData.value = addNewListItem.value[0];
+  const combinedLists = {
+    id: 0,
+    title: "All Lists",
+    isHovered: false,
+    opensubmenu: true,
+    level: 0,
+    isSublistSimple: true,
+    path: "0",
+    sublists: [],
+  };
+
+  addNewListItem.value.forEach((list) => {
+    combinedLists.sublists.push(...list.sublists);
+  });
+
+  tableData.value = combinedLists;
 });
 
 const filters = ref({

@@ -639,12 +639,12 @@ const isTooltipDisabled = () => {
   border: solid blue 1.5px;
 }
 
-::v-deep .disable {
+:deep(.disable) {
   background-color: rgb(169, 167, 167);
   cursor: not-allowed;
   border: none;
 }
-::v-deep .p-dialog-content {
+:deep(.p-dialog-content) {
   overflow-y: hidden !important;
 }
 </style>

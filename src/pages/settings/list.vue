@@ -18,8 +18,8 @@
 
         <!-- right section -->
         <!-- md:max-w-[70vw] -->
-        <div class="w-full md:w-[80%] py-2 ml-2">
-          <div class="mb-12 md:w-full relative max-h-[630px] overflow-y-auto">
+        <div class="w-full  py-2 ml-2">
+          <div class="mb-12 md:w-full relative  overflow-y-auto">
             <!-- Iterate over addNewListItem to call DataTableComponent for each list initially -->
             <template v-if="isInitialLoad">
               <DataTableComponent
@@ -373,12 +373,12 @@ const showSuccess = () => {
   background-color: yellow;
   color: black;
 }
-
-::v-deep .e-list-text {
+/* :deep(.p-datatable-row-expansion) */
+:deep(.e-list-text) {
   color: black; /* Default color for all text */
 }
 
-::v-deep .clickable .e-list-text {
+:deep(.clickable .e-list-text) {
   cursor: pointer;
 }
 
@@ -386,9 +386,10 @@ const showSuccess = () => {
   color: #009EE2 !important; 
 } */
 
-::v-deep .non-clickable .e-list-text {
+:deep(.non-clickable .e-list-text) {
   pointer-events: none;
   color: gray; /* Change the text color of non-clickable nodes to gray */
   cursor: not-allowed; /* Change the cursor to not-allowed for non-clickable nodes */
 }
 </style>
+

@@ -1,14 +1,14 @@
 <template>
   <!-- md:max-w-[30vw] -->
   <div
-    class="flex md:w-[20%] flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
+    class="flex w-80  px-3   flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
   >
     <div class="flex max-md:justify-center ml-1">
       <Button
         icon="pi pi-plus"
         label="Create new list"
         outlined
-        class="text-success border-success hover:bg-green-50 hover:border-success max-md:w-3/4 w-48"
+        class="text-success border-success whitespace-nowrap hover:bg-green-50 hover:border-success max-md:w-3/4 w-48"
         @click="visible = true"
       />
     </div>
@@ -23,8 +23,8 @@
       />
     </div>
 
-    <div class="mt-4 flex max-md:justify-center">
-      <span class="relative flex h-10 ml-1 max-md:w-3/4">
+    <div class="mt-4 flex max-md:justify-center  ">
+      <span class="relative flex h-10 ml-1  ">
         <i
           class="pi pi-search absolute top-2/4 -mt-2 left-2 text-surface-400 dark:text-surface-600 text-sm"
           style="color: rgb(117, 119, 120)"
@@ -32,7 +32,7 @@
         <InputText
           v-model="searchQuery"
           placeholder="Search"
-          class="pl-7 font-normal rounded-md border-gray-300 font-poppins max-md:w-full w-48"
+          class="pl-7 w-48  font-normal rounded-md  font-poppins "
         />
       </span>
     </div>
@@ -59,14 +59,13 @@ const transformData = (items) => {
     nodeId: item.path,
     nodeText: item.title,
     nodeChild: item.isSublistSimple ? (item.sublists ? transformData(item.sublists) : []) : [],
-    iconCss: item.isSublistSimple ? "" : "pi pi-file-excel text-success",
-    cssClass:
-      item.sublists && item.sublists.length > 0 ? "clickable" : "non-clickable",
+    iconCss: item.isSublistSimple ? "" : "pi pi-file-excel text-success pb-5 pl-3 pr-5",
+    
   }));
 };
-const nodeTemplate = (data) => {
-  return `<span>${data.nodeText} <i class="${data.iconCss}" style="margin-right: 5px;"></i></span>`;
-};
+// const nodeTemplate = (data) => {
+//   return `<span>${data.nodeText} <i class="${data.iconCss} excel" style="margin-right: 5px;"></i></span>`;
+// };
 
 const props = defineProps({
   tableData: Object,
@@ -92,7 +91,7 @@ const treeFields = ref({
   text: "nodeText",
   child: "nodeChild",
   iconCss: "iconCss",
-  nodeTemplate: nodeTemplate,
+  // nodeTemplate: nodeTemplate,
 });
 
 
@@ -338,39 +337,59 @@ const insertInside = (parentItem, newItem) => {
 </script>
 
 <style scoped>
-::v-deep .e-treeview {
+
+:deep(.e-treeview) {
   max-height: 600px; /* Set the fixed height */
   overflow-y: auto; /* Enable vertical scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
   scrollbar-width: none;
 }
 
-
-::v-deep .e-treeview .e-ul .e-level-1 {
-  margin-left: -14px !important
+:deep(.e-treeview .e-fullrow) {
+  background-color: transparent !important;
+  border : none;
 }
 
-::v-deep .e-treeview .e-list-text {
+:deep(.e-active > .e-icon-wrapper) {
+  background-color: #EEEEEE !important;
+  padding-left: -10px !important;
+}
+
+:deep(.e-treeview .e-ul .e-level-1) {
+  margin-left: -20px !important;
+}
+
+
+:deep(.e-treeview .e-list-text) {
   font-family: "Poppins", sans-serif; /* font-poppins */
   font-weight: 400; /* font-normal */
   font-size: 14px !important; /* Ensure font size is applied */
   color: #4b5563 !important; /* Ensure color is applied */
+  padding: 0 !important;
+}
+:deep(.e-treeview .e-text-content){
+  /* padding:0 !important; */
+  padding-left: 14px ;
 }
 
-::v-deep .clickable .e-list-text {
-  cursor: pointer;
+:deep(.e-icons) {
+  margin-left: 0px !important;
+  padding: 0 !important
+}
+:deep(.e-list-icon) {
+  width: 0 !important;
+  height: 5px !important;
+  
+
 }
 
-::v-deep .e-active > .e-text-content > .e-list-text {
+
+
+:deep(.e-active > .e-text-content > .e-list-text) {
   color: #009ee2 !important;
 }
-::v-deep .e-drag-item.e-dragging::before {
+:deep(.e-drag-item.e-dragging::before) {
   background-color: #009ee2 !important; /* Change the color of the drag indicator dot */
 }
 
-::v-deep .non-clickable .e-list-text {
-  pointer-events: none;
-  color: #4b5563 !important; /* Ensure color is applied */
-  cursor: not-allowed; /* Change the cursor to not-allowed for non-clickable nodes */
-}
 </style>

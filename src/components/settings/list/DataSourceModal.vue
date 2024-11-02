@@ -12,10 +12,9 @@
   >
     <template #header>
       <div
-        class="custom-header flex justify-start  bg-white  flex-wrap items-center"
+        class="custom-header flex justify-start bg-white flex-wrap items-center"
       >
-       
-        <p class="font-poppins  whitespace-nowrap  text-xl font-semibold">
+        <p class="font-poppins whitespace-nowrap text-xl font-semibold">
           {{ tableData.name }}
         </p>
       </div>
@@ -30,8 +29,9 @@
       striped-rows
       show-gridlines
       frozenHeader
-      scrollable scrollHeight="450px"
-      class=" border  rounded-lg overflow-hidden"
+      scrollable
+      scrollHeight="450px"
+      class="border rounded-lg overflow-hidden"
     >
       <Column
         v-for="(column, index) in columns"
@@ -89,22 +89,20 @@ const updateVisible = (value) => {
 .custom-header {
   display: flex;
   align-items: center;
-  padding:0;
-  
+  padding: 0;
 }
 
-
-::v-deep .p-datatable-thead > tr {
+:deep(.p-datatable-thead > tr) {
   border: none !important;
 }
 
-::v-deep .p-datatable-thead > tr > th {
+:deep(.p-datatable-thead > tr > th) {
   border-top: none !important;
   border-left: none !important;
   white-space: nowrap;
 }
 
-::v-deep .p-datatable-tbody > tr > td {
+:deep(.p-datatable-tbody > tr > td) {
   border-left: none !important;
 }
 </style>

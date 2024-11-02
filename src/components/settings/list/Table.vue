@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="isSublistData ? `max-w-[calc(100%-${c_level * 65}px)]` : 'w-full'"
+    :class="isSublistData ? `max-w-[70vw]` : 'w-full'"
     class=""
   >
     <DataTable
@@ -129,7 +129,7 @@
           :header="column"
           :sortable="true"
           :frozen="index === 0"
-          class="w-[calc(100% - 80px)] pl-[33px] header-white"
+          class="w-[70vw]"
           :class="headerClass"
         >
           <template #body="{ data, field }">
@@ -332,70 +332,68 @@ const showModal = (data) => {
 </script>
 
 <style scoped>
-::v-deep .p-datatable-row-expansion {
+:deep(.p-datatable-row-expansion) {
   padding: 0 !important;
   margin: 10 !important;
   border: none !important;
 }
-::v-deep .p-datatable-wrapper {
+:deep(.p-datatable-wrapper) {
   overflow-y: scroll !important; /* Enable vertical scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
   scrollbar-width: none; /* Hide scrollbar in Firefox */
 }
 
 /* Hide scrollbar in WebKit browsers (Chrome, Safari) */
-::v-deep .p-datatable-wrapper::-webkit-scrollbar {
+:deep(.p-datatable-wrapper::-webkit-scrollbar) {
   display: none;
 }
 
-::v-deep .p-datatable {
+:deep(.p-datatable) {
   border: none !important;
   padding: 0 !important;
 }
-::v-deep .p-datatable-header {
+:deep(.p-datatable-header) {
   padding: 0 !important;
   border: none !important;
 }
 
-::v-deep
-  .p-datatable-tbody
-  > tr.p-row-expanded
-  > td
-  > .p-datatable-row-expansion {
+:deep(
+    .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion
+  ) {
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
 }
 
-::v-deep .p-datatable-thead > tr {
+:deep(.p-datatable-thead > tr) {
   padding: 0 !important;
   border: none !important;
 }
 
-::v-deep .p-datatable-thead > tr > th {
+:deep(.p-datatable-thead > tr > th) {
   border: none !important;
   padding: 0 !important;
   white-space: nowrap;
 }
-::v-deep .p-datatable-thead > tr > th.header-white {
+:deep(.p-datatable-thead > tr > th.header-white) {
   background-color: white;
   border-bottom: 1.5px solide;
 }
 
-::v-deep .p-datatable-tbody > tr > td {
+:deep(.p-datatable-tbody > tr > td) {
   border-top: none !important;
   padding: 0;
   border: none !important;
 }
-::v-deep .p-datatable-tbody > tr > td.custom-padding {
+:deep(.p-datatable-tbody > tr > td.custom-padding) {
   padding-left: 0px !important;
 }
 
-::v-deep .p-datatable-tbody > tr.p-row-expanded {
+:deep(.p-datatable-tbody > tr.p-row-expanded) {
   border-bottom: none !important;
 }
 
-::v-deep .p-datatable-thead > tr > th.sublist-padding {
+:deep(.p-datatable-thead > tr > th.sublist-padding) {
   padding: 10px !important;
   white-space: nowrap;
 }

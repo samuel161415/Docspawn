@@ -100,8 +100,6 @@ export default defineNuxtConfig({
     "@syncfusion/ej2-buttons/styles/material.css",
     "@syncfusion/ej2-inputs/styles/material.css",
     "@syncfusion/ej2-vue-navigations/styles/material.css",
-    
-    
   ],
 
   runtimeConfig: {

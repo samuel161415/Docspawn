@@ -1,7 +1,7 @@
 <template>
   <!-- md:max-w-[30vw] -->
   <div
-    class="flex w-80  px-3   flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
+    class="flex w-80 px-3 flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
   >
     <div class="flex max-md:justify-center ml-1">
       <Button
@@ -23,8 +23,8 @@
       />
     </div>
 
-    <div class="mt-4 flex max-md:justify-center  ">
-      <span class="relative flex h-10 ml-1  ">
+    <div class="mt-4 flex max-md:justify-center">
+      <span class="relative flex h-10 ml-1">
         <i
           class="pi pi-search absolute top-2/4 -mt-2 left-2 text-surface-400 dark:text-surface-600 text-sm"
           style="color: rgb(117, 119, 120)"
@@ -32,12 +32,10 @@
         <InputText
           v-model="searchQuery"
           placeholder="Search"
-          class="pl-7 w-48  font-normal rounded-md  font-poppins "
+          class="pl-7 w-48 font-normal rounded-md font-poppins"
         />
       </span>
     </div>
-
-  
 
     <ejs-treeview
       :fields="treeFields"
@@ -58,9 +56,14 @@ const transformData = (items) => {
   return items.map((item) => ({
     nodeId: item.path,
     nodeText: item.title,
-    nodeChild: item.isSublistSimple ? (item.sublists ? transformData(item.sublists) : []) : [],
-    iconCss: item.isSublistSimple ? "" : "pi pi-file-excel text-success pb-5 pl-3 pr-5",
-    
+    nodeChild: item.isSublistSimple
+      ? item.sublists
+        ? transformData(item.sublists)
+        : []
+      : [],
+    iconCss: item.isSublistSimple
+      ? ""
+      : "pi pi-file-excel text-success pb-5 pl-3 pr-5",
   }));
 };
 // const nodeTemplate = (data) => {
@@ -83,7 +86,14 @@ const emit = defineEmits([
 const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
 const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
-const treeData = ref(transformData(filteredLists.value));
+const treeData = ref([
+  {
+    nodeId: "root",
+    nodeText: "Root List",
+    nodeChild: transformData(filteredLists.value),
+    // iconCss: "pi pi-folder",
+  },
+]);
 
 const treeFields = ref({
   dataSource: treeData,
@@ -93,7 +103,6 @@ const treeFields = ref({
   iconCss: "iconCss",
   // nodeTemplate: nodeTemplate,
 });
-
 
 const filteredList = computed(() => {
   const filterItems = (items, fn) => {
@@ -121,9 +130,9 @@ watch(searchQuery, (newValue) => {
   if (newValue === "") {
     filteredLists.value = addNewListItem.value;
   } else {
-    console.log("searchQuery",searchQuery)
-    console.log("filteredLists",filteredLists.value)
-    console.log("single filteredList",filteredList.value)
+    console.log("searchQuery", searchQuery);
+    console.log("filteredLists", filteredLists.value);
+    console.log("single filteredList", filteredList.value);
     filteredLists.value = filteredList.value;
   }
 });
@@ -131,8 +140,14 @@ watch(searchQuery, (newValue) => {
 watch(
   filteredLists,
   (newValue) => {
-    
-    treeData.value = transformData(newValue);
+    treeData.value = [
+      {
+        nodeId: "root",
+        nodeText: "Root List",
+        nodeChild: transformData(newValue),
+        // iconCss: "pi pi-folder",
+      },
+    ];
   },
   { deep: true }
 );
@@ -154,25 +169,48 @@ watch(addNewListItem, (newValue) => {
   filteredLists.value = JSON.parse(JSON.stringify(newValue));
 });
 
+// const onNodeClicked = (args) => {
+//   const clickedNode = args.node;
+//   const nodeId = clickedNode.getAttribute("data-uid");
+//   console.log("clicked node",nodeId)
+//   const clickedItem = props.findItemByPath(
+//     addNewListItem.value,
+//     nodeId,
+//     "treeView"
+//   );
+
+//   const treeView = document.querySelector(".e-treeview");
+//   const activeNodes = treeView.querySelectorAll(".e-active");
+//   activeNodes.forEach((node) => node.classList.remove("e-active"));
+//   clickedNode.classList.add("e-active");
+
+//   if (
+//     !clickedItem ||
+//     !clickedItem.sublists ||
+//     clickedItem.sublists.length === 0
+//   ) {
+//     args.event.preventDefault();
+//     return;
+//   }
+//   if (clickedItem) {
+//     emit("handleopensubmenu", clickedItem);
+//   }
+// };
 const onNodeClicked = (args) => {
   const clickedNode = args.node;
   const nodeId = clickedNode.getAttribute("data-uid");
-  console.log("clicked node",nodeId)
-  const clickedItem = props.findItemByPath(
-    addNewListItem.value,
-    nodeId,
-    "treeView"
-  );
+  const clickedItem =
+    nodeId === "root"
+      ? { path: "root" }
+      : props.findItemByPath(addNewListItem.value, nodeId, "treeView");
 
   const treeView = document.querySelector(".e-treeview");
   const activeNodes = treeView.querySelectorAll(".e-active");
   activeNodes.forEach((node) => node.classList.remove("e-active"));
   clickedNode.classList.add("e-active");
 
-  if (
-    !clickedItem ||
-    !clickedItem.sublists ||
-    clickedItem.sublists.length === 0
+  if (clickedItem && clickedItem?.path !== "root" &&
+    (!clickedItem.sublists || clickedItem.sublists.length === 0)
   ) {
     args.event.preventDefault();
     return;
@@ -194,6 +232,24 @@ const onNodeDragStop = (args) => {
 
   const droppedNodeId = droppedNodeData.id;
   const dropPosition = args.position;
+
+  // Prevent dragging and dropping outside the root folder
+  if (droppedNodeId === "root" && dropPosition !== "Inside") {
+    console.warn("Cannot drop outside the root folder");
+    return;
+  }
+
+  // Prevent dragging and dropping above the root folder
+  if (dropPosition === "Before" && droppedNodeId === "root") {
+    console.warn("Cannot drop above the root folder");
+    return;
+  }
+
+  // Prevent dragging and dropping to the same level as the root folder
+  if (dropPosition === "After" && droppedNodeId === "root") {
+    console.warn("Cannot drop to the same level as the root folder");
+    return;
+  }
 
   const draggedItem = props.findItemByPath(
     addNewListItem.value,
@@ -247,10 +303,10 @@ const expandParentNodeById = (nodeId) => {
       const treeView = document.querySelector(".e-treeview");
       console.log("treeView", treeView);
       const node = treeView.querySelector(`[data-uid="${nodeId}"]`);
-      console.log('nodeId', nodeId);
+      console.log("nodeId", nodeId);
       console.log("node ", node);
       if (node) {
-        const parentNode = node.closest('li.e-list-item.e-level-1');
+        const parentNode = node.closest("li.e-list-item.e-level-1");
         console.log("parentNode ", parentNode);
         if (parentNode) {
           try {
@@ -332,14 +388,11 @@ const insertInside = (parentItem, newItem) => {
   }
   parentItem.sublists.push(newItem);
 };
-
-
 </script>
 
 <style scoped>
-
 :deep(.e-treeview) {
-  max-height: 600px; /* Set the fixed height */
+  /* max-height: 600px; Set the fixed height */
   overflow-y: auto; /* Enable vertical scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
   scrollbar-width: none;
@@ -347,18 +400,17 @@ const insertInside = (parentItem, newItem) => {
 
 :deep(.e-treeview .e-fullrow) {
   background-color: transparent !important;
-  border : none;
+  border: none;
 }
 
 :deep(.e-active > .e-icon-wrapper) {
-  background-color: #EEEEEE !important;
-  padding-left: -10px !important;
+  background-color: #eeeeee !important;
+  /* padding-left: -10px !important; */
 }
 
 :deep(.e-treeview .e-ul .e-level-1) {
   margin-left: -20px !important;
 }
-
 
 :deep(.e-treeview .e-list-text) {
   font-family: "Poppins", sans-serif; /* font-poppins */
@@ -366,21 +418,24 @@ const insertInside = (parentItem, newItem) => {
   font-size: 14px !important; /* Ensure font size is applied */
   color: #4b5563 !important; /* Ensure color is applied */
   padding: 0 !important;
+  padding-left: 8px !important;
+  /* border : solid blue 1.5px */
+  
 }
-:deep(.e-treeview .e-text-content){
+:deep(.e-treeview .e-text-content) {
   /* padding:0 !important; */
-  padding-left: 14px ;
+  padding-left: 14px;
 }
 
 :deep(.e-icons) {
   margin-left: 0px !important;
-  padding: 0 !important
+  padding: 0 !important;
+  padding-right: 5px !important;
+  /* border : solid red 1.5px */
 }
 :deep(.e-list-icon) {
   width: 0 !important;
   height: 5px !important;
-  
-
 }
 
 
@@ -391,5 +446,4 @@ const insertInside = (parentItem, newItem) => {
 :deep(.e-drag-item.e-dragging::before) {
   background-color: #009ee2 !important; /* Change the color of the drag indicator dot */
 }
-
 </style>

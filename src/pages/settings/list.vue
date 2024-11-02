@@ -21,7 +21,7 @@
         <div class="w-full  py-2 ml-2">
           <div class="mb-12 md:w-full relative  overflow-y-auto">
             <!-- Iterate over addNewListItem to call DataTableComponent for each list initially -->
-            <template v-if="isInitialLoad">
+            <template v-if="isRootSelected">
               <DataTableComponent
                 v-for="list in addNewListItem"
                 :key="list.id"
@@ -166,10 +166,16 @@ const sublistPath = ref();
 const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
 const isInitialLoad = ref(true); // Track if the page is loaded initially
+const isRootSelected = ref(true); // Track if the root list is selected
 
 const handleopensubmenu = (clickedItem) => {
-  tableData.value = clickedItem;
-  isInitialLoad.value = false; // Update the state to indicate that a list is selected
+  if (clickedItem.path === "root") {
+    isRootSelected.value = true;
+  } else {
+    tableData.value = clickedItem;
+    isInitialLoad.value = false; // Update the state to indicate that a list is selected
+    isRootSelected.value = false;
+  }
 };
 
 onMounted(() => {

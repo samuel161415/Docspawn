@@ -1,6 +1,7 @@
 <template>
+  <!-- md:max-w-[30vw] -->
   <div
-    class="flex md:max-w-[30vw] flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
+    class="flex md:w-[20%] flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
   >
     <div class="flex max-md:justify-center ml-1">
       <Button

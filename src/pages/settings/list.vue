@@ -17,20 +17,42 @@
         />
 
         <!-- right section -->
-        <div class="w-full md:max-w-[70vw] py-5 ml-2">
-          <div class="mb-12 max-w-[70vw] relative">
-            <DataTableComponent
-              :tableData="tableData"
-              :filters="filters"
-              @row-reorder="onRowReorder"
-              @edit-item="handleEditItem"
-              @open-delete="handleOpenDelete"
-              @open-add-items="handleOpenAddItems"
-              @open-list-options="openListOptions = true"
-              @open-create-sublist-modal="createSubList"
-              calledFrom="root"
-              :c_level="0"
-            />
+        <!-- md:max-w-[70vw] -->
+        <div class="w-full md:w-[80%] py-2 ml-2">
+          <div class="mb-12 md:w-full relative max-h-[630px] overflow-y-auto">
+            <!-- Iterate over addNewListItem to call DataTableComponent for each list initially -->
+            <template v-if="isInitialLoad">
+              <DataTableComponent
+                v-for="list in addNewListItem"
+                :key="list.id"
+                :tableData="list"
+                :filters="filters"
+                @row-reorder="onRowReorder"
+                @edit-item="handleEditItem"
+                @open-delete="handleOpenDelete"
+                @open-add-items="handleOpenAddItems"
+                @open-list-options="openListOptions = true"
+                @open-create-sublist-modal="createSubList"
+                calledFrom="root"
+                :c_level="0"
+              />
+            </template>
+
+            <!-- Call DataTableComponent with the selected value when a list is selected -->
+            <template v-else>
+              <DataTableComponent
+                :tableData="tableData"
+                :filters="filters"
+                @row-reorder="onRowReorder"
+                @edit-item="handleEditItem"
+                @open-delete="handleOpenDelete"
+                @open-add-items="handleOpenAddItems"
+                @open-list-options="openListOptions = true"
+                @open-create-sublist-modal="createSubList"
+                calledFrom="root"
+                :c_level="0"
+              />
+            </template>
 
             <Toast />
           </div>
@@ -143,29 +165,15 @@ const sublistId = ref();
 const sublistPath = ref();
 const searchQuery = ref("");
 const filteredLists = ref(addNewListItem.value);
+const isInitialLoad = ref(true); // Track if the page is loaded initially
 
 const handleopensubmenu = (clickedItem) => {
   tableData.value = clickedItem;
+  isInitialLoad.value = false; // Update the state to indicate that a list is selected
 };
 
 onMounted(() => {
-  // tableData.value = addNewListItem.value[0];
-  const combinedLists = {
-    id: 0,
-    title: "All Lists",
-    isHovered: false,
-    opensubmenu: true,
-    level: 0,
-    isSublistSimple: true,
-    path: "0",
-    sublists: [],
-  };
-
-  addNewListItem.value.forEach((list) => {
-    combinedLists.sublists.push(...list.sublists);
-  });
-
-  tableData.value = combinedLists;
+  tableData.value = addNewListItem.value[0];
 });
 
 const filters = ref({

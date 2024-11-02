@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="isSublistData ? `max-w-[calc(60vw-${c_level * 65}px)]` : 'w-full'"
+    :class="isSublistData ? `max-w-[calc(100%-${c_level * 65}px)]` : 'w-full'"
     class=""
   >
     <DataTable
@@ -8,7 +8,7 @@
       :value="tableData?.sublists"
       dataKey="id"
       scrollable
-      :scrollHeight="calledFrom === 'root' ? '550px':'400px'"
+      :scrollHeight="calledFrom === 'root' ? '550px' : '400px'"
       scrollDirection="both"
       frozenHeader
       :paginator="showPaginator"
@@ -50,7 +50,7 @@
       </template>
 
       <template v-if="!isSublistData">
-        <Column class="w-[48px] text-center" >
+        <Column class="w-[48px] text-center">
           <template #body="{ data }">
             <span
               v-if="hasSublists(data)"
@@ -145,7 +145,7 @@
       <template v-if="tableData?.sublists?.length" #expansion="{ data }">
         <div
           v-if="hasSublists(data)"
-          :class="isChildSublistSimple(data) ? '' : 'max-w-[calc(60vw-34px)]'"
+          :class="isChildSublistSimple(data) ? '' : 'max-w-[calc(100%-34px)]'"
           class="pl-[47px] border-none mb-[-1px] overflow-x-auto"
         >
           <Table
@@ -184,6 +184,7 @@ import DataSourceModal from "~/components/settings/list/DataSourceModal.vue";
 
 const props = defineProps({
   tableData: Object,
+  // tableData: Array,
   filters: Object,
   calledFrom: String,
   c_level: Number,

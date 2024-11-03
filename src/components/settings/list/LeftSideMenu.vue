@@ -169,33 +169,7 @@ watch(addNewListItem, (newValue) => {
   filteredLists.value = JSON.parse(JSON.stringify(newValue));
 });
 
-// const onNodeClicked = (args) => {
-//   const clickedNode = args.node;
-//   const nodeId = clickedNode.getAttribute("data-uid");
-//   console.log("clicked node",nodeId)
-//   const clickedItem = props.findItemByPath(
-//     addNewListItem.value,
-//     nodeId,
-//     "treeView"
-//   );
 
-//   const treeView = document.querySelector(".e-treeview");
-//   const activeNodes = treeView.querySelectorAll(".e-active");
-//   activeNodes.forEach((node) => node.classList.remove("e-active"));
-//   clickedNode.classList.add("e-active");
-
-//   if (
-//     !clickedItem ||
-//     !clickedItem.sublists ||
-//     clickedItem.sublists.length === 0
-//   ) {
-//     args.event.preventDefault();
-//     return;
-//   }
-//   if (clickedItem) {
-//     emit("handleopensubmenu", clickedItem);
-//   }
-// };
 const onNodeClicked = (args) => {
   const clickedNode = args.node;
   const nodeId = clickedNode.getAttribute("data-uid");
@@ -227,6 +201,7 @@ const onNodeDragStop = (args) => {
   // Check if droppedNodeData is null
   if (!droppedNodeData) {
     console.error("Dropped node data is null");
+    args.cancel = true; // Cancel the drag-and-drop operation
     return;
   }
 
@@ -236,18 +211,21 @@ const onNodeDragStop = (args) => {
   // Prevent dragging and dropping outside the root folder
   if (droppedNodeId === "root" && dropPosition !== "Inside") {
     console.warn("Cannot drop outside the root folder");
+    args.cancel = true; // Cancel the drag-and-drop operation
     return;
   }
 
   // Prevent dragging and dropping above the root folder
   if (dropPosition === "Before" && droppedNodeId === "root") {
     console.warn("Cannot drop above the root folder");
+    args.cancel = true; // Cancel the drag-and-drop operation
     return;
   }
 
   // Prevent dragging and dropping to the same level as the root folder
   if (dropPosition === "After" && droppedNodeId === "root") {
     console.warn("Cannot drop to the same level as the root folder");
+    args.cancel = true; // Cancel the drag-and-drop operation
     return;
   }
 

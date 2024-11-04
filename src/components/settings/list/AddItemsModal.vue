@@ -48,6 +48,7 @@ import { useToast } from "primevue/usetoast";
 
 const props = defineProps({
   listTitle: String,
+  tableData: Object,
 });
 
 const toast = useToast();
@@ -66,7 +67,22 @@ const handleAddItems = () => {
 
   listItems.value = listItems.value.concat(items);
 
-  emit("addItems", listItems.value);
+  const updatedSublistItems = listItems.value.map((item, index) => {
+    return {
+      id: index,
+      title: item.name,
+      isHovered: false,
+      level: props.tableData.level + 1,
+      isSublistSimple: true,
+      sublists: [],
+    };
+  });
+
+  emit("addItems", {
+    sublistItems: updatedSublistItems,
+    isSublistSimple: true,
+    path: props.tableData.path,
+  });
   listItem.value = "";
   listItems.value = [];
   emit("cancel");

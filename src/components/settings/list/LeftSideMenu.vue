@@ -1,14 +1,14 @@
 <template>
   <!-- md:max-w-[30vw] -->
   <div
-    class="flex w-80 px-3 flex-col justify-between h-full overflow-y-scroll pt-5 no-scrollbar"
+    class="min-w-80 flex  flex-col items-center justify-between h-full overflow-y-scroll overflow-x-auto pt-5 px-5 no-scrollbar"
   >
     <div class="flex max-md:justify-center ml-1">
       <Button
         icon="pi pi-plus"
         label="Create new list"
         outlined
-        class="text-success border-success whitespace-nowrap hover:bg-green-50 hover:border-success max-md:w-3/4 w-48"
+        class="text-success border-success whitespace-nowrap hover:bg-green-50 hover:border-success w-48 flex justify-center items-center"
         @click="visible = true"
       />
     </div>
@@ -17,7 +17,7 @@
       <Button
         :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
         :label="isAllExpanded ? 'Collapse' : 'Expand'"
-        class="p-button-success w-48"
+        class="p-button-success w-48 whitespace-nowrap flex justify-center items-center"
         outlined
         @click="toggleExpandCollapse"
       />
@@ -37,13 +37,18 @@
       </span>
     </div>
 
-    <ejs-treeview
-      :fields="treeFields"
-      @nodeClicked="onNodeClicked"
-      @nodeDragStop="onNodeDragStop"
-      :allowDragAndDrop="true"
-      cssClass="font-poppins text-lg text-gray-500 py-2"
-    ></ejs-treeview>
+    <div
+      class="py-2 w-full flex justify-center items-center overflow-x-auto"
+    >
+      <TreeViewComponent
+        :fields="treeFields"
+        @nodeClicked="onNodeClicked"
+        @nodeDragStop="onNodeDragStop"
+        :allowDragAndDrop="true"
+        @created="onTreeViewCreated"
+        @destroyed="onTreeViewDestroyed"
+      ></TreeViewComponent>
+    </div>
   </div>
 </template>
 
@@ -51,8 +56,9 @@
 import { ref, watch, computed, nextTick } from "vue";
 import { useToast } from "primevue/usetoast";
 import { addNewListItem } from "~/services/newListData.js";
-
+import { TreeViewComponent } from "@syncfusion/ej2-vue-navigations";
 const transformData = (items) => {
+  // console.log("items to be seen ", items);
   return items.map((item) => ({
     nodeId: item.path,
     nodeText: item.title,
@@ -63,7 +69,7 @@ const transformData = (items) => {
       : [],
     iconCss: item.isSublistSimple
       ? ""
-      : "pi pi-file-excel text-success pb-5 pl-3 pr-5",
+      : "pi pi-file-excel   excel-icon text-[#]",
   }));
 };
 // const nodeTemplate = (data) => {
@@ -89,7 +95,7 @@ const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
 const treeData = ref([
   {
     nodeId: "root",
-    nodeText: "Root List",
+    nodeText: "Root list",
     nodeChild: transformData(filteredLists.value),
     // iconCss: "pi pi-folder",
   },
@@ -143,7 +149,7 @@ watch(
     treeData.value = [
       {
         nodeId: "root",
-        nodeText: "Root List",
+        nodeText: "Root list",
         nodeChild: transformData(newValue),
         // iconCss: "pi pi-folder",
       },
@@ -169,7 +175,6 @@ watch(addNewListItem, (newValue) => {
   filteredLists.value = JSON.parse(JSON.stringify(newValue));
 });
 
-
 const onNodeClicked = (args) => {
   const clickedNode = args.node;
   const nodeId = clickedNode.getAttribute("data-uid");
@@ -183,7 +188,9 @@ const onNodeClicked = (args) => {
   activeNodes.forEach((node) => node.classList.remove("e-active"));
   clickedNode.classList.add("e-active");
 
-  if (clickedItem && clickedItem?.path !== "root" &&
+  if (
+    clickedItem &&
+    clickedItem?.path !== "root" &&
     (!clickedItem.sublists || clickedItem.sublists.length === 0)
   ) {
     args.event.preventDefault();
@@ -229,18 +236,32 @@ const onNodeDragStop = (args) => {
     return;
   }
 
+  // Prevent dragging the root node to any other node
+  if (draggedNodeId === "root") {
+    console.warn("Cannot drag the root node to any other node");
+    args.cancel = true; // Cancel the drag-and-drop operation
+    return;
+  }
+
+  // Prevent dragging a parent to its child
   const draggedItem = props.findItemByPath(
     addNewListItem.value,
     draggedNodeId,
     "treeView"
   );
-  removeItemByPath(addNewListItem.value, draggedNodeId);
-
   const droppedItem = props.findItemByPath(
     addNewListItem.value,
     droppedNodeId,
     "treeView"
   );
+
+  if (isDescendant(draggedItem, droppedItem)) {
+    console.warn("Cannot drop a parent node to its child");
+    args.cancel = true; // Cancel the drag-and-drop operation
+    return;
+  }
+
+  removeItemByPath(addNewListItem.value, draggedNodeId);
 
   if (dropPosition === "Before") {
     insertBefore(addNewListItem.value, droppedItem, draggedItem);
@@ -257,6 +278,31 @@ const onNodeDragStop = (args) => {
 
   // Expand the parent node of the dropped item
   // expandParentNodeById(droppedNodeId);
+};
+
+const isDescendant = (parent, child) => {
+  if (!parent || !child) return false;
+  if (parent.path === child.path) return true;
+  if (!parent.sublists || parent.sublists.length === 0) return false;
+  return parent.sublists.some((sublist) => isDescendant(sublist, child));
+};
+
+const onTreeViewCreated = () => {
+  try {
+    // Any additional setup can be done here
+    console.log("TreeView created successfully");
+  } catch (error) {
+    console.error("Error during TreeView creation:", error);
+  }
+};
+
+const onTreeViewDestroyed = () => {
+  try {
+    // Any cleanup can be done here
+    console.log("TreeView destroyed successfully");
+  } catch (error) {
+    console.error("Error during TreeView destruction:", error);
+  }
 };
 
 const isAllExpanded = ref(false);
@@ -370,10 +416,14 @@ const insertInside = (parentItem, newItem) => {
 
 <style scoped>
 :deep(.e-treeview) {
-  /* max-height: 600px; Set the fixed height */
+  max-height: 600px; /* Set the fixed height */
   overflow-y: auto; /* Enable vertical scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
   scrollbar-width: none;
+  overflow-x: auto;
+  width: 12rem;
+  
+  
 }
 
 :deep(.e-treeview .e-fullrow) {
@@ -381,9 +431,35 @@ const insertInside = (parentItem, newItem) => {
   border: none;
 }
 
+:deep(.e-treeview .e-text-content) {
+  /* padding:0 !important; */
+  padding-left: 10px;
+  display: flex;
+  width: 100%;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: start;
+  /* margin-left:8px; */
+  /* background-color: yellow; */
+}
+/* I had to use this to make the cssIcon to be next to nodetext as pi-excel doesn't have e-icon-wrapper */
+:deep(.e-treeview .e-icon-wrapper) {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: start;
+  width : 12rem;
+}
+
+
 :deep(.e-active > .e-icon-wrapper) {
   background-color: #eeeeee !important;
-  /* padding-left: -10px !important; */
+  color: #009ee2 !important;
+
+}
+:deep(.e-treeview .e-list-item .e-ul) {
+  padding: 0px 0px 0px 26px !important;
 }
 
 :deep(.e-treeview .e-ul .e-level-1) {
@@ -396,29 +472,40 @@ const insertInside = (parentItem, newItem) => {
   font-size: 14px !important; /* Ensure font size is applied */
   color: #4b5563 !important; /* Ensure color is applied */
   padding: 0 !important;
-  padding-left: 8px !important;
+  padding-left: 9px !important;
   /* border : solid blue 1.5px */
-  
 }
-:deep(.e-treeview .e-text-content) {
-  /* padding:0 !important; */
-  padding-left: 14px;
-}
+
 
 :deep(.e-icons) {
   margin-left: 0px !important;
   padding: 0 !important;
-  padding-right: 5px !important;
+  padding-right: 0 !important;
+
   /* border : solid red 1.5px */
 }
-:deep(.e-list-icon) {
+:deep(.e-treeview .e-list-icon) {
   width: 0 !important;
+  margin: 0 !important;
   height: 5px !important;
+
+}
+:deep(.e-treeview .excel-icon){
+
+  font-size: 13px;
+  padding: 0 0px 13px 4px;
+  text-align: center;
+
+
 }
 
-
-
 :deep(.e-active > .e-text-content > .e-list-text) {
+  color: #009ee2 !important;
+}
+:deep(.e-active > .e-text-content > .e-list-icon) {
+  color: #009ee2 !important;
+}
+:deep(.e-active > .e-text-content > .e-icons) {
   color: #009ee2 !important;
 }
 :deep(.e-drag-item.e-dragging::before) {

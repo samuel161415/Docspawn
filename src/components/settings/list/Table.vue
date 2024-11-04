@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="isSublistData ? `max-w-[70vw]` : 'w-full'"
-    class=""
-  >
+  <div :class="isSublistData ? `max-w-[70vw]` : 'w-full'" class="">
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="tableData?.sublists"
@@ -35,7 +32,7 @@
               icon="pi pi-plus"
               label="Add item(s)"
               outlined
-              @click="$emit('open-add-items', tableData.title)"
+              @click="$emit('open-add-items', tableData)"
               class="text-success border-success hover:bg-green-50 w-40"
             />
             <!-- <Button

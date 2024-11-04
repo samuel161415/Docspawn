@@ -526,9 +526,10 @@ watch(dataSourceFileCompleteJSON, () => {
 });
 
 const handleCreateList = () => {
-  console.log("yes I am inside handlecreatelist");
+  // console.log("yes I am inside handlecreatelist");
   addClicked.value = true;
   if (listType.value === "simple" && sublistItems.value.length > 0) {
+    console.log("yes it is simple sublist")
     isSublistSimple.value = true;
     sublistItems.value = sublistItems.value.map((item, index) => {
       return {
@@ -536,7 +537,7 @@ const handleCreateList = () => {
         title: item.name,
         isHovered: false,
         level: props.level + 1,
-        isSublistSimple: false,
+        isSublistSimple: true,
         sublists: [],
       };
     });
@@ -611,7 +612,9 @@ const getTooltipMessage = () => {
     return messages[0];
   } else if (messages.length > 1) {
     return `<ul style="list-style-type: disc; padding-left: 20px;">
-              ${messages.map((msg) => `<li style="margin-bottom: 5px;">${msg}</li>`).join("")}
+              ${messages
+                .map((msg) => `<li style="margin-bottom: 5px;">${msg}</li>`)
+                .join("")}
             </ul>`;
   }
 

@@ -81,11 +81,12 @@
     />
 
     <AddItemsModal
-      v-model:visible="openAddItems"
-      :listTitle="addItemsTitle"
-      @addItems="handleAddItems"
-      @cancel="openAddItems = false"
-    />
+  v-model:visible="openAddItems"
+  :listTitle="addItemsTitle"
+  :tableData="tableData"
+  @addItems="handleAddItems"
+  @cancel="openAddItems = false"
+/>
 
     <ListOptionModal
       v-if="openListOptions"
@@ -202,7 +203,6 @@ const createSubList = (data) => {
 
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-  console.log("data.name", data.name);
   // Update tableData
   const tableDataList = findItemByPath(
     tableData.value,
@@ -238,12 +238,12 @@ const handleCreateSubSublist = (data) => {
     }
     tableDataList.isSublistSimple = data.isSublistSimple;
     openCreateSubList.value = false;
-    console.log("tableDataList", tableDataList);
+    // console.log("tableDataList", tableDataList);
   }
 };
 const findItemByPath = (list, path, from) => {
   if (from === "tableEdit") {
-    console.log("list is ", list, " path is ", path);
+    // console.log("list is ", list, " path is ", path);
     if (list.path === path) {
       return list;
     }
@@ -300,8 +300,8 @@ const handleEditItem = (data) => {
   tableData.value = { ...tableData.value };
 };
 
-const handleOpenAddItems = (title) => {
-  addItemsTitle.value = title;
+const handleOpenAddItems = (data) => {
+  addItemsTitle.value = data.title;
   openAddItems.value = true;
 };
 
@@ -333,19 +333,43 @@ const handleCreateList = (data) => {
   addNewListItem.value.push(newList);
 };
 
-const handleAddItems = (data) => {
-  const lastid = addNewListItem.value.length;
-  data.map((item, index) => {
-    const newItem = {
-      id: lastid + index + 1,
-      title: item.name,
-      isHovered: false,
-      level: tableData.value.level + 1,
-      sublists: [],
-    };
+// const handleAddItems = (data) => {
+//   const lastid = addNewListItem.value.length;
+//   data.map((item, index) => {
+//     const newItem = {
+//       id: lastid + index + 1,
+//       title: item.name,
+//       isHovered: false,
+//       level: tableData.value.level + 1,
+//       sublists: [],
+//     };
 
-    tableData.value.sublists.push(newItem);
-  });
+//     tableData.value.sublists.push(newItem);
+//   });
+// };
+const handleAddItems = (data) => {
+  const { sublistItems, isSublistSimple, path } = data;
+  const tableDataList = findItemByPath(tableData.value, path, "tableEdit");
+
+  if (tableDataList) {
+    const newSublistItems = sublistItems.map((item, index) => {
+      const newPath =
+        tableDataList.sublists.length === 0
+          ? `${tableDataList.path}-1`
+          : `${tableDataList.path}-${tableDataList.sublists.length + index + 1}`;
+      return { ...item, path: newPath };
+    });
+
+    if (tableDataList.isSublistSimple) {
+      tableDataList.sublists = Array.isArray(tableDataList.sublists)
+        ? tableDataList.sublists.concat(newSublistItems)
+        : newSublistItems;
+    } else {
+      tableDataList.sublists = newSublistItems;
+    }
+
+    tableDataList.isSublistSimple = isSublistSimple;
+  }
 };
 
 const handleOpenDelete = (data) => {

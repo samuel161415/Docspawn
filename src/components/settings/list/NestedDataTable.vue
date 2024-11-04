@@ -99,16 +99,16 @@
   </script>
   
   <style scoped>
-  ::v-deep .p-datatable-header {
+  :deep(.p-datatable-header) {
     border-radius: 0.4rem 0.4rem 0 0 !important;
   }
   
   /* Bottom Left Would Be: */
-  ::v-deep .p-datatable-table > tbody > tr:last-of-type > td:first-of-type {
+  :deep(.p-datatable-table > tbody > tr:last-of-type > td:first-of-type)  {
     border-radius: 0 0 0 0.5rem !important;
   }
   /* Bottom Right Would Be: */
-  ::v-deep .p-datatable-table > tbody > tr:last-of-type > td:last-of-type {
+  :deep(.p-datatable-table > tbody > tr:last-of-type > td:last-of-type)  {
     border-radius: 0 0 0.5rem 0 !important;
   }
   </style>

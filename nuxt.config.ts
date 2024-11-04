@@ -82,8 +82,7 @@ export default defineNuxtConfig({
     },
   },
 
-  plugins: ["~/plugins/fontawesome.js","~/plugins/syncfusion.js",
-    "~/plugins/syncfusion-components.js"],
+  plugins: ["~/plugins/fontawesome.js","~/plugins/syncfusion.js"],
 
   app: {
     layoutTransition: {

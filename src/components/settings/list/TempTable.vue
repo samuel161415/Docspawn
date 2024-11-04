@@ -273,45 +273,45 @@ const toggleRow = (data) => {
 </script>
 
 <style scoped>
-::v-deep .p-datatable-row-expansion {
+:deep(.p-datatable-row-expansion)  {
   padding: 0 !important;
   margin: 0 !important;
 }
 
-::v-deep .p-datatable {
+:deep(.p-datatable)  {
   border: none !important;
   padding: 0 !important;
 }
 
-::v-deep .p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion {
+:deep(.p-datatable-tbody > tr.p-row-expanded > td > .p-datatable-row-expansion)  {
   margin: 0 !important;
   padding: 0 !important;
 }
 
-::v-deep .p-datatable-thead > tr {
+:deep(.p-datatable-thead > tr)  {
   padding: 0 !important;
   border: none !important;
 }
 
 
 
-::v-deep .p-datatable-thead > tr > th {
+:deep(.p-datatable-thead > tr > th)  {
   border: none !important;
   padding: 0 !important;
   white-space: nowrap;
 }
 
-::v-deep .p-datatable-tbody > tr > td {
+:deep(.p-datatable-tbody > tr > td)  {
   border-top: none !important;
   padding-right:0 ;
   /* border-bottom: none !important; */
 }
 
-::v-deep .p-datatable-tbody > tr.p-row-expanded {
+:deep(.p-datatable-tbody > tr.p-row-expanded)  {
   border-bottom: none !important;
 }
 
-::v-deep .p-datatable-thead > tr > th.sublist-padding {
+:deep(.p-datatable-thead > tr > th.sublist-padding)  {
   padding: 10px !important;
   white-space: nowrap;
 }

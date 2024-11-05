@@ -47,6 +47,7 @@
         :allowDragAndDrop="true"
         @created="onTreeViewCreated"
         @destroyed="onTreeViewDestroyed"
+        @nodeCollapsing="onNodeCollapsing"
       ></TreeViewComponent>
     </div>
   </div>
@@ -57,9 +58,10 @@ import { ref, watch, computed, nextTick } from "vue";
 import { useToast } from "primevue/usetoast";
 import { addNewListItem } from "~/services/newListData.js";
 import { TreeViewComponent } from "@syncfusion/ej2-vue-navigations";
+
 const transformData = (items) => {
-  // console.log("items to be seen ", items);
-  return items.map((item) => ({
+  return items.filter((item) =>item.sublists && item.sublists.length > 0)
+  .map((item) => ({
     nodeId: item.path,
     nodeText: item.title,
     nodeChild: item.isSublistSimple
@@ -72,9 +74,7 @@ const transformData = (items) => {
       : "pi pi-file-excel   excel-icon text-[#]",
   }));
 };
-// const nodeTemplate = (data) => {
-//   return `<span>${data.nodeText} <i class="${data.iconCss} excel" style="margin-right: 5px;"></i></span>`;
-// };
+
 
 const props = defineProps({
   tableData: Object,
@@ -95,7 +95,7 @@ const copiedList = ref(JSON.parse(JSON.stringify(addNewListItem.value)));
 const treeData = ref([
   {
     nodeId: "root",
-    nodeText: "Root list",
+    nodeText: "Lists",
     nodeChild: transformData(filteredLists.value),
     expanded: true,
     // iconCss: "pi pi-folder",
@@ -147,7 +147,7 @@ watch(
     treeData.value = [
       {
         nodeId: "root",
-        nodeText: "Root list",
+        nodeText: "Lists",
         nodeChild: transformData(newValue),
         // iconCss: "pi pi-folder",
       },
@@ -212,6 +212,7 @@ const onNodeDragStop = (args) => {
 
   const droppedNodeId = droppedNodeData.id;
   const dropPosition = args.position;
+  console.log('droped node id',droppedNodeId)
 
   // Prevent dragging and dropping outside the root folder
   if (droppedNodeId === "root" && dropPosition !== "Inside") {
@@ -253,6 +254,7 @@ const onNodeDragStop = (args) => {
     "treeView"
   );
 
+
   if (isDescendant(draggedItem, droppedItem)) {
     console.warn("Cannot drop a parent node to its child");
     args.cancel = true; // Cancel the drag-and-drop operation
@@ -266,7 +268,7 @@ const onNodeDragStop = (args) => {
   } else if (dropPosition === "After") {
     insertAfter(addNewListItem.value, droppedItem, draggedItem);
   } else if (dropPosition === "Inside") {
-    insertInside(droppedItem, draggedItem);
+    insertInside(droppedItem, draggedItem, droppedNodeId);
   }
 
   updatePaths(addNewListItem.value);
@@ -335,6 +337,14 @@ const toggleExpandCollapse = () => {
       isAllExpanded.value = !isAllExpanded.value;
     }
   });
+};
+
+const onNodeCollapsing = (args) => {
+  // Prevent collapsing for the root node
+  console.log("prenvent collapsing is called")
+  if (args.node.getAttribute("data-uid") === "root") {
+    args.cancel = true;
+  }
 };
 
 const expandParentNodeById = (nodeId) => {
@@ -418,17 +428,25 @@ const insertAfter = (list, referenceItem, newItem) => {
   return false;
 };
 
-const insertInside = (parentItem, newItem) => {
-  if (!Array.isArray(parentItem.sublists)) {
-    parentItem.sublists = [];
+const insertInside = (parentItem, newItem, droppedNodeId) => {
+  if (droppedNodeId === "root") {
+    // Handle the case where the parentItem is the root node
+    newItem.path = `${addNewListItem.value.length + 1}`;
+    addNewListItem.value.push(newItem);
+  } else {
+    if (!Array.isArray(parentItem.sublists)) {
+      parentItem.sublists = [];
+    }
+    newItem.path = `${parentItem.path}-${parentItem.sublists.length + 1}`;
+    parentItem.sublists.push(newItem);
   }
-  parentItem.sublists.push(newItem);
 };
+
 </script>
 
 <style scoped>
 :deep(.e-treeview) {
-  max-height: 600px; /* Set the fixed height */
+  max-height: 370px; /* Set the fixed height */
   overflow-y: auto; /* Enable vertical scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
   /* scrollbar-width: none; */

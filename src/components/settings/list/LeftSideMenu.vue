@@ -159,6 +159,10 @@ watch(
 watch(
   treeData,
   (newValue) => {
+    console.log('treeData watch is called');
+    if (newValue.length > 0 && newValue[0].nodeId === "root") {
+      newValue[0].expanded = true; // Ensure the root node is always expanded
+    }
     treeFields.value = {
       dataSource: newValue,
       id: "nodeId",

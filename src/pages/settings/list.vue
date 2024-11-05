@@ -203,11 +203,11 @@ const createSubList = (data) => {
 
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-  // Update tableData
+  // Update addNewListItem
   const tableDataList = findItemByPath(
-    tableData.value,
+    addNewListItem.value,
     sublistPath.value,
-    "tableEdit"
+    "treeView"
   );
   if (tableDataList) {
     const newSublistItems = data.sublistItems.map((item, index) => {
@@ -238,7 +238,6 @@ const handleCreateSubSublist = (data) => {
     }
     tableDataList.isSublistSimple = data.isSublistSimple;
     openCreateSubList.value = false;
-    // console.log("tableDataList", tableDataList);
   }
 };
 const findItemByPath = (list, path, from) => {
@@ -301,6 +300,7 @@ const handleEditItem = (data) => {
 };
 
 const handleOpenAddItems = (data) => {
+  tableData.value = data;
   addItemsTitle.value = data.title;
   openAddItems.value = true;
 };
@@ -349,8 +349,9 @@ const handleCreateList = (data) => {
 // };
 const handleAddItems = (data) => {
   const { sublistItems, isSublistSimple, path } = data;
-  const tableDataList = findItemByPath(tableData.value, path, "tableEdit");
-
+  const tableDataList = findItemByPath(addNewListItem.value, path, "treeView");
+  console.log("path table ",tableDataList, 'path',path)
+  console.log("sublistItems ",sublistItems)
   if (tableDataList) {
     const newSublistItems = sublistItems.map((item, index) => {
       const newPath =

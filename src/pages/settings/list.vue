@@ -242,6 +242,7 @@ const handleCreateSubSublist = (data) => {
 };
 const findItemByPath = (list, path, from) => {
   if (from === "tableEdit") {
+    // console.log("list is ", list, " path is ", path);
     if (list.path === path) {
       return list;
     }
@@ -349,6 +350,8 @@ const handleCreateList = (data) => {
 const handleAddItems = (data) => {
   const { sublistItems, isSublistSimple, path } = data;
   const tableDataList = findItemByPath(addNewListItem.value, path, "treeView");
+  console.log("path table ",tableDataList, 'path',path)
+  console.log("sublistItems ",sublistItems)
   if (tableDataList) {
     const newSublistItems = sublistItems.map((item, index) => {
       const newPath =

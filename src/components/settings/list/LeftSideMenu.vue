@@ -1,14 +1,14 @@
 <template>
   <!-- md:max-w-[30vw] -->
   <div
-    class="min-w-80 flex  flex-col items-center justify-between h-full overflow-y-scroll overflow-x-auto pt-5 px-5 no-scrollbar"
+    class="min-w-80 flex  flex-col items-center justify-between h-full overflow-y-scroll overflow-x-auto pt-5  no-scrollbar"
   >
-    <div class="flex max-md:justify-center ml-1">
+    <div class="flex max-md:justify-center ml-1 ">
       <Button
         icon="pi pi-plus"
         label="Create new list"
         outlined
-        class="text-success border-success whitespace-nowrap hover:bg-green-50 hover:border-success w-48 flex justify-center items-center"
+        class="text-success text-center border-success whitespace-nowrap hover:bg-green-50 hover:border-success w-64 flex justify-center items-center"
         @click="visible = true"
       />
     </div>
@@ -17,7 +17,7 @@
       <Button
         :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
         :label="isAllExpanded ? 'Collapse' : 'Expand'"
-        class="p-button-success w-48 whitespace-nowrap flex justify-center items-center"
+        class="p-button-success text-center w-64 whitespace-nowrap flex justify-center items-center"
         outlined
         @click="toggleExpandCollapse"
       />
@@ -32,13 +32,13 @@
         <InputText
           v-model="searchQuery"
           placeholder="Search"
-          class="pl-7 w-48 font-normal rounded-md font-poppins"
+          class="pl-7 w-64 font-normal rounded-md font-poppins"
         />
       </span>
     </div>
 
     <div
-      class="py-2 w-full flex justify-center items-center overflow-x-auto"
+      class="w-64 py-2   flex justify-center items-start overflow-x-hidden "
     >
       <TreeViewComponent
         :fields="treeFields"
@@ -97,6 +97,7 @@ const treeData = ref([
     nodeId: "root",
     nodeText: "Root list",
     nodeChild: transformData(filteredLists.value),
+    expanded: true,
     // iconCss: "pi pi-folder",
   },
 ]);
@@ -135,10 +136,7 @@ const filteredList = computed(() => {
 watch(searchQuery, (newValue) => {
   if (newValue === "") {
     filteredLists.value = addNewListItem.value;
-  } else {
-    console.log("searchQuery", searchQuery);
-    console.log("filteredLists", filteredLists.value);
-    console.log("single filteredList", filteredList.value);
+  } else {;
     filteredLists.value = filteredList.value;
   }
 });
@@ -290,7 +288,25 @@ const isDescendant = (parent, child) => {
 const onTreeViewCreated = () => {
   try {
     // Any additional setup can be done here
-    console.log("TreeView created successfully");
+    nextTick(() => {
+      setTimeout(() => {
+        const treeView = document.querySelector(".e-treeview");
+        if (treeView && treeView.ej2_instances && treeView.ej2_instances[0]) {
+          const rootNode = treeView.querySelector('[data-uid="root"]');
+          if (rootNode) {
+            try {
+              rootNode.classList.add("e-active"); // Make the root node active
+            } catch (error) {
+              console.error("Error expanding root node:", error);
+            }
+          } else {
+            console.warn("Root node not found");
+          }
+        } else {
+          console.warn("TreeView instance not found");
+        }
+      }, 100); // Adjust the delay as needed
+    });
   } catch (error) {
     console.error("Error during TreeView creation:", error);
   }
@@ -325,13 +341,9 @@ const expandParentNodeById = (nodeId) => {
   nextTick(() => {
     setTimeout(() => {
       const treeView = document.querySelector(".e-treeview");
-      console.log("treeView", treeView);
       const node = treeView.querySelector(`[data-uid="${nodeId}"]`);
-      console.log("nodeId", nodeId);
-      console.log("node ", node);
       if (node) {
         const parentNode = node.closest("li.e-list-item.e-level-1");
-        console.log("parentNode ", parentNode);
         if (parentNode) {
           try {
             treeView.ej2_instances[0].expandNode(parentNode);
@@ -419,13 +431,16 @@ const insertInside = (parentItem, newItem) => {
   max-height: 600px; /* Set the fixed height */
   overflow-y: auto; /* Enable vertical scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
-  scrollbar-width: none;
+  /* scrollbar-width: none; */
   overflow-x: auto;
-  width: 12rem;
+  width: 100%;
   
   
 }
-
+:deep(.p-button-label) {
+  margin-left: 10px; /* or padding-left: 10px; */
+  flex: none; /* Remove flex-1 */
+}
 :deep(.e-treeview .e-fullrow) {
   background-color: transparent !important;
   border: none;
@@ -449,12 +464,14 @@ const insertInside = (parentItem, newItem) => {
   width: 100%;
   align-items: center;
   justify-content: start;
-  width : 12rem;
+  width : 16rem;
 }
 
 
 :deep(.e-active > .e-icon-wrapper) {
   background-color: #eeeeee !important;
+  padding-top: 3px;
+  padding-bottom: 3px;
   color: #009ee2 !important;
 
 }

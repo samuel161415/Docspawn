@@ -232,7 +232,7 @@ const isChildSublistSimple = (data) => {
 const getMenuModel = (data) => {
   const model = [
     {
-      label: "Add element(s)",
+      label: "Add item(s)",
       icon: "pi pi-plus",
       command: () => emit("open-add-items", data),
     },

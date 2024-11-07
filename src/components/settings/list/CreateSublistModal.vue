@@ -304,8 +304,9 @@ const isSublistSimple = ref(true);
 const tableName = ref();
 
 const handleAdd = () => {
+
+  addClicked.value = true;
   if (sublistItem.value.trim() === "") {
-    addClicked.value = true;
     return;
   }
 
@@ -541,6 +542,7 @@ const handleCreateList = () => {
         sublists: [],
       };
     });
+    console.log('all sublists are', sublistItems.value)
     emit("createSubSubList", {
       sublistItems: sublistItems.value,
       isSublistSimple: isSublistSimple.value,

@@ -59,7 +59,7 @@ import { useToast } from "primevue/usetoast";
 import { addNewListItem } from "~/services/newListData.js";
 import { TreeViewComponent } from "@syncfusion/ej2-vue-navigations";
 
-const transformData = (items) => {
+const transformData = (items, expandedPath = null) => {
   return items.filter((item) =>item.sublists && item.sublists.length > 0)
   .map((item) => ({
     nodeId: item.path,
@@ -69,9 +69,10 @@ const transformData = (items) => {
         ? transformData(item.sublists)
         : []
       : [],
+      expanded: item.path === expandedPath,
     iconCss: item.isSublistSimple
       ? ""
-      : "pi pi-file-excel   excel-icon text-[#]",
+      : "pi pi-file-excel   excel-icon ",
   }));
 };
 
@@ -144,11 +145,13 @@ watch(searchQuery, (newValue) => {
 watch(
   filteredLists,
   (newValue) => {
+    console.log("wath filteredlist excution ")
     treeData.value = [
       {
         nodeId: "root",
         nodeText: "Lists",
-        nodeChild: transformData(newValue),
+        nodeChild: transformData(newValue, props.tableData.path),
+        expanded: true,
         // iconCss: "pi pi-folder",
       },
     ];
@@ -169,13 +172,23 @@ watch(
       text: "nodeText",
       child: "nodeChild",
     };
+    nextTick(() => {
+      const treeView = document.querySelector(".e-treeview");
+      if (treeView && treeView.ej2_instances && treeView.ej2_instances[0]) {
+        treeView.ej2_instances[0].expandAll();
+      } else {
+        console.warn("TreeView instance not found");
+      }
+    });
   },
   { deep: true }
 );
 
 watch(addNewListItem, (newValue) => {
   filteredLists.value = JSON.parse(JSON.stringify(newValue));
-});
+},{ deep: true });
+
+
 
 const onNodeClicked = (args) => {
   const clickedNode = args.node;
@@ -293,11 +306,13 @@ const isDescendant = (parent, child) => {
 
 const onTreeViewCreated = () => {
   try {
+    console.log("I am on create view")
     // Any additional setup can be done here
     nextTick(() => {
       setTimeout(() => {
         const treeView = document.querySelector(".e-treeview");
         if (treeView && treeView.ej2_instances && treeView.ej2_instances[0]) {
+          treeView.ej2_instances[0].expandAll();
           const rootNode = treeView.querySelector('[data-uid="root"]');
           if (rootNode) {
             try {
@@ -305,9 +320,10 @@ const onTreeViewCreated = () => {
             } catch (error) {
               console.error("Error expanding root node:", error);
             }
-          } else {
-            console.warn("Root node not found");
-          }
+        }  else {
+          console.warn("root node is no instance not found");
+        }
+      
         } else {
           console.warn("TreeView instance not found");
         }
@@ -327,7 +343,7 @@ const onTreeViewDestroyed = () => {
   }
 };
 
-const isAllExpanded = ref(false);
+const isAllExpanded = ref(true);
 
 const toggleExpandCollapse = () => {
   nextTick(() => {
@@ -351,28 +367,7 @@ const onNodeCollapsing = (args) => {
   }
 };
 
-const expandParentNodeById = (nodeId) => {
-  nextTick(() => {
-    setTimeout(() => {
-      const treeView = document.querySelector(".e-treeview");
-      const node = treeView.querySelector(`[data-uid="${nodeId}"]`);
-      if (node) {
-        const parentNode = node.closest("li.e-list-item.e-level-1");
-        if (parentNode) {
-          try {
-            treeView.ej2_instances[0].expandNode(parentNode);
-          } catch (error) {
-            console.error("Error expanding parent node:", error);
-          }
-        } else {
-          console.warn("Parent node not found for nodeId:", nodeId);
-        }
-      } else {
-        console.warn("Node not found for nodeId:", nodeId);
-      }
-    }, 500); // Adjust the delay as needed
-  });
-};
+
 
 const updatePaths = (list, parentPath = "") => {
   list.forEach((item, index) => {
@@ -447,6 +442,8 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
 };
 
 </script>
+
+
 
 <style scoped>
 :deep(.e-treeview) {

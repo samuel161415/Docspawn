@@ -5,10 +5,10 @@
       :value="tableData?.sublists"
       dataKey="id"
       scrollable
-      :scrollHeight="calledFrom === 'root' ? '550px' : '400px'"
+      :scrollHeight="calledFrom === 'root' ? '550px' : ''"
       scrollDirection="both"
       frozenHeader
-      :paginator="showPaginator"
+      :paginator="calledFrom === 'root' && showPaginator"
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
@@ -21,27 +21,19 @@
         >
           <p class="font-poppins font-normal text-lg">{{ tableData.title }}</p>
           <div class="flex flex-col md:flex-row justify-end gap-2">
-            <!-- <Button
-              :icon="isAllExpanded ? 'pi pi-minus' : 'pi pi-plus'"
-              :label="isAllExpanded ? 'Collapse' : 'Expand'"
-              class="p-button-success w-36"
-              outlined
-              @click="toggleExpandCollapse"
-            /> -->
-            <Button
-              icon="pi pi-plus"
-              label="Add item(s)"
-              outlined
-              @click="$emit('open-add-items', tableData)"
-              class="text-success border-success hover:bg-green-50 w-40"
+            <div class="w-8 h-8">
+              <Button
+                icon="pi pi-cog"
+                outlined
+                class="p-button-rounded p-button-success w-full h-full flex justify-center items-center"
+                @click="$refs[`menu-h-${tableData.path}`].toggle($event)"
+              />
+            </div>
+            <Menu
+              :ref="`menu-h-${tableData.path}`"
+              :model="getMenuModel(tableData)"
+              popup
             />
-            <!-- <Button
-              icon="pi pi-cog"
-              label="List options"
-              class="p-button-success w-40 flex justify-start"
-              outlined
-              @click="$emit('open-list-options')"
-            /> -->
           </div>
         </div>
       </template>
@@ -104,11 +96,11 @@
                   icon="pi pi-cog"
                   outlined
                   class="p-button-rounded p-button-success w-full h-full flex justify-center items-center"
-                  @click="$refs[`menu-${data.id}`].toggle($event)"
+                  @click="$refs[`menu-r-${data.id}`].toggle($event)"
                 />
               </div>
               <Menu
-                :ref="`menu-${data.id}`"
+                :ref="`menu-r-${data.id}`"
                 :model="getMenuModel(data)"
                 popup
               />
@@ -240,6 +232,11 @@ const isChildSublistSimple = (data) => {
 const getMenuModel = (data) => {
   const model = [
     {
+      label: "Add element(s)",
+      icon: "pi pi-plus",
+      command: () => emit("open-add-items", data),
+    },
+    {
       label: "Edit",
       icon: "pi pi-pencil",
       command: () => emit("edit-item", { ...data, path: data.path }),
@@ -253,7 +250,7 @@ const getMenuModel = (data) => {
 
   if (props.tableData?.level < 3) {
     model.unshift({
-      label: "Add Sublist",
+      label: "Add sublist",
       icon: "pi pi-plus",
       command: () =>
         emit("open-create-sublist-modal", {
@@ -265,6 +262,8 @@ const getMenuModel = (data) => {
 
   return model;
 };
+
+
 
 watch(
   () => props.tableData.sublists,
@@ -300,9 +299,6 @@ const columns = computed(() => {
 });
 
 const toggleRow = (data) => {
-  console.log("toggleRow called for data:", data);
-  console.log("expandedRows before toggle:", expandedRows.value);
-  console.log("isChildSublistSimple:", isChildSublistSimple(data));
   if (props.tableData.level > 2) {
     return; // Prevent expanding if level is greater than 3
   }
@@ -318,11 +314,9 @@ const toggleRow = (data) => {
       expandedRows.value[data.id] = true;
     }
   }
-  console.log("expandedRows after toggle:", expandedRows.value);
 };
 
 const showModal = (data) => {
-  console.log("show modal is clicked and the passed props is", data);
   modalTableData.value = data;
   isModalVisible.value = true;
 };

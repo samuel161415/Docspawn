@@ -18,8 +18,8 @@
 
         <!-- right section -->
         <!-- md:max-w-[70vw] -->
-        <div class="w-full  py-2 ml-2">
-          <div class="mb-12 md:w-full relative  overflow-y-auto">
+        <div class="w-full py-2 ml-2">
+          <div class="mb-12 md:w-full relative overflow-y-auto">
             <!-- Iterate over addNewListItem to call DataTableComponent for each list initially -->
             <template v-if="isRootSelected">
               <DataTableComponent
@@ -71,7 +71,16 @@
       @success="showSuccess"
     />
 
-    <CreateSublistModal
+    <!-- <CreateSublistModal
+      v-if="openCreateSubList"
+      v-model:visible="openCreateSubList"
+      :level="currentListLevel"
+      :title="currentListTitle"
+      @createSubSubList="handleCreateSubSublist"
+      @cancel="openCreateSubList = false"
+    /> -->
+
+    <TempCreateSublistModal
       v-if="openCreateSubList"
       v-model:visible="openCreateSubList"
       :level="currentListLevel"
@@ -81,12 +90,12 @@
     />
 
     <AddItemsModal
-  v-model:visible="openAddItems"
-  :listTitle="addItemsTitle"
-  :tableData="tableData"
-  @addItems="handleAddItems"
-  @cancel="openAddItems = false"
-/>
+      v-model:visible="openAddItems"
+      :listTitle="addItemsTitle"
+      :tableData="tableData"
+      @addItems="handleAddItems"
+      @cancel="openAddItems = false"
+    />
 
     <ListOptionModal
       v-if="openListOptions"
@@ -145,6 +154,7 @@ import AddItemsModal from "~/components/settings/list/AddItemsModal.vue";
 import EditItemOptionModal from "~/components/settings/list/EditItemOptionModal.vue";
 import ListOptionModal from "~/components/settings/list/ListOptionModal.vue";
 import CreateSublistModal from "~/components/settings/list/CreateSublistModal.vue";
+import TempCreateSublistModal from "~/components/settings/list/TempCreateSublistModal.vue";
 import { addNewListItem } from "~/services/newListData.js";
 import LeftSideMenu from "~/components/settings/list/LeftSideMenu.vue";
 
@@ -193,6 +203,7 @@ const filters = ref({
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
+  console.log("sublistPath", data)
   openItemOptions.value = false;
   openCreateSubList.value = true;
   sublistId.value = data.id;
@@ -201,14 +212,55 @@ const createSubList = (data) => {
   currentListTitle.value = data.title;
 };
 
+// const handleCreateSubSublist = (data) => {
+//   isSublistSimple.value = data.isSublistSimple;
+//   // Update addNewListItem
+//   const tableDataList = findItemByPath(
+//     addNewListItem.value,
+//     sublistPath.value,
+//     "treeView"
+//   );
+//   if (tableDataList) {
+//     const newSublistItems = data.sublistItems.map((item, index) => {
+//       if (isSublistSimple.value) {
+//         const newPath =
+//           tableDataList.sublists.length === 0
+//             ? `${tableDataList.path}-1`
+//             : `${tableDataList.path}-${
+//                 tableDataList.sublists.length + index + 1
+//               }`;
+//         return { ...item, path: newPath };
+//       } else {
+//         return { ...item };
+//       }
+//     });
+
+//     if (!isSublistSimple.value) {
+//       tableDataList.sublists = newSublistItems;
+//       tableDataList.name = data.name;
+//     } else {
+//       if (tableDataList.isSublistSimple) {
+//         tableDataList.sublists = Array.isArray(tableDataList.sublists)
+//           ? tableDataList.sublists.concat(newSublistItems)
+//           : newSublistItems;
+//       } else {
+//         tableDataList.sublists = newSublistItems;
+//       }
+//     }
+//     tableDataList.isSublistSimple = data.isSublistSimple;
+//     openCreateSubList.value = false;
+//   }
+// }
+
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-  // Update addNewListItem
+   console.log(" sublistPath.value", sublistPath.value)
   const tableDataList = findItemByPath(
     addNewListItem.value,
     sublistPath.value,
     "treeView"
   );
+
   if (tableDataList) {
     const newSublistItems = data.sublistItems.map((item, index) => {
       if (isSublistSimple.value) {
@@ -218,7 +270,24 @@ const handleCreateSubSublist = (data) => {
             : `${tableDataList.path}-${
                 tableDataList.sublists.length + index + 1
               }`;
-        return { ...item, path: newPath };
+
+        // Set path for child sublists if isSublistSimple is true
+        const setChildPaths = (sublists, parentPath) => {
+          return sublists.map((sublist, subIndex) => {
+            const childPath = `${parentPath}-${subIndex + 1}`;
+            return {
+              ...sublist,
+              path: childPath,
+              sublists: setChildPaths(sublist.sublists || [], childPath),
+            };
+          });
+        };
+
+        return {
+          ...item,
+          path: newPath,
+          sublists: setChildPaths(item.sublists || [], newPath),
+        };
       } else {
         return { ...item };
       }
@@ -229,6 +298,7 @@ const handleCreateSubSublist = (data) => {
       tableDataList.name = data.name;
     } else {
       if (tableDataList.isSublistSimple) {
+        console.log("newSublistItems",newSublistItems)
         tableDataList.sublists = Array.isArray(tableDataList.sublists)
           ? tableDataList.sublists.concat(newSublistItems)
           : newSublistItems;
@@ -350,14 +420,16 @@ const handleCreateList = (data) => {
 const handleAddItems = (data) => {
   const { sublistItems, isSublistSimple, path } = data;
   const tableDataList = findItemByPath(addNewListItem.value, path, "treeView");
-  console.log("path table ",tableDataList, 'path',path)
-  console.log("sublistItems ",sublistItems)
+  console.log("path table ", tableDataList, "path", path);
+  console.log("sublistItems ", sublistItems);
   if (tableDataList) {
     const newSublistItems = sublistItems.map((item, index) => {
       const newPath =
         tableDataList.sublists.length === 0
           ? `${tableDataList.path}-1`
-          : `${tableDataList.path}-${tableDataList.sublists.length + index + 1}`;
+          : `${tableDataList.path}-${
+              tableDataList.sublists.length + index + 1
+            }`;
       return { ...item, path: newPath };
     });
 
@@ -423,4 +495,3 @@ const showSuccess = () => {
   cursor: not-allowed; /* Change the cursor to not-allowed for non-clickable nodes */
 }
 </style>
-

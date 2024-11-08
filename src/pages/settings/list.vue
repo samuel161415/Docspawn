@@ -217,9 +217,9 @@ const createSubList = (data) => {
 
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-  console.log(" sublistPath.value", sublistPath.value);
+  console.log(" current level.value", currentListLevel.value);
 
-  if (currentListLevel.value === 0) {
+  if (currentListLevel.value === -1) {
     const newSublistItems = data.sublistItems.map((item, index) => {
       const newPath = (addNewListItem.length + 1).toString();
       const setChildPaths = (sublists, parentPath) => {
@@ -296,8 +296,9 @@ const handleCreateSubSublist = (data) => {
       tableDataList.isSublistSimple = data.isSublistSimple;
       
     }
-    openCreateSubList.value = false;
+    
   }
+  openCreateSubList.value = false;
 };
 const findItemByPath = (list, path, from) => {
   if (from === "tableEdit") {
@@ -460,6 +461,7 @@ const showSuccess = () => {
 </script>
 
 <style scoped>
+
 .highlight {
   background-color: yellow;
   color: black;

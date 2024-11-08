@@ -46,6 +46,7 @@
         @created="onTreeViewCreated"
         @destroyed="onTreeViewDestroyed"
         @nodeCollapsing="onNodeCollapsing"
+        :cssClass="searchQuery ? 'filtered' : ''"
       ></TreeViewComponent>
     </div>
   </div>
@@ -134,9 +135,11 @@ const filteredList = computed(() => {
 
   if (!searchQuery.value) return copiedList.value;
 
-  return filterItems(addNewListItem.value, (item) => {
+  const filtered = filterItems(addNewListItem.value, (item) => {
     return item.title.toLowerCase().includes(searchQuery.value.toLowerCase());
   });
+
+  return filtered.length > 0 ? filtered : [];
 });
 
 watch(searchQuery, (newValue) => {
@@ -144,9 +147,7 @@ watch(searchQuery, (newValue) => {
     filteredLists.value = addNewListItem.value;
   } else {
     const filtered = filteredList.value;
-    if (filtered.length > 0) {
-      filteredLists.value = filtered;
-    }
+    filteredLists.value = filtered.length > 0 ? filtered : [];
   }
   nextTick(() => {
     const treeView = document.querySelector(".e-treeview");
@@ -455,6 +456,15 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
 </script>
 
 <style scoped>
+:deep(.e-treeview .e-list-item.e-level-1[data-uid="root"] > .e-text-content > .e-list-text) {
+  background-color: white !important;
+}
+:deep(.e-treeview .e-list-item.e-level-1[data-uid="root"].e-active > .e-text-content > .e-list-text) {
+  background-color: #eeeeee !important;
+}
+:deep(.filtered .e-list-text) {
+  background-color: rgba(255, 255, 0, 0.4) !important;
+}
 :deep(.e-treeview) {
   max-height: 370px; /* Set the fixed height */
   overflow-y: auto; /* Enable vertical scrolling */

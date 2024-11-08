@@ -1,18 +1,21 @@
 <template>
   <div :class="isSublistData ? `max-w-[70vw]` : 'w-full'" class="">
-    <DataTable
-      v-model:expandedRows="expandedRows"
-      :value="tableData?.sublists"
-      dataKey="id"
-      scrollable
-      :scrollHeight="calledFrom === 'root' ? '550px' : ''"
-      scrollDirection="both"
-      frozenHeader
-      :paginator="calledFrom === 'root' && showPaginator"
+    <!-- 
+  :paginator="calledFrom === 'root' && showPaginator"
       :rows="10"
       :rowsPerPageOptions="[10, 25, 50]"
       paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="{first} to {last} of {totalRecords}"
+
+       scrollable
+      :scrollHeight="calledFrom === 'root' ? '550px' : ''"
+      scrollDirection="both"
+   -->
+    <DataTable
+      v-model:expandedRows="expandedRows"
+      :value="tableData?.sublists"
+      dataKey="id"
+      frozenHeader
       class="my-3"
     >
       <template v-if="calledFrom === 'root'" #header>
@@ -231,7 +234,6 @@ const isChildSublistSimple = (data) => {
 
 const getMenuModel = (data) => {
   const model = [
-   
     {
       label: "Edit",
       icon: "pi pi-pencil",
@@ -244,14 +246,14 @@ const getMenuModel = (data) => {
     },
   ];
 
-  if (data.sublists?.length > 0) {
+  if (data.sublists?.length > 0 && props.tableData?.level < 3) {
     model.unshift({
       label: "Add item(s)",
       icon: "pi pi-plus",
       command: () => emit("open-add-items", data),
     });
   }
-  
+
   if (props.tableData?.level < 3) {
     model.unshift({
       label: "Add sublist",
@@ -264,12 +266,8 @@ const getMenuModel = (data) => {
     });
   }
 
-
-
   return model;
 };
-
-
 
 watch(
   () => props.tableData.sublists,
@@ -279,9 +277,13 @@ watch(
         delete expandedRows.value[data.id];
       }
     });
+    expandAll();
   },
   { deep: true }
 );
+onMounted(() => {
+  expandAll(); // Expand all rows when the component is mounted
+});
 
 const isSublistData = computed(() => {
   return !props.tableData?.isSublistSimple;
@@ -305,9 +307,9 @@ const columns = computed(() => {
 });
 
 const toggleRow = (data) => {
-  if (props.tableData.level > 2) {
-    return; // Prevent expanding if level is greater than 3
-  }
+  // if (props.tableData.level > 2) {
+  //   return; // Prevent expanding if level is greater than 3
+  // }
   if (!isChildSublistSimple(data)) {
     if (expandedRows.value[data.id]) {
       delete expandedRows.value[data.id];
@@ -335,7 +337,7 @@ const showModal = (data) => {
   border: none !important;
 }
 :deep(.p-datatable-wrapper) {
-  overflow-y: scroll !important; /* Enable vertical scrolling */
+  overflow: visible !important; /* Allow content to expand without scrolling */
   -ms-overflow-style: none; /* Hide scrollbar in Internet Explorer and Edge */
   scrollbar-width: none; /* Hide scrollbar in Firefox */
 }

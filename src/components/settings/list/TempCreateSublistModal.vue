@@ -31,6 +31,7 @@
             Simple list
           </button>
           <button
+            v-if="level !== 0"
             :class="[
               listType === 'dataSource'
                 ? 'bg-success text-white hover:bg-success hover:border-success'
@@ -46,7 +47,7 @@
 
       <!-- Conditional Rendering of SublistCreator or DatasourceCreator -->
       <SublistCreator
-        v-if="listType === 'simple'"
+         v-if="listType === 'simple' || level === 0"
         :initialItems="sublistItems"
         :initialSublistName="sublistName"
         @SublistNameUpdated="sublistName = $event"

@@ -54,10 +54,7 @@ import { watch, ref } from "vue";
 
 const emit = defineEmits();
 const props = defineProps({
-  editableItem: {
-    type: Object,
-    required: true,
-  },
+  tableData: Object,
 });
 
 const listOptions = [
@@ -66,10 +63,10 @@ const listOptions = [
   ]
 
 const visible = ref(false);
-const listItemName = ref(props.editableItem.title);
+const listItemName = ref(props.tableData.title);
 
 watch(
-  () => props.editableItem,
+  () => props.tableData,
   (newVal) => {
     listItemName.value = newVal.title;
   }
@@ -77,8 +74,8 @@ watch(
 
 const handleEditItem = () => {
   const editedData = {
-    id: props.editableItem.id,
     title: listItemName.value,
+    path: props.tableData.path,
   };
 
   emit("editItem", editedData);

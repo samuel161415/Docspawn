@@ -29,108 +29,30 @@ export const addNewListItem = ref([
         sublists: [
             {
                 id: 1,
-                title: 'Report',
+                title: 'L1 e.1',
                 isHovered: false,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '1-1',
                 sublists:[
-                    {
-                        id: 1,
-                        title: 'Section',
-                        isHovered: false,
-                        opensubmenu: true,
-                        level: 2,
-                        isSublistSimple : true,
-                        path: '1-1-1',
-                        sublists:[
-                            {
-                                id: 1,
-                                title: 'Data',
-                                isHovered: false,
-                                opensubmenu: true,
-                                level: 3,
-                                isSublistSimple : true,
-                                path: '1-1-1-1',
-                                sublists:[
-                                    // {
-                                    //     id: 1,
-                                    //     title: 'Inside data',
-                                    //     isHovered: false,
-                                    //     level: 4,
-                                    //     isSublistSimple : true,
-                                    //     path: '1-1-1-1-1',
-                                    //     sublists:[
-                                    //         {   id: 1,
-                                    //             title: 'inner data',
-                                    //             isHovered: false,
-                                    //             level: 5,
-                                    //             isSublistSimple : true,
-                                    //             path: '1-1-1-1-1-1',}
-                                    //     ]
-                                    // }
-                                ]
-                            }
-                        ]  
-                    },
-                    {
-                        id: 2,
-                        title: 'Task',
-                        isHovered: false,
-                        level: 2,
-                        opensubmenu: false,
-                        isSublistSimple : true,
-                        path: '1-1-2',
-                        sublists:[
-                            {
-                                id: 1,
-                                title: 'Task Data',
-                                isHovered: false,
-                                level: 3,
-                                isSublistSimple : true,
-                                path: '1-1-2-1',
-                                sublists:[]
-                            }
-                        ]
-                    }
                 ]
             },
             {
                 id: 2,
-                title: 'Trial 1',
+                title: 'L1 e.2',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '1-2',
-                sublists:[
-                    {
-                        id: 2,
-                        title: 'Trial Ttask',
-                        isHovered: false,
-                        level: 2,
-                        opensubmenu: false,
-                        isSublistSimple : true,
-                        path: '1-2-1',
-                        sublists:[
-                            {
-                                id: 2,
-                                title: 'Task data',
-                                isHovered: false,
-                                level: 3,
-                                isSublistSimple : true,
-                                path: '1-2-1-1',
-                                sublists:[]
-                            }
-                        ]
-                    }
+                sublists:[  
                 ]
             },
             {
                 id: 3,
-                title: 'Item 2',
+                title: 'L1 e.3',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
@@ -141,7 +63,7 @@ export const addNewListItem = ref([
             },
             {
                 id: 4,
-                title: 'Item 3',
+                title: 'L1 e.4',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
@@ -152,47 +74,67 @@ export const addNewListItem = ref([
             },
             {
                 id: 5,
-                title: 'Item 4',
+                title: 'L1 Sublist 1',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '1-5',
-                sublists:[]
+                sublists:[
+                    {
+                        id: 1,
+                        title: 'L1 SL 1 e.1',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '1-5-1',
+                        sublists:[]
+                    },
+                    {
+                        id: 2,
+                        title: 'L1 SL 1 e.1',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '1-5-2',
+                        sublists:[]
+                    },
+                ]
             },
             {
                 id: 6,
-                title: 'Item 5',
+                title: 'L1 Sublist 2',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '1-6',
-                sublists:[]
-            },
-            {
-                id: 7,
-                title: 'Item 6',
-                isHovered: false,
-                sublist: true,
-                opensubmenu: false,
-                level: 1,
-                isSublistSimple : true,
-                path: '1-7',
-                sublists:[]
-            },
-            {
-                id: 8,
-                title: 'Item 7',
-                isHovered: false,
-                sublist: true,
-                opensubmenu: false,
-                level: 1,
-                isSublistSimple : true,
-                path: '1-8',
-                sublists:[]
+                sublists:[
+                    {
+                        id: 1,
+                        title: 'L1 SL 2 e.1',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '1-6-1',
+                        sublists:[]
+                    },
+                    {
+                        id: 2,
+                        title: 'L1 SL 2 e.2',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '1-6-2',
+                        sublists:[]
+                    },
+                ]
             },
             
         ]
@@ -208,29 +150,18 @@ export const addNewListItem = ref([
         sublists: [
             {
                 id: 1,
-                title: 'Contract',
+                title: 'L2 e.1',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '2-1',
-                sublists:[
-                    {
-                        id: 1,
-                        title: 'Contract item',
-                        isHovered: false,
-                        opensubmenu: false,
-                        level: 2,
-                        isSublistSimple : true,
-                        path: '2-1-1',
-                        sublists:[]
-                    }
-                ]
+                sublists:[]
             },
             {
                 id: 2,
-                title: 'Form',
+                title: 'L2 e.2',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
@@ -241,7 +172,7 @@ export const addNewListItem = ref([
             },
             {
                 id: 3,
-                title: 'Form 3',
+                title: 'L2 e.2',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
@@ -252,25 +183,67 @@ export const addNewListItem = ref([
             },
             {
                 id: 4,
-                title: 'Form 4',
+                title: 'L2 Sublist 1',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '2-4',
-                sublists:[]
+                sublists:[
+                    {
+                        id: 1,
+                        title: 'L2 SL 1 e.1',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '2-4-1',
+                        sublists:[]
+                    },
+                    {
+                        id: 2,
+                        title: 'L2 SL 1 e.2',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '2-4-2',
+                        sublists:[]
+                    },
+                ]
             },
             {
                 id: 5,
-                title: 'Form 5',
+                title: 'L2 Sublist 2',
                 isHovered: false,
                 sublist: true,
                 opensubmenu: false,
                 level: 1,
                 isSublistSimple : true,
                 path: '2-5',
-                sublists:[]
+                sublists:[
+                    {
+                        id: 1,
+                        title: 'L2 SL 2 e.1',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '2-5-1',
+                        sublists:[]
+                    },
+                    {
+                        id: 2,
+                        title: 'L2 SL 2 e.2',
+                        isHovered: false,
+                        opensubmenu: false,
+                        level: 2,
+                        isSublistSimple : true,
+                        path: '2-5-2',
+                        sublists:[]
+                    },
+                ]
             }
         ]
     },

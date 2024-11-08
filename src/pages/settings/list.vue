@@ -205,6 +205,7 @@ const filters = ref({
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
+  console.log("data clicked",data)
   console.log("sublistPath", data);
   openEditOptions.value = false;
   openCreateSubList.value = true;

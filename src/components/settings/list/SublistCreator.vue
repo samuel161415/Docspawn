@@ -12,7 +12,7 @@
       <InputText
         id="sublistName"
         v-model="sublistName"
-        placeholder="Enter table name"
+        :placeholder="level===-1 ? 'Enter list name':'Enter sublist name'"
         :invalid="addClicked && !sublistName.trim()"
       />
     </div>
@@ -94,7 +94,12 @@ const props = defineProps({
   initialSublistName:{
     type: String,
     default: ""
+  },
+  level : {
+    type: Number,
+    default: 0
   }
+
   
 });
 const emit = defineEmits(["updateItems","SublistNameUpdated"]);

@@ -9,7 +9,7 @@
     <template #header>
       <div class="flex justify-center items-center ml-5">
         <p class="font-semibold text-xl flex justify-center text-center">
-          Create Sublist
+          {{ level === -1 ? "Create list" : "Create sublist" }}
         </p>
       </div>
     </template>
@@ -17,7 +17,7 @@
     <div class="h-full overflow-hidden">
       <!-- List Type Selection Buttons -->
       <div class="flex flex-col align-items-center gap-3 px-5 mb-5 mt-2">
-        <label class="font-semibold w-6rem text-lg">List Type</label>
+        <label class="font-semibold w-6rem text-lg">List type</label>
         <div class="flex gap-2">
           <button
             :class="[
@@ -31,7 +31,7 @@
             Simple list
           </button>
           <button
-            v-if="level !== 0"
+            v-if="level !== -1"
             :class="[
               listType === 'dataSource'
                 ? 'bg-success text-white hover:bg-success hover:border-success'
@@ -47,9 +47,10 @@
 
       <!-- Conditional Rendering of SublistCreator or DatasourceCreator -->
       <SublistCreator
-         v-if="listType === 'simple' || level === 0"
+        v-if="listType === 'simple' || level === -1"
         :initialItems="sublistItems"
         :initialSublistName="sublistName"
+        :level = "level"
         @SublistNameUpdated="sublistName = $event"
         @updateItems="sublistItems = $event"
       />
@@ -79,7 +80,7 @@
     <template #footer>
       <div class="flex justify-center items-center mt-6 h-full w-full">
         <Button
-          label="Create sublist"
+          :label="level === -1 ? 'Create list' : 'Create sublist'"
           icon="pi pi-check"
           :class="[
             'flex justify-center text-center',
@@ -129,6 +130,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+console.log("level", props.level);
 
 const visible = ref(false);
 const listType = ref("simple");
@@ -358,12 +361,22 @@ const getTooltipMessage = () => {
     console.log("!sublistName.value", !sublistName.value);
     console.log("is selected file", sublistItems.value.length === 0);
     if (sublistItems.value.length === 0 && !sublistName.value) {
-      messages.push("Enter table name", "Please enter items in the text area");
+      if(props.level===-1){
+        messages.push("Enter list name", "Enter items in the text area");
+      }
+      else{
+        messages.push("Enter sublist name", "Enter items in the text area");
+      }
+      
     } else if (sublistItems.value.length === 0) {
       messages.push("Please enter items in the text area");
     } else if (!sublistName.value) {
-      console.log("no sublist name");
-      messages.push("Please provide a sublist name.");
+      if(props.level===-1){
+        messages.push("Please provide a list name.");
+      }
+      else{
+        messages.push("Please provide a sublist name.");
+      }
     }
   } else if (listType.value === "dataSource") {
     if (selectedFiles.value.length === 0 && !tableName.value) {

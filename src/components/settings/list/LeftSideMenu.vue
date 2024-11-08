@@ -102,7 +102,7 @@ const treeData = ref([
 const createNewList = () => {
   emit("open-create-sublist-modal", {
     id: null,
-    level: 0,
+    level: -1,
     path: "root",
     title: "",
   });

@@ -14,6 +14,7 @@
           @update:filteredLists="filteredLists = $event"
           @update:tableData="tableData = $event"
           @handleopensubmenu="handleopensubmenu"
+          @open-create-sublist-modal="createSubList"
         />
 
         <!-- right section -->
@@ -28,7 +29,7 @@
                 :tableData="list"
                 :filters="filters"
                 @row-reorder="onRowReorder"
-                @edit-item="handleEditItem"
+                @edit-item="handleOpenEditItem"
                 @open-delete="handleOpenDelete"
                 @open-add-items="handleOpenAddItems"
                 @open-list-options="openListOptions = true"
@@ -44,7 +45,7 @@
                 :tableData="tableData"
                 :filters="filters"
                 @row-reorder="onRowReorder"
-                @edit-item="handleEditItem"
+                @edit-item="handleOpenEditItem"
                 @open-delete="handleOpenDelete"
                 @open-add-items="handleOpenAddItems"
                 @open-list-options="openListOptions = true"
@@ -105,11 +106,12 @@
     />
 
     <EditItemOptionModal
-      v-if="editableItem"
-      v-model:visible="openItemOptions"
+      v-if="openEditOptions"
+      v-model:visible="openEditOptions"
+      :tableData="editableItem"
       @editItem="handleEditItem"
       v-model:editableItem="editableItem"
-      @cancel="openItemOptions = false"
+      @cancel="openEditOptions = false"
       @openCreateListModal="createSubList"
     />
 
@@ -163,7 +165,7 @@ const visible = ref(false);
 const openAddItems = ref(false);
 const addItemsTitle = ref("");
 const openListOptions = ref(false);
-const openItemOptions = ref(false);
+const openEditOptions = ref(false);
 const openDeleteModal = ref(false);
 const editableItem = ref();
 const tableData = ref({});
@@ -203,8 +205,9 @@ const filters = ref({
 
 // this is emitted from editItemOptionModal
 const createSubList = (data) => {
-  console.log("sublistPath", data)
-  openItemOptions.value = false;
+  console.log("data clicked",data)
+  console.log("sublistPath", data);
+  openEditOptions.value = false;
   openCreateSubList.value = true;
   sublistId.value = data.id;
   currentListLevel.value = data.level;
@@ -212,101 +215,87 @@ const createSubList = (data) => {
   currentListTitle.value = data.title;
 };
 
-// const handleCreateSubSublist = (data) => {
-//   isSublistSimple.value = data.isSublistSimple;
-//   // Update addNewListItem
-//   const tableDataList = findItemByPath(
-//     addNewListItem.value,
-//     sublistPath.value,
-//     "treeView"
-//   );
-//   if (tableDataList) {
-//     const newSublistItems = data.sublistItems.map((item, index) => {
-//       if (isSublistSimple.value) {
-//         const newPath =
-//           tableDataList.sublists.length === 0
-//             ? `${tableDataList.path}-1`
-//             : `${tableDataList.path}-${
-//                 tableDataList.sublists.length + index + 1
-//               }`;
-//         return { ...item, path: newPath };
-//       } else {
-//         return { ...item };
-//       }
-//     });
-
-//     if (!isSublistSimple.value) {
-//       tableDataList.sublists = newSublistItems;
-//       tableDataList.name = data.name;
-//     } else {
-//       if (tableDataList.isSublistSimple) {
-//         tableDataList.sublists = Array.isArray(tableDataList.sublists)
-//           ? tableDataList.sublists.concat(newSublistItems)
-//           : newSublistItems;
-//       } else {
-//         tableDataList.sublists = newSublistItems;
-//       }
-//     }
-//     tableDataList.isSublistSimple = data.isSublistSimple;
-//     openCreateSubList.value = false;
-//   }
-// }
-
 const handleCreateSubSublist = (data) => {
   isSublistSimple.value = data.isSublistSimple;
-   console.log(" sublistPath.value", sublistPath.value)
-  const tableDataList = findItemByPath(
-    addNewListItem.value,
-    sublistPath.value,
-    "treeView"
-  );
+  console.log(" sublistPath.value", sublistPath.value);
 
-  if (tableDataList) {
+  if (currentListLevel.value === 0) {
     const newSublistItems = data.sublistItems.map((item, index) => {
-      if (isSublistSimple.value) {
-        const newPath =
-          tableDataList.sublists.length === 0
-            ? `${tableDataList.path}-1`
-            : `${tableDataList.path}-${
-                tableDataList.sublists.length + index + 1
-              }`;
+      const newPath = (addNewListItem.length + 1).toString();
+      const setChildPaths = (sublists, parentPath) => {
+        return sublists.map((sublist, subIndex) => {
+          const childPath = `${parentPath}-${subIndex + 1}`;
+          return {
+            ...sublist,
+            path: childPath,
+            sublists: setChildPaths(sublist.sublists || [], childPath),
+          };
+        });
+      };
 
-        // Set path for child sublists if isSublistSimple is true
-        const setChildPaths = (sublists, parentPath) => {
-          return sublists.map((sublist, subIndex) => {
-            const childPath = `${parentPath}-${subIndex + 1}`;
-            return {
-              ...sublist,
-              path: childPath,
-              sublists: setChildPaths(sublist.sublists || [], childPath),
-            };
-          });
-        };
-
-        return {
-          ...item,
-          path: newPath,
-          sublists: setChildPaths(item.sublists || [], newPath),
-        };
-      } else {
-        return { ...item };
-      }
+      return {
+        ...item,
+        path: newPath,
+        sublists: setChildPaths(item.sublists || [], newPath),
+      };
     });
 
-    if (!isSublistSimple.value) {
-      tableDataList.sublists = newSublistItems;
-      tableDataList.name = data.name;
-    } else {
-      if (tableDataList.isSublistSimple) {
-        console.log("newSublistItems",newSublistItems)
-        tableDataList.sublists = Array.isArray(tableDataList.sublists)
-          ? tableDataList.sublists.concat(newSublistItems)
-          : newSublistItems;
-      } else {
+    addNewListItem.value.push(...newSublistItems);
+  } else {
+    const tableDataList = findItemByPath(
+      addNewListItem.value,
+      sublistPath.value,
+      "treeView"
+    );
+
+    if (tableDataList) {
+      const newSublistItems = data.sublistItems.map((item, index) => {
+        if (isSublistSimple.value) {
+          const newPath =
+            tableDataList.sublists.length === 0
+              ? `${tableDataList.path}-1`
+              : `${tableDataList.path}-${
+                  tableDataList.sublists.length + index + 1
+                }`;
+
+          // Set path for child sublists if isSublistSimple is true
+          const setChildPaths = (sublists, parentPath) => {
+            return sublists.map((sublist, subIndex) => {
+              const childPath = `${parentPath}-${subIndex + 1}`;
+              return {
+                ...sublist,
+                path: childPath,
+                sublists: setChildPaths(sublist.sublists || [], childPath),
+              };
+            });
+          };
+
+          return {
+            ...item,
+            path: newPath,
+            sublists: setChildPaths(item.sublists || [], newPath),
+          };
+        } else {
+          return { ...item };
+        }
+      });
+
+      if (!isSublistSimple.value) {
         tableDataList.sublists = newSublistItems;
+        tableDataList.name = data.name;
+      } else {
+        if (tableDataList.isSublistSimple) {
+          console.log("newSublistItems", newSublistItems);
+          tableDataList.sublists = Array.isArray(tableDataList.sublists)
+            ? tableDataList.sublists.concat(newSublistItems)
+            : newSublistItems;
+        } else {
+          tableDataList.sublists = newSublistItems;
+        }
       }
+      tableDataList.isSublistSimple = data.isSublistSimple;
+      
     }
-    tableDataList.isSublistSimple = data.isSublistSimple;
     openCreateSubList.value = false;
   }
 };
@@ -341,32 +330,31 @@ const findItemByPath = (list, path, from) => {
   }
 };
 
-const handleEditItem = (data) => {
+const handleOpenEditItem = (data) =>{
+  console.log("data to be edited in handleOpenEditItem", data);
   editableItem.value = data;
-  openItemOptions.value = true;
+  openEditOptions.value = true;
 
+  
+  // addItemsTitle.value = data.title;
+  // openAddItems.value = true;
+}
+
+const handleEditItem = (data) => {
+  console.log("data to be edited in handleEditItem", data);
   // Update addNewListItem
   const itemToEditInAddNewListItem = findItemByPath(
-    tableData.value,
+    addNewListItem.value,
     data.path,
-    "tableEdit"
+    "treeView"
   );
+
   if (itemToEditInAddNewListItem) {
     itemToEditInAddNewListItem.title = data.title;
   }
 
-  // Update tableData
-  const itemToEditInTableData = findItemByPath(
-    tableData.value,
-    data.path,
-    "tableEdit"
-  );
-  if (itemToEditInTableData) {
-    itemToEditInTableData.title = data.title;
-  }
-
   // Force reactivity update
-  tableData.value = { ...tableData.value };
+  // addNewListItem.value = [...addNewListItem.value];
 };
 
 const handleOpenAddItems = (data) => {

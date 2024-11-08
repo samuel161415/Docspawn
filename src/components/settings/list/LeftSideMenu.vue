@@ -1,15 +1,15 @@
 <template>
   <!-- md:max-w-[30vw] -->
   <div
-    class="min-w-80 flex  flex-col items-center justify-between h-full overflow-y-scroll overflow-x-auto pt-5  no-scrollbar"
+    class="min-w-80 flex flex-col items-center justify-between h-full overflow-y-scroll overflow-x-auto pt-5 no-scrollbar"
   >
-    <div class="flex max-md:justify-center ml-1 ">
+    <div class="flex max-md:justify-center ml-1">
       <Button
         icon="pi pi-plus"
         label="Create new list"
         outlined
         class="text-success text-center border-success whitespace-nowrap hover:bg-green-50 hover:border-success w-64 flex justify-center items-center"
-        @click="visible = true"
+        @click="createNewList"
       />
     </div>
 
@@ -37,9 +37,7 @@
       </span>
     </div>
 
-    <div
-      class="w-64 py-2   flex justify-center items-start overflow-x-hidden "
-    >
+    <div class="w-64 py-2 flex justify-center items-start overflow-x-hidden">
       <TreeViewComponent
         :fields="treeFields"
         @nodeClicked="onNodeClicked"
@@ -60,22 +58,20 @@ import { addNewListItem } from "~/services/newListData.js";
 import { TreeViewComponent } from "@syncfusion/ej2-vue-navigations";
 
 const transformData = (items, expandedPath = null) => {
-  return items.filter((item) =>item.sublists && item.sublists.length > 0)
-  .map((item) => ({
-    nodeId: item.path,
-    nodeText: item.title,
-    nodeChild: item.isSublistSimple
-      ? item.sublists
-        ? transformData(item.sublists)
-        : []
-      : [],
+  return items
+    .filter((item) => item.sublists && item.sublists.length > 0)
+    .map((item) => ({
+      nodeId: item.path,
+      nodeText: item.title,
+      nodeChild: item.isSublistSimple
+        ? item.sublists
+          ? transformData(item.sublists)
+          : []
+        : [],
       expanded: item.path === expandedPath,
-    iconCss: item.isSublistSimple
-      ? ""
-      : "pi pi-file-excel   excel-icon ",
-  }));
+      iconCss: item.isSublistSimple ? "" : "pi pi-file-excel   excel-icon ",
+    }));
 };
-
 
 const props = defineProps({
   tableData: Object,
@@ -102,6 +98,15 @@ const treeData = ref([
     // iconCss: "pi pi-folder",
   },
 ]);
+
+const createNewList = () => {
+  emit("open-create-sublist-modal", {
+    id: null,
+    level: -1,
+    path: "root",
+    title: "",
+  });
+};
 
 const treeFields = ref({
   dataSource: treeData,
@@ -137,15 +142,24 @@ const filteredList = computed(() => {
 watch(searchQuery, (newValue) => {
   if (newValue === "") {
     filteredLists.value = addNewListItem.value;
-  } else {;
-    filteredLists.value = filteredList.value;
+  } else {
+    const filtered = filteredList.value;
+    if (filtered.length > 0) {
+      filteredLists.value = filtered;
+    }
   }
+  nextTick(() => {
+    const treeView = document.querySelector(".e-treeview");
+    if (treeView && treeView.ej2_instances && treeView.ej2_instances[0]) {
+      treeView.ej2_instances[0].expandAll();
+    }
+  });
 });
 
 watch(
   filteredLists,
   (newValue) => {
-    console.log("wath filteredlist excution ")
+    console.log("wath filteredlist excution ");
     treeData.value = [
       {
         nodeId: "root",
@@ -162,7 +176,7 @@ watch(
 watch(
   treeData,
   (newValue) => {
-    console.log('treeData watch is called');
+    console.log("treeData watch is called");
     if (newValue.length > 0 && newValue[0].nodeId === "root") {
       newValue[0].expanded = true; // Ensure the root node is always expanded
     }
@@ -184,11 +198,13 @@ watch(
   { deep: true }
 );
 
-watch(addNewListItem, (newValue) => {
-  filteredLists.value = JSON.parse(JSON.stringify(newValue));
-},{ deep: true });
-
-
+watch(
+  addNewListItem,
+  (newValue) => {
+    filteredLists.value = JSON.parse(JSON.stringify(newValue));
+  },
+  { deep: true }
+);
 
 const onNodeClicked = (args) => {
   const clickedNode = args.node;
@@ -229,7 +245,7 @@ const onNodeDragStop = (args) => {
 
   const droppedNodeId = droppedNodeData.id;
   const dropPosition = args.position;
-  console.log('droped node id',droppedNodeId)
+  console.log("droped node id", droppedNodeId);
 
   // Prevent dragging and dropping outside the root folder
   if (droppedNodeId === "root" && dropPosition !== "Inside") {
@@ -271,7 +287,6 @@ const onNodeDragStop = (args) => {
     "treeView"
   );
 
-
   if (isDescendant(draggedItem, droppedItem)) {
     console.warn("Cannot drop a parent node to its child");
     args.cancel = true; // Cancel the drag-and-drop operation
@@ -306,7 +321,7 @@ const isDescendant = (parent, child) => {
 
 const onTreeViewCreated = () => {
   try {
-    console.log("I am on create view")
+    console.log("I am on create view");
     // Any additional setup can be done here
     nextTick(() => {
       setTimeout(() => {
@@ -320,10 +335,9 @@ const onTreeViewCreated = () => {
             } catch (error) {
               console.error("Error expanding root node:", error);
             }
-        }  else {
-          console.warn("root node is no instance not found");
-        }
-      
+          } else {
+            console.warn("root node is no instance not found");
+          }
         } else {
           console.warn("TreeView instance not found");
         }
@@ -361,13 +375,11 @@ const toggleExpandCollapse = () => {
 
 const onNodeCollapsing = (args) => {
   // Prevent collapsing for the root node
-  console.log("prenvent collapsing is called")
+  console.log("prenvent collapsing is called");
   if (args.node.getAttribute("data-uid") === "root") {
     args.cancel = true;
   }
 };
-
-
 
 const updatePaths = (list, parentPath = "") => {
   list.forEach((item, index) => {
@@ -440,10 +452,7 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
     parentItem.sublists.push(newItem);
   }
 };
-
 </script>
-
-
 
 <style scoped>
 :deep(.e-treeview) {
@@ -453,8 +462,6 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
   /* scrollbar-width: none; */
   overflow-x: auto;
   width: 100%;
-  
-  
 }
 :deep(.p-button-label) {
   margin-left: 10px; /* or padding-left: 10px; */
@@ -483,16 +490,14 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
   width: 100%;
   align-items: center;
   justify-content: start;
-  width : 16rem;
+  width: 16rem;
 }
-
 
 :deep(.e-active > .e-icon-wrapper) {
   background-color: #eeeeee !important;
   padding-top: 3px;
   padding-bottom: 3px;
   color: #009ee2 !important;
-
 }
 :deep(.e-treeview .e-list-item .e-ul) {
   padding: 0px 0px 0px 26px !important;
@@ -512,7 +517,6 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
   /* border : solid blue 1.5px */
 }
 
-
 :deep(.e-icons) {
   margin-left: 0px !important;
   padding: 0 !important;
@@ -524,15 +528,11 @@ const insertInside = (parentItem, newItem, droppedNodeId) => {
   width: 0 !important;
   margin: 0 !important;
   height: 5px !important;
-
 }
-:deep(.e-treeview .excel-icon){
-
+:deep(.e-treeview .excel-icon) {
   font-size: 13px;
   padding: 0 0px 13px 4px;
   text-align: center;
-
-
 }
 
 :deep(.e-active > .e-text-content > .e-list-text) {

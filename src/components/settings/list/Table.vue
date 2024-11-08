@@ -231,11 +231,7 @@ const isChildSublistSimple = (data) => {
 
 const getMenuModel = (data) => {
   const model = [
-    {
-      label: "Add item(s)",
-      icon: "pi pi-plus",
-      command: () => emit("open-add-items", data),
-    },
+   
     {
       label: "Edit",
       icon: "pi pi-pencil",
@@ -248,6 +244,14 @@ const getMenuModel = (data) => {
     },
   ];
 
+  if (data.sublists?.length > 0) {
+    model.unshift({
+      label: "Add item(s)",
+      icon: "pi pi-plus",
+      command: () => emit("open-add-items", data),
+    });
+  }
+  
   if (props.tableData?.level < 3) {
     model.unshift({
       label: "Add sublist",
@@ -259,6 +263,8 @@ const getMenuModel = (data) => {
         }),
     });
   }
+
+
 
   return model;
 };
